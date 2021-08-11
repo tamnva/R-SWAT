@@ -1,0 +1,5 @@
+  HRU YEAR  DAY         Precip           PERC         sol_ul         sol_st         sol_fc         nh3bgn         nh3end         no3bgn         no3end          nitrN        denitrN        solpbgn        solpend       solpconc
+    #                     (mm)           (mm)           (mm)           (mm)           (mm)        (kg/ha)        (kg/ha)        (kg/ha)        (kg/ha)        (kg/ha)        (kg/ha)        (kg/ha)        (kg/ha)         (mg/l)
+                    Year the first failure occured
+
+  HRU Failyr
