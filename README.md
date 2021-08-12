@@ -7,7 +7,7 @@
 
 ## Getting Started!
 
-This app ([https://github.com/tamnva/SWATshiny](https://github.com/tamnva/SWATshiny)) is designed for complete beginner to advance R user, you can use this app even you don't know anything about R. Just install the latest version of R that you can find [here](https://cran.r-project.org/bin/windows/base/). I would also suggest installing [RStudio](https://www.rstudio.com/).  After installing R, open R (or RStudio) and use the following code to download the app to your local machine:
+This app ([https://github.com/tamnva/SWATshiny](https://github.com/tamnva/SWATshiny)) is designed for complete beginner to advance R user, you can use this app even you don't know anything about R. Just install the **<u>latest</u>** version of R that you can find [here](https://cran.r-project.org/bin/windows/base/). I would also suggest installing [RStudio](https://www.rstudio.com/).  After installing R, open R (or RStudio) and use the following code to download the app to your local machine:
 
     # Install shiny package (skip the first line if you already have shiny installed)
     install.packages("shiny")
