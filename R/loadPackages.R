@@ -12,7 +12,7 @@
                 'excelR')
 
 # Install dependency packages if necessary
-  install.packages(repos = getOption("repos"),
+  install.packages(repos = 'http://cran.us.r-project.org',
                    setdiff(packages, 
                            rownames(installed.packages())
                            )
