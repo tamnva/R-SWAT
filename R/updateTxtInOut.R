@@ -397,13 +397,13 @@
 	      if (length(intersectFiles) >= 1){
 	        idx <-  which(change$file %in% intersectFiles)	   
 	        for (j in 1:length(idx)){
-	          change$atLine[[j]] <- c(change$atLine[[j]], atLine)
-	          change$atPosition[[j]] <- rbind(change$atPosition[[j]], c(atPosition))
-	          change$numberFormat[[j]] <- c(change$numberFormat[[j]], numberFormat)
-	          change$changeMethod[[j]] <- c(change$changeMethod[[j]], changeMethod)
-	          change$applyValue[[j]] <- c(change$applyValue[[j]], i)
-	          change$absoluteMin[[j]] <- c(change$absoluteMin[[j]], absoluteMin)
-	          change$absoluteMax[[j]] <- c(change$absoluteMax[[j]], absoluteMax)
+	          change$atLine[[idx[j]]] <- c(change$atLine[[idx[j]]], atLine)
+	          change$atPosition[[idx[j]]] <- rbind(change$atPosition[[idx[j]]], c(atPosition))
+	          change$numberFormat[[idx[j]]] <- c(change$numberFormat[[idx[j]]], numberFormat)
+	          change$changeMethod[[idx[j]]] <- c(change$changeMethod[[idx[j]]], changeMethod)
+	          change$applyValue[[idx[j]]] <- c(change$applyValue[[idx[j]]], i)
+	          change$absoluteMin[[idx[j]]] <- c(change$absoluteMin[[idx[j]]], absoluteMin)
+	          change$absoluteMax[[idx[j]]] <- c(change$absoluteMax[[idx[j]]], absoluteMax)
 	        }	
 	      }
 	      
