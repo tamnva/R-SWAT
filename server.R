@@ -393,25 +393,21 @@ server <- function(input, output, session) {
                     session = session)
     
     SWATParamFile <- parseFilePaths(volumes, input$getSWATParamFile)
-    
-    if(length(SWATParamFile$datapath) == 1){
-      if(input$getSWATParamFile$files$`0`[[2]] == "swatParam.txt"){
-        output$printSWATParamFile <- renderText(SWATParamFile$datapath)
+
+    output$printSWATParamFile <- NULL
+    globalVariable$SWATParamFile <<- NULL
+    globalVariable$SWATParam <<- NULL
+    output$tableSWATParam <- NULL
+
+    if (length(SWATParamFile$datapath) == 1){
+      if (SWATParamFile$name == "swatParam.txt"){
         globalVariable$SWATParamFile <<- as.character(SWATParamFile$datapath) 
         globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
+        output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
         output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
-      } else {
-        output$printSWATParamFile <- NULL
-        globalVariable$SWATParamFile <<- NULL
-        globalVariable$SWATParam <<- NULL
-        output$tableSWATParam <- NULL        
       }
-    } else {
-      output$printSWATParamFile <- NULL
-      globalVariable$SWATParamFile <<- NULL
-      globalVariable$SWATParam <<- NULL
-      output$tableSWATParam <- NULL
     }
+    
   })
   
   # Get executable SWAT file

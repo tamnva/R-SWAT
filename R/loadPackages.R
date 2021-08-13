@@ -1,11 +1,11 @@
 
 # Dependency packages
   packages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
-                'shinyFiles', 'tippy', 'excelR', 'shiny')
+                'shinyFiles', 'tippy', 'excelR', 'shiny', 'doParallel')
 
 # Install dependency packages if necessary
   install.packages(setdiff(packages,rownames(installed.packages())),
-                   repos = 'http://cran.us.r-project.org') 
+                   repos = 'https://CRAN.R-project.org') 
 
 # Load dependency packages
   library(shiny)
@@ -17,3 +17,6 @@
   library(shinyFiles)
   library(tippy)
   library(excelR)
+  library(doParallel)
+
+  
