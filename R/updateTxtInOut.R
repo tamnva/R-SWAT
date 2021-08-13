@@ -321,7 +321,8 @@
 	  
 	  for (i in 1:nrow(paraSelection)){
       para <- trimws(paraSelection[i,1])
-      fileType <- strsplit(para, split = '.', fixed = TRUE)[[1]][2]
+      temp <-  strsplit(para, split = '.', fixed = TRUE)[[1]]
+      fileType <- temp[2]
 	    changeMethod <- trimws(paraSelection[i,2])
 	    
 	    if (i == 1) {
@@ -331,34 +332,40 @@
 	                                     as.numeric(paraSelection[i,3:4]))
 	    }
 
-	    if(fileType %in% hruBasedFile){
-	      selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
-	      selectCriteria$lu <- trimws(strsplit(paraSelection[i,6], split=",")[[1]])
-	      selectCriteria$soil <- trimws(strsplit(paraSelection[i,7], split=",")[[1]])
-	      selectCriteria$slope <- trimws(strsplit(paraSelection[i,8], split=",")[[1]])	
-	    } else if (fileType %in% subBasedFile){
-	      selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
+	    # Check if there is new files/parameters added by user
+	    if (length(temp) == 3){
+	      files <- paste(temp[2], ".", temp[3], sep = "") 
 	    } else {
+	      if(fileType %in% hruBasedFile){
+	        selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
+	        selectCriteria$lu <- trimws(strsplit(paraSelection[i,6], split=",")[[1]])
+	        selectCriteria$soil <- trimws(strsplit(paraSelection[i,7], split=",")[[1]])
+	        selectCriteria$slope <- trimws(strsplit(paraSelection[i,8], split=",")[[1]])	
+	      } else if (fileType %in% subBasedFile){
+	        selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
+	      } else {
+	      }
+	      
+	      
+	      #Get list of files
+	      if(fileType %in% hruBasedFile){
+	        files <- hruSubset(HRUinfo, selectCriteria)
+	        files <- gsub("hru", fileType, files)
+	      } else if (fileType %in% subBasedFile){
+	        files <- paste(subtofilename(as.integer(selectCriteria$sub[1])), 
+	                       ".", fileType, sep ="")
+	        if (length(selectCriteria$sub) > 1){
+	          for(j in 1:length(selectCriteria$sub)){
+	            files <- c(files, paste(subtofilename(
+	              as.integer(selectCriteria$sub[j])), ".", fileType, sep =""))        
+	          }          
+	        }
+	      } else {
+	        files <- paste("basin.", fileType, sep="")
+	      }	      
 	    }
-	    
-	    
-	    #Get list of files
-	    if(fileType %in% hruBasedFile){
-	      files <- hruSubset(HRUinfo, selectCriteria)
-	      files <- gsub("hru", fileType, files)
-	    } else if (fileType %in% subBasedFile){
-	      files <- paste(subtofilename(as.integer(selectCriteria$sub[1])), 
-	                     ".", fileType, sep ="")
-        if (length(selectCriteria$sub) > 1){
-          for(j in 1:length(selectCriteria$sub)){
-            files <- c(files, paste(subtofilename(
-              as.integer(selectCriteria$sub[j])), ".", fileType, sep =""))        
-          }          
-        }
-	    } else {
-	      files <- paste("basin.", fileType, sep="")
-	    }
-	    
+        
+        
 	    
 	    # Find location of the parameters in the file
 	    index <- which(SWATParam$parameter == para)

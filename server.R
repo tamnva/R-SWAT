@@ -502,10 +502,6 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   observeEvent(input$runSWAT, {
     
-    # deleteme (2 rows)
-    globalVariable$SWATexeFile <<- "C:/swat_64rel.exe"
-    globalVariable$SWATParam <<- loadSwatParam("C:/swatParam.txt")
-    
     # First get or generate parameter set
     if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") {
       globalVariable$parameterValue <<- lhsRange(as.numeric(globalVariable$paraSampling$InputInfo),

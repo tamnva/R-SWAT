@@ -1,0 +1,17 @@
+In this example, assume that you modified SWAT model and have a new file as below
+Now you want SWATshiny modifies parameters listed in this file
+
+      file.name
+
+where 'file' is the file name (you can change to any name of your choice)
+      'name' is the file extention (any extention that you like, must be 
+             different with existing SWAT files extention (.hru,.sub, .rte,...)
+
+This file should always be in the TxtInOut folder. The file content is as you see
+here and the parameters in this file are listed as below. There is no associate 
+spatial  information about these parameter (e.g., subbasin, land use, soil, slope) 
+therefore, you should leave these fields EMPTY in step "2. Parameter sampling". 
+
+       1           | PARA_1 : My new parameter description (All of this description text is optional, just for you to understand which parameter is this) 
+       1.2         | PARA_2 : My new parameter description
+       1.00003     | PARA_3 : My new parameter description

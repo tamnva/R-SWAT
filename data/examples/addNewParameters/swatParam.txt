@@ -1,9 +1,13 @@
 !----------------------------------------------------------------------------------
 ! This is comment line
 ! Line start with ! or blank line will be ignored by the program
+! Recommendation: replace -Inf and Inf with your theoretical min and max values 
 !--------------------------------------------------------------------------------------
-!Parameter    AtLine         StartPosition  EndPosition   RoundUp    AbsoluteMin   AbsoluteMin
+!Parameter    AtLine         StartPosition  EndPosition   RoundUp    AbsoluteMin   AbsoluteMax
 !--------------------------------------------------------------------------------------
+PARA_1.file.name  15             1               8            0         -Inf         Inf
+PARA_2.file.name  16             1              10            1         -Inf         Inf
+PARA_3.file.name  17             1              14            5         -Inf         Inf
 HRU_FR.hru        2              1              16            7		     0.0         1.0
 SLSUBBSN.hru      3              1              16            3         10.0	   150.0
 HRU_SLP.hru       4              1              16            3          0.0         1.0
