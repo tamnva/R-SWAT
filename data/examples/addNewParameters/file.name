@@ -1,4 +1,4 @@
-In this example, assume that you modified SWAT model and have a new file as below
+DO NOT TRY, STILL UNDERDEVELOPMENT. In this example, assume that you modified SWAT model and have a new file as below
 Now you want SWATshiny modifies parameters listed in this file
 
       file.name
