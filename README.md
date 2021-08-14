@@ -21,15 +21,16 @@ This app ([https://github.com/tamnva/SWATshiny](https://github.com/tamnva/SWATsh
     # After that, runGitHub("SWATshiny", "tamnva") again
     
     # If you already manually downloaded it from the github, you can run the app using this command
-    runApp("Insert_the_link_to_the_folder_of_this_app_where_server.R_and_ui.R_files_are_located")
+    # runApp("Insert_the_link_to_the_folder_of_this_app_where_server.R_and_ui.R_files_are_located")
 
 If the app is successfully downloaded to your local machine. The following interface (attached screenshot on the end of this document) will appear and you can start using this app. Start with Tab '1. General setting' => '2. Parameter sampling' => and so on. On each tab there are subitems (e.g., in the first figure, start with '1. Working folder' => '2. TxtInOut folder' => and so on)
 
 If you don't know which input is required, simply clicking to "Help?" at the right side of each respective input field. A sample of data for running this app can be downloaded from my [GitHub repository](https://github.com/tamnva/SWATshiny/tree/master/data), including:
 
- 1. _\data\TxtInOut_: A TxtInOut folder and all associated files created by ArcSWAT
+ 1. _/data/TxtInOut_: A TxtInOut folder and all associated files created by ArcSWAT
  2. _swatParam.txt_: An input file describing all SWAT parameters that you will need for the input field _1. General Setting => 4. Files with list of all SWAT Parameters_
  3. _obs_var_1.txt_: Observed data file (streamflow) at the catchment outlet that you might need to input to evaluate the model performance _4.1. Objective function => 2. Get observed data files_
+  4. _data/examples_: you will see examples how to include new parameters in new files (e.g., this could be the case  if you modify SWAT code)
 
 ## Screenshot of each step
 ### Step 1. General Setting
