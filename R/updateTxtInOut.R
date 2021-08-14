@@ -363,7 +363,7 @@
 	            as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
 	        }	        
 	      } else {
-	        files <- paste("basin.", fileType, sep="")
+	        files <- paste("basins.", fileType, sep="")
 	      }	      
 	    }
         
