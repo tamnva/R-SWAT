@@ -13,8 +13,15 @@ This app ([https://github.com/tamnva/SWATshiny](https://github.com/tamnva/SWATsh
     install.packages("shiny")
     library(shiny)
     
-    # Download this SWATshiny app (code + data) to your local machine and run it
+    # Automatically download this SWATshiny app (code + data) to your local machine and run it
     runGitHub("SWATshiny", "tamnva")
+    
+    # It should take 1 or 2 minutes for the interface to appear, if it keeps showing downloading....then
+    # Go to Github and copy all content from the file R\loadPackages.R, paste and run in R
+    # After that, runGitHub("SWATshiny", "tamnva") again
+    
+    # If you already manually downloaded it from the github, you can run the app using this command
+    runApp("Insert_the_link_to_the_folder_of_this_app_where_server.R_and_ui.R_files_are_located")
 
 If the app is successfully downloaded to your local machine. The following interface (attached screenshot on the end of this document) will appear and you can start using this app. Start with Tab '1. General setting' => '2. Parameter sampling' => and so on. On each tab there are subitems (e.g., in the first figure, start with '1. Working folder' => '2. TxtInOut folder' => and so on)
 
