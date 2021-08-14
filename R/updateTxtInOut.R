@@ -352,14 +352,16 @@
 	        files <- hruSubset(HRUinfo, selectCriteria)
 	        files <- gsub("hru", fileType, files)
 	      } else if (fileType %in% subBasedFile){
-	        files <- paste(subtofilename(as.integer(selectCriteria$sub[1])), 
-	                       ".", fileType, sep ="")
-	        if (length(selectCriteria$sub) > 1){
-	          for(j in 1:length(selectCriteria$sub)){
-	            files <- c(files, paste(subtofilename(
-	              as.integer(selectCriteria$sub[j])), ".", fileType, sep =""))        
-	          }          
-	        }
+          if (selectCriteria$sub == "All") { 
+            selectCriteria$sub <- c(1:max(HRUinfo$sub))
+          } else {
+            selectCriteria$sub <- as.numeric(selectCriteria$sub)
+          }
+	        for(j in 1:length(selectCriteria$sub)){
+	          if (j == 1) {files <- NULL}
+	          files <- c(files, paste(subtofilename(
+	            as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
+	        }	        
 	      } else {
 	        files <- paste("basin.", fileType, sep="")
 	      }	      
@@ -485,9 +487,13 @@
 	getParamRange <- function(paraSelection){
 	  
 	  parameterRange <- as.matrix(paraSelection[,3:4])
-	  colnames(parameterRange) <- NULL
+	  temp <- matrix(rep(NA, nrow(parameterRange)*2), ncol = 2)
 	  
-	  return(parameterRange)
+	  for (i in 1:nrow(parameterRange)){
+	    temp[i,] <- as.numeric(parameterRange[i,])
+	  }
+	  
+	  return(temp)
 	}
 	
    

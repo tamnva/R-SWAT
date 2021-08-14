@@ -501,15 +501,6 @@ server <- function(input, output, session) {
   # Run SWAT
   #-----------------------------------------------------------------------------
   observeEvent(input$runSWAT, {
-    
-    # First get or generate parameter set
-    if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") {
-      globalVariable$parameterValue <<- lhsRange(as.numeric(globalVariable$paraSampling$InputInfo),
-                                                 getParamRange(globalVariable$paraSelection))
-    } else {
-      Print("Other parameter sampling approaches are under development")
-    }
-    
     # Save global variables
     if (file.exists(input$workingFolder)) {
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
@@ -517,7 +508,23 @@ server <- function(input, output, session) {
                                            sep ='')
       )
     }
-    
+  
+    # First get or generate parameter set
+    if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") {
+      globalVariable$parameterValue <<- lhsRange(as.numeric(globalVariable$paraSampling$InputInfo),
+                                                 getParamRange(globalVariable$paraSelection))
+    } else {
+      Print("Other parameter sampling approaches are under development")
+    }
+   
+    # Save global variables
+    if (file.exists(input$workingFolder)) {
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+                                           'SWATShinyObject.rds',
+                                           sep ='')
+      )
+    }
+   
     # Message show all input was saved
     showModal(modalDialog(
       title = "Save current input",
@@ -530,13 +537,13 @@ server <- function(input, output, session) {
       size = "l"
     ))
     
-    
+
     #  Load all files that are going to be updated
     globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo, 
                                             globalVariable$paraSelection,
                                             globalVariable$SWATParam, 
                                             globalVariable$TxtInOutFolder)
-  
+    
     # Copy unchanged file for the first simulation
     copyUnchangeFiles <- TRUE
     saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
