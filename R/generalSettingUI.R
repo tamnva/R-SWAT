@@ -119,7 +119,9 @@ generalSettingUI <- function(id) {
                             manually and add to the file. The theoretical min 
                             and max values are used to restrict the parameters
                             that you are going to modified for calibration or 
-                            sensitivity analysis will not out of this range.
+                            sensitivity analysis will not out of this range. I 
+                            would suggest checking the theoretical min and max values of 
+                            your selected parameters
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",

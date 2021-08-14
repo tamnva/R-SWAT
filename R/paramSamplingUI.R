@@ -47,6 +47,23 @@ paramSamplingUI <- function(id) {
                          height = "1px"),
       ),
       
+      column(width = 1,
+             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+                   With hru-based parameters (e.g., parameters in
+                   .hru files) you should fill in all fields of this table. 
+                   With subbasin parameters, the land use, soil, slope can be left
+                   empty. With basin parameters, the subbasin, landuse, soil, slope 
+                   cells can be left emtpy. If you select all subbasins/landuse/soil
+                   or slope, just type 'All'. Note: 'relative' change means 
+                   x_new = x_old*(1 + appliedValue). 'absolute' change means
+                   x_new = x_old + appliedValue. 'replace' means
+                   x_new = appliedValue
+                   <span>", 
+                   allowHTML = TRUE, 
+                   trigger = "click",
+                   theme = "light"),
+      ),
+      
 
       column(width = 10,
              actionButton("checkParameterTableButton", 
