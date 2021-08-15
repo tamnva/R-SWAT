@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------------------
 # Default objective function
 # ------------------------------------------------------------------------------
@@ -80,7 +79,7 @@ dataOutputExtraction = data.frame(FileType = c('watout.dat'),
                                   Reach = c(NA))
                                
 
-columnsOutputExtraction = data.frame(title= c('File type', 'File Name', 'Column number', 'Reach Number'),
+columnsOutputExtraction = data.frame(title= colnames(dataOutputExtraction),
                                   source = I(list(c('watout.dat', 'output.rch_Under_Development_DO_NOT_TRY'),
                                                   NA,
                                                   NA, 
@@ -478,3 +477,69 @@ prFactor <- function(obs, low, up){
   
   return(c(pfactor, rfactor))
 }
+
+# ------------------------------------------------------------------------------
+# Print out number of variables - required observed files
+# ------------------------------------------------------------------------------
+printVariableNameObservedFiles <- function(outputExtraction){
+ 
+  output <- list()
+  output$varNumber <- c()
+  output$file <- c()
+  output$column <- c()
+  output$reach <- c()
+  output$observedFile <- c()
+  
+  counter <- 0
+
+  for (i in 1:nrow(outputExtraction)){
+
+    if(outputExtraction$FileType[i] == "watout.dat"){
+      columnNr <- strsplit(outputExtraction$Column[i], split = ",")[[1]]
+      for (j in 1:length(columnNr)){
+        counter <- counter + 1
+        output$varNumber[counter] <- counter
+        output$column[counter] <- columnNr[j]
+        output$file[counter] <- outputExtraction$FileName[i]
+        output$reach[counter] <- NA
+        output$observedFile[counter] <- paste("obs_var_", counter ,".txt", sep = "")
+      }
+    } else if (outputExtraction$FileType[i] == "output.rch") {
+      columnNr <- strsplit(outputExtraction$Column[i], split = ",")[[1]]
+      reachNr <- strsplit(outputExtraction$Reach[i], split = ",")[[1]]
+      for (j in 1:length(columnNr)){
+        for (k in 1:length(reachNr)){
+          counter <- counter + 1
+          output$varNumber[counter] <- counter
+          output$column[counter] <- columnNr[j]
+          output$file[counter] <- outputExtraction$FileName[i]
+          output$reach[counter] <- reachNr[k]
+          output$observedFile[counter] <- paste("obs_var_", counter ,".txt", sep = "")          
+        }
+      }
+    } else {
+      counter <- counter + 1
+      output$varNumber[counter] <- NA
+      output$column[counter] <- NA
+      output$file[counter] <- "Unknown file type"
+      output$reach[counter] <- NA
+      output$observedFile[counter] <- NA       
+    }
+  }
+  
+  # output data frame
+  data <- data.frame(varNumber = output$varNumber,
+                    file = output$file,
+                    column = output$column,
+                    reach = output$reach,
+                    observedFile = output$observedFile)
+  colnames(data) <- c("Variable number",
+                     "Ouput file name",
+                     "Column number",
+                     "Reach number",
+                     "Observed file name (see 4.1)")
+  
+  
+  return(data)
+}
+

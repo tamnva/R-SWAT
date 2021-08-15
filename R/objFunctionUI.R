@@ -43,8 +43,7 @@ objFunctionUI <- function(id) {
                    Load observed data, single file for each variable. 
                    Files should be in ASCII format with two columns and header,
                    the first column is the date (format dd/mm/yyyy) and 
-                   the second column is the data. For the first, second,... variable the 
-                   file name should be obs_var_1.txt, obs_var_2.txt, and so on...
+                   the second column is the data. Please the file name in section 3.1
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
