@@ -84,6 +84,23 @@ runSwatUI <- function(id) {
                   HTML("<b>","3. Run SWAT","</b>"),
            ),
       ),
+
+      column(width = 1,
+             tippy("Help?", tooltip = "<span style='font-size:15px;'>
+                   When you click this button, all settings are saved to the file 
+                   'SWATShinyObject.rds' in the working directory folder. The parameter
+                   sets are generated and SWAT are run in parallel. Running can
+                   can take time, R is busy while calling SWAT on the background
+                   therefore, it might not response to any anything. Don't turn of R.
+                   You can check the current simulation status in the file 
+                   ./Output/CurrentSimulationReport.log You still go to step 4 and click 
+                   the 'Open file CurrentSimulationReport.log'. When all simulations
+                   are finished, you will see a table appear
+                   <span>", 
+                   allowHTML = TRUE, 
+                   trigger = "click",
+                   theme = "light"),
+      ),
       
       column(width = 10,
              actionButton("runSWAT", "Click here to run SWAT"),
@@ -96,12 +113,6 @@ runSwatUI <- function(id) {
            ),
       ),
 
-      column(width = 10,
-             checkboxInput('checkCurrentSimulation', 
-                           'Open file CurrentSimulationReport.log', 
-                           value = FALSE, width = NULL),
-      ),
-      
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:15px;'>
                    You can only open this files when all SWAT simulations are 
@@ -113,6 +124,22 @@ runSwatUI <- function(id) {
                    trigger = "click",
                    theme = "light"),
       ),
+      #-------------------------------------------------------------------------
+      # Display report of the simulation when all simulations are finished
+      #-------------------------------------------------------------------------
+      
+      column(width = 5,
+             checkboxInput('checkCurrentSimulation', 
+                           'Open file CurrentSimulationReport.log', 
+                           value = FALSE, width = NULL),
+      ),
+      
+      column(width = 5,
+             checkboxInput('checkDisplayParameterSet', 
+                           'Display all parameter sets', 
+                           value = FALSE, width = NULL),
+      ),
+      
       
       conditionalPanel(
         condition = "input.checkCurrentSimulation == 1",
@@ -121,6 +148,19 @@ runSwatUI <- function(id) {
                
         ),
       ),
+
+      #-------------------------------------------------------------------------
+      # Display parameter sets
+      #-------------------------------------------------------------------------
+      
+      conditionalPanel(
+        condition = "input.checkDisplayParameterSet == 1",
+        column(width = 10,
+               excelOutput("tableDisplayParameterSet", 
+                           width = "100%", 
+                           height = "1px"),
+        ),
+      ),      
       
     )
     

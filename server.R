@@ -78,17 +78,48 @@ server <- function(input, output, session) {
   # Display current simulation
   observe({
     req(input$checkCurrentSimulation)
-    currentSim <- read.table(globalVariable$CurrentSimulationReportFile,
-                             header = FALSE)
-    colnames(currentSim) <- c('Finished simulation', 'Simulation number', 
-                              'Out of', 'Total simulations', 'On core', 
-                              'Core number', 'Date', 'Time')
-    output$tableCurrentSimulation <- renderDataTable(currentSim)
+    if (file.exists(globalVariable$CurrentSimulationReportFile)){
+      currentSim <- read.table(globalVariable$CurrentSimulationReportFile,
+                               header = FALSE)
+      colnames(currentSim) <- c('Finished simulation', 'Simulation number', 
+                                'Out of', 'Total simulations', 'On core', 
+                                'Core number', 'Date', 'Time')
+      output$tableCurrentSimulation <- renderDataTable(currentSim)
+    }
   })
   
   
+  #-----------------------------------------------------------------------------
+  # Control data display on tab item
+  #-----------------------------------------------------------------------------L
+  observe({
+    req(input$checkDisplayParameterSet)
+    
+    if (!is.null(globalVariable$parameterValue)){
+ 
+      columnsParameterValue <- data.frame(title = c("Simulation Nr.", globalVariable$paraSelection$Parameter), 
+                                          source = rep(NA, ncol(globalVariable$parameterValue)),
+                                          width = rep(300, ncol(globalVariable$parameterValue)),
+                                          type = rep('numeric', ncol(globalVariable$parameterValue)))
+      
+      output$tableDisplayParameterSet <- renderExcel(excelTable(data = globalVariable$parameterValue,
+                                                        columns = columnsParameterValue,
+                                                        editable = FALSE,
+                                                        allowInsertRow = FALSE,
+                                                        allowInsertColumn = FALSE,
+                                                        allowDeleteColumn = FALSE,
+                                                        allowDeleteRow = FALSE, 
+                                                        rowDrag = FALSE,
+                                                        columnResize = FALSE,
+                                                        wordWrap = FALSE))      
+      } else {
+      output$tableDisplayParameterSet <- NULL
+      }
+  })
   
+  #-----------------------------------------------------------------------------
   # Update input date range for calibration
+  #-----------------------------------------------------------------------------L
   observe({
     
     req(input$TxtInOutFolder)
@@ -194,55 +225,62 @@ server <- function(input, output, session) {
   observe({
     req(input$checkDisplayObjFunction)
     # Get parameter values
-    tableParaObj <- globalVariable$parameterValue 
     
-    # replace the first row as it is the simulation number with the obj function value
-    tableParaObj[,1] <- globalVariable$objValue 
-    tableParaObj <- as.data.frame(tableParaObj)
-    
-    colnames(tableParaObj) <- c("objectiveFunction", globalVariable$paraSelection$Parameter)
-    
-    # round up to 3 decimal digits
-    is.num <- sapply(tableParaObj, is.numeric)
-    tableParaObj[is.num] <- lapply(tableParaObj[is.num], round, 3)
-    
-    columnsCalObjFunction <- data.frame(title = colnames(tableParaObj), 
-                                        source = rep(NA, ncol(tableParaObj)),
-                                        width = rep(300, ncol(tableParaObj)),
-                                        type = rep('text', ncol(tableParaObj)))
-    
-    output$tableCalObjFunction <- renderExcel(excelTable(data = tableParaObj,
-                                                         columns = columnsCalObjFunction,
-                                                         editable = FALSE,
-                                                         allowInsertRow = FALSE,
-                                                         allowInsertColumn = FALSE,
-                                                         allowDeleteColumn = FALSE,
-                                                         allowDeleteRow = FALSE, 
-                                                         rowDrag = FALSE,
-                                                         columnResize = FALSE,
-                                                         wordWrap = FALSE))
+    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
+      tableParaObj <- globalVariable$parameterValue 
+      
+      # replace the first row as it is the simulation number with the obj function value
+      tableParaObj[,1] <- globalVariable$objValue 
+      tableParaObj <- as.data.frame(tableParaObj)
+      
+      colnames(tableParaObj) <- c("objectiveFunction", globalVariable$paraSelection$Parameter)
+      
+      # round up to 3 decimal digits
+      is.num <- sapply(tableParaObj, is.numeric)
+      tableParaObj[is.num] <- lapply(tableParaObj[is.num], round, 3)
+      
+      columnsCalObjFunction <- data.frame(title = colnames(tableParaObj), 
+                                          source = rep(NA, ncol(tableParaObj)),
+                                          width = rep(300, ncol(tableParaObj)),
+                                          type = rep('text', ncol(tableParaObj)))
+      
+      output$tableCalObjFunction <- renderExcel(excelTable(data = tableParaObj,
+                                                           columns = columnsCalObjFunction,
+                                                           editable = FALSE,
+                                                           allowInsertRow = FALSE,
+                                                           allowInsertColumn = FALSE,
+                                                           allowDeleteColumn = FALSE,
+                                                           allowDeleteRow = FALSE, 
+                                                           rowDrag = FALSE,
+                                                           columnResize = FALSE,
+                                                           wordWrap = FALSE))
+    } else {
+      output$tableCalObjFunction <- NULL
+    }
   })
   
   
   observe({
     req(input$checkPlotVariableNumber)
-    
-    globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue, 
-                                             globalVariable$simData, 
-                                             globalVariable$parameterValue,
-                                             input$behThreshold, 
-                                             input$plotVarNumber,
-                                             globalVariable$objFunction$Index[1],
-                                             globalVariable$observedData)
-    
-    dataPlot <- cbind(globalVariable$dataPlotVariableNumber$ppuSimData, 
-                      Date = as.Date(globalVariable$observedData[[input$plotVarNumber]]$Date, "%Y-%m-%d"),
-                      Value = globalVariable$observedData[[input$plotVarNumber]]$Value
-                      )
-    
-    PlotVariableNumber <- plot_ly(dataPlot, x = ~Date, y = ~bestSim, name = 'Simulated (best)', type = 'scatter', mode = 'lines') 
-    PlotVariableNumber <- PlotVariableNumber %>% add_trace(y = ~Value, name = 'Observed', mode = 'lines')
-    output$PlotVariableNumber <- renderPlotly(PlotVariableNumber)
+    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
+      globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue, 
+                                                               globalVariable$simData, 
+                                                               globalVariable$parameterValue,
+                                                               input$behThreshold, 
+                                                               input$plotVarNumber,
+                                                               globalVariable$objFunction$Index[1],
+                                                               globalVariable$observedData)
+      
+      dataPlot <- cbind(globalVariable$dataPlotVariableNumber$ppuSimData, 
+                        Date = as.Date(globalVariable$observedData[[input$plotVarNumber]]$Date, "%Y-%m-%d"),
+                        Value = globalVariable$observedData[[input$plotVarNumber]]$Value
+      )
+      
+      PlotVariableNumber <- plot_ly(dataPlot, x = ~Date, y = ~bestSim, name = 'Simulated (best)', type = 'scatter', mode = 'lines') 
+      PlotVariableNumber <- PlotVariableNumber %>% add_trace(y = ~Value, name = 'Observed', mode = 'lines')
+      output$PlotVariableNumber <- renderPlotly(PlotVariableNumber)      
+    }    
+
   })
  
   observe({
@@ -273,13 +311,14 @@ server <- function(input, output, session) {
     req(input$checkTableBehaParam)
     
     if(!is.null(globalVariable$dataPlotVariableNumber)){
-      columnsTableBehaParam <- data.frame(title = c('parameterNumber', 'lower_95PPU', 'median', 
+      columnsTableBehaParam <- data.frame(title = c('parameter', 'lower_95PPU', 'median', 
                                                     'upper_95PPU', 'bestParameter'), 
                                         source = rep(NA, 5),
                                         width = rep(300, 5),
                                         type = rep('numeric', 5))
       
-      output$tableBehaParam <- renderExcel(excelTable(data = globalVariable$dataPlotVariableNumber$ppuParaRange,
+      output$tableBehaParam <- renderExcel(excelTable(data = cbind(globalVariable$paraSelection$Parameter,
+                                                                   globalVariable$dataPlotVariableNumber$ppuParaRange),
                                                     columns = columnsTableBehaParam,
                                                     editable = FALSE,
                                                     allowInsertRow = FALSE,
@@ -501,71 +540,82 @@ server <- function(input, output, session) {
   # Run SWAT
   #-----------------------------------------------------------------------------
   observeEvent(input$runSWAT, {
-    # Save global variables
-    if (file.exists(input$workingFolder)) {
+    
+    # Performe check list otherwise SWATshiny will be turn off when click this
+
+    checkList <- TRUE
+    checkList <- checkList & !is.null(globalVariable$workingFolder) 
+    checkList <- checkList & !is.null(globalVariable$paraSampling)
+    checkList <- checkList & !is.null(globalVariable$paraSelection)
+    checkList <- checkList & !is.null(globalVariable$HRUinfo) 
+    checkList <- checkList & !is.null(globalVariable$SWATParam)
+    checkList <- checkList & !is.null(globalVariable$TxtInOutFolder)     
+    checkList <- checkList & !is.null(globalVariable$outputExtraction)
+    checkList <- checkList & !is.null(globalVariable$paraSampling)
+    checkList <- checkList & !is.null(globalVariable$ncores) 
+    checkList <- checkList & !is.null(globalVariable$SWATexeFile) 
+    checkList <- checkList & !is.null(globalVariable$fileCioInfo)
+    checkList <- checkList & !is.null(globalVariable$dateRangeCali)
+    
+    if (checkList){
+
+      # First get or generate parameter set
+      if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") {
+        globalVariable$parameterValue <<- lhsRange(as.numeric(globalVariable$paraSampling$InputInfo),
+                                                   getParamRange(globalVariable$paraSelection))
+      } else {
+        Print("Other parameter sampling approaches are under development")
+      }
+
+      #  Load all files that are going to be updated
+      globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo, 
+                                                              globalVariable$paraSelection,
+                                                              globalVariable$SWATParam, 
+                                                              globalVariable$TxtInOutFolder)
+
+      # Save global variables
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')
-      )
-    }
-  
-    # First get or generate parameter set
-    if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") {
-      globalVariable$parameterValue <<- lhsRange(as.numeric(globalVariable$paraSampling$InputInfo),
-                                                 getParamRange(globalVariable$paraSelection))
-    } else {
-      Print("Other parameter sampling approaches are under development")
-    }
-   
-    # Save global variables
-    if (file.exists(input$workingFolder)) {
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')
-      )
-    }
-   
-    # Message show all input was saved
-    showModal(modalDialog(
-      title = "Save current input",
-      HTML("All current inputs were save to the file 'SWATShinyObject.rds'.<br> 
+                                             'SWATShinyObject.rds',
+                                             sep =''))
+      
+      # Message show all input was saved
+      showModal(modalDialog(
+        title = "Save current input",
+        HTML("All current inputs were save to the file 'SWATShinyObject.rds'.<br> 
       in the working folder. SWAT is running, close this message .<br>
       You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
-      in the working folder to see the current simulation. If your simulation is 
-           interupted you can restart from the last simulations using these two files"),
-      easyClose = TRUE,
-      size = "l"
-    ))
-    
-
-    #  Load all files that are going to be updated
-    globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo, 
-                                            globalVariable$paraSelection,
-                                            globalVariable$SWATParam, 
-                                            globalVariable$TxtInOutFolder)
-    
-    # Copy unchanged file for the first simulation
-    copyUnchangeFiles <- TRUE
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                         'SWATShinyObject.rds',
-                                         sep =''))
- 
-    # Run SWAT in parallel
-    runSWATpar(globalVariable$workingFolder, 
-               globalVariable$TxtInOutFolder, 
-               globalVariable$outputExtraction, 
-               globalVariable$ncores, 
-               globalVariable$SWATexeFile, 
-               globalVariable$parameterValue,
-               globalVariable$caliParam,
-               copyUnchangeFiles,
-               globalVariable$fileCioInfo,
-               globalVariable$dateRangeCali)
-    
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                         'SWATShinyObject.rds',
-                                         sep ='')
-    )
+      in the working folder to see the current simulation. If your simulation .<br>
+      is interupted you can restart from the last simulations using these two files"),
+        easyClose = TRUE,
+        size = "l"
+      ))
+      
+      # Copy unchanged file for the first simulation
+      copyUnchangeFiles <- TRUE
+      
+      # Run SWAT in parallel
+      runSWATpar(globalVariable$workingFolder, 
+                 globalVariable$TxtInOutFolder, 
+                 globalVariable$outputExtraction, 
+                 globalVariable$ncores, 
+                 globalVariable$SWATexeFile, 
+                 globalVariable$parameterValue,
+                 globalVariable$caliParam,
+                 copyUnchangeFiles,
+                 globalVariable$fileCioInfo,
+                 globalVariable$dateRangeCali)
+      
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+                                           'SWATShinyObject.rds',
+                                           sep =''))     
+    } else {
+      # Message show all input was saved
+      showModal(modalDialog(
+        title = "Input data/information is missing, please check again",
+        easyClose = TRUE,
+        size = "l"
+      ))
+    }
   })
    
   #-----------------------------------------------------------------------------

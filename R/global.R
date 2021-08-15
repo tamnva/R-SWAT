@@ -231,8 +231,7 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   ppuParaRange <- as.data.frame(ppuParaRange)
   
   # Add parameter number to the data frame
-  ppuParaRange <- cbind(c(1:(ncol(parameterValue)-1)),ppuParaRange)
-  colnames(ppuParaRange) <- c('parameterNumber', 'lower_95PPU', 'median', 
+  colnames(ppuParaRange) <- c('lower_95PPU', 'median', 
                               'upper_95PPU', 'bestParameter')
   output <- list()
   output$ppuSimData <- ppuSimData
