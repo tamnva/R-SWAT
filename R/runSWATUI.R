@@ -34,6 +34,20 @@ runSwatUI <- function(id) {
                          width = "100%", 
                          height = "1px"),
       ),
+
+      column(width = 5,
+             checkboxInput('checkOutputExtractionDisplayOnly', 
+                           'Display your selected outputs', 
+                           value = FALSE, width = NULL),
+      ),
+      
+      
+      conditionalPanel(
+        condition = "input.checkOutputExtractionDisplayOnly == 1",
+        column(width = 10,
+               dataTableOutput('tableOutputExtractionDisplayOnly'),
+        ),
+      ),
       
       # -------------------------------------------------------Evaluation period
       column(width = 10,

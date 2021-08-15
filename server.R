@@ -13,7 +13,7 @@ server <- function(input, output, session) {
   globalVariable$checkSimComplete <<- FALSE
   globalVariable$checkParameterTable <<- FALSE
   
-    #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
   # Default values for all tables
   #-----------------------------------------------------------------------------
   # Default setting for parameter selection
@@ -515,6 +515,9 @@ server <- function(input, output, session) {
     if(is.null(outputExtraction)) outputExtraction <- dataOutputExtraction
     globalVariable$outputExtraction  <<- outputExtraction  
     globalVariable$nOutputVar  <<- getNumberOutputVar(outputExtraction)
+    output$tableOutputExtractionDisplayOnly <- renderDataTable(
+      printVariableNameObservedFiles(outputExtraction)
+      )
   })
   
   # Get working folder 
