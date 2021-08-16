@@ -63,9 +63,11 @@ server <- function(input, output, session) {
                                                     columnResize = FALSE,
                                                     wordWrap = TRUE))
   
+
+
   #-----------------------------------------------------------------------------
   # Control data display on tab item
-  #-----------------------------------------------------------------------------L
+  #-----------------------------------------------------------------------------  
   observeEvent(input$checkParameterTableButton, {
     checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection, 
                                                globalVariable$SWATParam, 
@@ -116,6 +118,8 @@ server <- function(input, output, session) {
       output$tableDisplayParameterSet <- NULL
       }
   })
+  
+
   
   #-----------------------------------------------------------------------------
   # Update input date range for calibration
@@ -214,7 +218,49 @@ server <- function(input, output, session) {
         
         output$plotlySensitivity <- renderPlotly(figSensitivity)
         
+      } else if (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)"){
         
+        
+        globalVariable$morrisObject <- tell(globalVariable$morrisObject, globalVariable$objValue)
+        tableSensitivity <- print(globalVariable$morrisObject)
+        tableSensitivity <- tableSensitivity[1:3]
+        
+        
+        # give this matrix column names 
+        tableSensitivity <- as.data.frame(tableSensitivity)
+        tableSensitivity <- cbind(globalVariable$paraSelection$Parameter,tableSensitivity)
+        colnames(tableSensitivity) <- c("Parameter","mu", "mu.star", "sigma")
+        rownames(tableSensitivity) <- NULL        
+        
+        # display output      
+        columnsTableSensitivity <- data.frame(title = colnames(tableSensitivity), 
+                                              source = rep(NA, ncol(tableSensitivity)),
+                                              width = rep(300, ncol(tableSensitivity)),
+                                              type = rep('numeric', ncol(tableSensitivity)))
+        
+        output$tableSensitivity <- renderExcel(excelTable(data = tableSensitivity,
+                                                          columns = columnsTableSensitivity,
+                                                          editable = FALSE,
+                                                          allowInsertRow = FALSE,
+                                                          allowInsertColumn = FALSE,
+                                                          allowDeleteColumn = FALSE,
+                                                          allowDeleteRow = FALSE, 
+                                                          rowDrag = FALSE,
+                                                          columnResize = FALSE,
+                                                          wordWrap = FALSE))
+        
+        figSensitivity  <- plot_ly(y = tableSensitivity$sigma,
+                                   x = tableSensitivity$mu.star,         
+                                   type = "scatter", 
+                                   mode   = 'markers', 
+                                   name = globalVariable$paraSelection[,1])
+        
+        ytitle <- list(title = "sigma --> increasing parameter interation")
+        xtitle <- list(title = "mu.star --> increasing sensitivity")
+        figSensitivity <- figSensitivity  %>% layout(xaxis = xtitle , yaxis = ytitle , showlegend = TRUE)
+        
+        output$plotlySensitivity <- renderPlotly(figSensitivity)        
+      } else {
         
       }
      
@@ -491,6 +537,7 @@ server <- function(input, output, session) {
     paraSelection <-  excel_to_R(input$tableParaSelection)
     if(is.null(paraSelection)) paraSelection <- dataParaSelection
     globalVariable$paraSelection  <<- paraSelection
+
   })
   
   
@@ -499,6 +546,35 @@ server <- function(input, output, session) {
     paraSampling <- excel_to_R(input$tableParaSampling)
     if(is.null(paraSampling)) paraSampling <- dataParaSampling
     globalVariable$paraSampling  <<- paraSampling
+    
+    if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)"){
+      output$printSelectedParaSensiApproach <- renderText(paste("Mutivariable regression, ",
+                                                                "global approach. ",
+                                                                "Parameters generated ", 
+                                                                "by Latin Hypercube Sampling (LHS)",
+                                                                sep = ""))
+      output$printHelpInputinfo <- renderText("Please input the number of parametersets (iterations) in the InputInfo column, e.g., 10")
+      
+    } else if (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)") {
+      output$printSelectedParaSensiApproach <- renderText(paste("Partial derivative, ", 
+                                                                "global approach. ",
+                                                                "See you command 'design = ..:' ",
+                                                                "for parameter sampling approach", sep =""))   
+      output$printHelpInputinfo <- renderText("Please write morris command in the InputInfo. For example,
+      
+      morris(model = SWAT, factors = nParameters, binf = minColumn, bsup = maxColumn, r = 4, design = list(type = 'oat', levels = 5, grid.jump = 3))
+
+The first 4 input fields MUST be 'model = SWAT, factors = nParameters, binf = minColumn, bsup = maxColumn', 
+other input fields could be modifed, see function morris in the sensitivity package for help. In the first
+4 fields, this tool automatically gets information from the above table as input for this function. E.g.,
+SWAT means it will take results from the SWAT model, nParameters is the number of parameters in the above
+table, minColumn and maxColumn means values in the column Min and Max from the above table")
+      
+    } else {
+      output$printSelectedParaSensiApproach <- NULL
+    }
+    
+  
   })
   
   # Get definition of objective function
@@ -566,6 +642,21 @@ server <- function(input, output, session) {
       if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") {
         globalVariable$parameterValue <<- lhsRange(as.numeric(globalVariable$paraSampling$InputInfo),
                                                    getParamRange(globalVariable$paraSelection))
+      } else if (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)"){
+        # e.g., morris(model = SWAT, factors = 5, r = 4, binf = minColumn, bsup = maxColumn, design = list(type = 'oat', levels = 5, grid.jump = 3))
+        
+        #get and edit the input text (InputInfo) command
+        morrisCommand <-  globalVariable$paraSampling$InputInfo
+        morrisCommand <- gsub("SWAT", "NULL", morrisCommand)
+        morrisCommand <- gsub("minColumn", "globalVariable$paraSelection$Min", morrisCommand)
+        morrisCommand <- gsub("maxColumn", "globalVariable$paraSelection$Max", morrisCommand)
+        morrisCommand <- gsub("nParameters", "length(globalVariable$paraSelection$Max)", morrisCommand)
+        
+        # call morris to generate parameters
+        morrisObject <<- eval(parse(text = morrisCommand))
+        globalVariable$parameterValue <<- cbind(c(1:nrow(morrisObject$X)), morrisObject$X)
+        globalVariable$morrisObject <<- morrisObject
+
       } else {
         Print("Other parameter sampling approaches are under development")
       }
@@ -595,6 +686,10 @@ server <- function(input, output, session) {
       
       # Copy unchanged file for the first simulation
       copyUnchangeFiles <- TRUE
+      #rownames(globalVariable$parameterValue) <- NULL
+      #colnames(globalVariable$parameterValue) <- NULL
+      #globalVariable$parameterValue <- as.matrix(globalVariable$parameterValue)
+
       
       # Run SWAT in parallel
       runSWATpar(globalVariable$workingFolder, 
@@ -743,5 +838,19 @@ server <- function(input, output, session) {
   })
   }
 
-  # globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds')  
+  # globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 
+  # x <- morris(model = NULL, factors = 20, r = 4, design = list(type = "oat", levels = 5, grid.jump = 3))
+  # minimum parameter values
+  # binf <- c(1:20)
+  # bsup <- c(21:40)
+  # x <- morris(model = SWAT, factors = nParam, r = 4, binf = minColumn, bsup = maxColumn, design = list(type = "oat", levels = 5, grid.jump = 3))
+  # y <- runif(84)
+  # tell(x,y)
+  # plot(x)
+  # eval(parse(text = "x <- 2+3"))
+  # morris(model = SWAT, factors = nParameters, r = 4, binf = minColumn, bsup = maxColumn, design = list(type = 'oat', levels = 5, grid.jump = 3))
   #-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+# Display parameter sensitivity analyis approach
+#-----------------------------------------------------------------------------L
+
