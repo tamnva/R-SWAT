@@ -129,6 +129,7 @@ server <- function(input, output, session) {
     req(input$TxtInOutFolder)
 
     if (checkDirFileExist(input$TxtInOutFolder, "file.cio", "")){
+      
       myDate <- getFileCioInfo(input$TxtInOutFolder)
       globalVariable$fileCioInfo <<- myDate
       
@@ -397,6 +398,7 @@ server <- function(input, output, session) {
   observe({
     req(input$TxtInOutFolder)
     if (checkDirFileExist(input$TxtInOutFolder, "", ".hru")){
+
       globalVariable$HRUinfo <<- getHruInfo(input$TxtInOutFolder)
       globalVariable$TxtInOutFolder <<- input$TxtInOutFolder  
       
