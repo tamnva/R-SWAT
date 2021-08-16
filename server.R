@@ -305,10 +305,29 @@ server <- function(input, output, session) {
     }
   })
   
+  observe({
+    globalVariable$isBehThresholdValid <<- FALSE
+    if(!is.null(input$behThreshold)){
+      if(!is.null(globalVariable$objValue)){
+        if (input$behThreshold > max(globalVariable$objValue)){
+          output$printMaxBehThreshold <- renderText(paste("Your selected value is greater than the maximum value ", 
+                                                          max(globalVariable$objValue), sep =""))
+        } else {
+          globalVariable$isBehThresholdValid <<- TRUE
+          output$printMaxBehThreshold <- renderText("check threshold value OK")
+        }
+      } else {
+        output$printMaxBehThreshold <- NULL
+      }
+    } else {
+      output$printMaxBehThreshold <- NULL
+    }
+  })
+  
   
   observe({
     req(input$checkPlotVariableNumber)
-    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
+    if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
       globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue, 
                                                                globalVariable$simData, 
                                                                globalVariable$parameterValue,
@@ -324,15 +343,9 @@ server <- function(input, output, session) {
       
       PlotVariableNumber <- plot_ly(dataPlot, x = ~Date, y = ~bestSim, name = 'Simulated (best)', type = 'scatter', mode = 'lines') 
       PlotVariableNumber <- PlotVariableNumber %>% add_trace(y = ~Value, name = 'Observed', mode = 'lines')
-      output$PlotVariableNumber <- renderPlotly(PlotVariableNumber)      
-    }    
-
-  })
- 
-  observe({
-    req(input$checkTableBehaSim)
-
-    if(!is.null(globalVariable$dataPlotVariableNumber)){
+      output$PlotVariableNumber <- renderPlotly(PlotVariableNumber) 
+      
+      # Table
       columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'), 
                                         source = rep(NA, 5),
                                         width = rep(300, 5),
@@ -347,51 +360,35 @@ server <- function(input, output, session) {
                                                     allowDeleteRow = FALSE, 
                                                     rowDrag = FALSE,
                                                     columnResize = FALSE,
-                                                    wordWrap = FALSE))      
-    } else {
-      output$tableBehaSim <- NULL
-    }
-  })
- 
-  observe({
-    req(input$checkTableBehaParam)
-    
-    if(!is.null(globalVariable$dataPlotVariableNumber)){
+                                                    wordWrap = FALSE)) 
+      #Table beha parameter range
       columnsTableBehaParam <- data.frame(title = c('parameter', 'lower_95PPU', 'median', 
                                                     'upper_95PPU', 'bestParameter'), 
-                                        source = rep(NA, 5),
-                                        width = rep(300, 5),
-                                        type = rep('numeric', 5))
+                                          source = rep(NA, 5),
+                                          width = rep(300, 5),
+                                          type = rep('numeric', 5))
       
       output$tableBehaParam <- renderExcel(excelTable(data = cbind(globalVariable$paraSelection$Parameter,
                                                                    globalVariable$dataPlotVariableNumber$ppuParaRange),
-                                                    columns = columnsTableBehaParam,
-                                                    editable = FALSE,
-                                                    allowInsertRow = FALSE,
-                                                    allowInsertColumn = FALSE,
-                                                    allowDeleteColumn = FALSE,
-                                                    allowDeleteRow = FALSE, 
-                                                    rowDrag = FALSE,
-                                                    columnResize = FALSE,
-                                                    wordWrap = FALSE))      
-    } else {
-      output$tableBehaParam <- NULL
-    }
-  })
-
-  observe({
-    req(input$checkPandRFactor)
-    
-    if(!is.null(globalVariable$dataPlotVariableNumber)){
+                                                      columns = columnsTableBehaParam,
+                                                      editable = FALSE,
+                                                      allowInsertRow = FALSE,
+                                                      allowInsertColumn = FALSE,
+                                                      allowDeleteColumn = FALSE,
+                                                      allowDeleteRow = FALSE, 
+                                                      rowDrag = FALSE,
+                                                      columnResize = FALSE,
+                                                      wordWrap = FALSE))   
+      # P and r factor
       output$printPandRFactor <- renderText(
         paste("p-factor = ", globalVariable$dataPlotVariableNumber$prFactor[1],
               " r-factor = ", globalVariable$dataPlotVariableNumber$prFactor[2],
-              sep ="")
-      )
-    } else {
-      output$printPandRFactor <-  NULL
-    }
-  })  
+              sep =""))
+    }    
+
+  })
+ 
+
   
   #-----------------------------------------------------------------------------
   # Update global parameter for each reactive input
