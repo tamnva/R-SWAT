@@ -22,6 +22,10 @@ paraOptUncerUI <- function(id) {
              ),
       
       column(width = 10,
+             verbatimTextOutput("printMaxBehThreshold", placeholder = TRUE),
+      ),
+      
+      column(width = 10,
              sliderInput("plotVarNumber", 
                          "2. Input variable number to plot", 
                          value = 1, 
