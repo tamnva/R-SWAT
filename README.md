@@ -2,7 +2,7 @@
 
 - This is an interactive web-based app for parallel parameter sensitivity, calibration, and uncertainty analysis with the Soil and Water Assessment Tool ([SWAT](https://swat.tamu.edu/)).
 - The latest version of this app is always in the "master" branch.
-- If you like to contribute to the code, have any suggestions, report errors, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/swatshiny) specially designed for this app 
+- If you like to contribute to the code, have any suggestions, report errors, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/swatshiny) specially designed for this app. Tutorial videos can be found in [SWATshiny youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - This is the first version (v1.0), the app will be continued to be developed while trying to get comments/feedback from the user community
 
 ## Getting Started!

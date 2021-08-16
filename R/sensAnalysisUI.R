@@ -13,14 +13,12 @@ sensAnalysisUI <- function(id) {
     fluidRow(
     #---------------------------------------------------------------------------
     column(width = 10,
-           HTML("<b>","1. Select sensitivity analyis approach","</b>"),
+           HTML("<b>","1. Display the sensitivity analysis approach","</b>"),
     ),
     column(width = 1,
            tippy("Help?", tooltip = "<span style='font-size:15px;'>
-                   Curently 'Multivariable regression' (like SUFI 2) is the only 
-                   option. Other options are under development. The results does
-                   not change if you change to other options becuase the option
-                   'Multivariable regression' is automatically selected in the code
+                   You cannot change this option, it is automatically link to 
+                   '2.2. Pameter sampling' approach
                    <span>", 
                  allowHTML = TRUE, 
                  trigger = "click",
@@ -28,11 +26,7 @@ sensAnalysisUI <- function(id) {
     ), 
     
     column(width = 10,
-           selectInput("sensApproach", " ",
-                       list(`Sensi_Cali_(LHS)` = list("Multivariable regression"),
-                            `One at a time` = list("Morris"),
-                            `Other` = list("Todo"))
-          ),
+           verbatimTextOutput("printSelectedParaSensiApproach", placeholder = TRUE),
     ),
     
     column(width = 10,

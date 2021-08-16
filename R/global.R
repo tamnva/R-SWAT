@@ -19,7 +19,7 @@ ColumnsParaSampling = data.frame(title = colnames(dataParaSampling),
                                  width = c(900,
                                            900),
                                  source = I(list(c('Sensi_Cali_(LHS)', 
-                                                   'Sensi_(Morris)_Under_Development_DO_NOT_TRY', 
+                                                   'Sensi_(Morris)', 
                                                    'Cali_(DDS)_Under_Development_DO_NOT_TRY',
                                                    'Sensi_Cali_(UserInput)_Under_Development_DO_NOT_TRY'), 
                                                  NA)),
@@ -542,4 +542,17 @@ printVariableNameObservedFiles <- function(outputExtraction){
   
   return(data)
 }
+
+# ------------------------------------------------------------------------------
+# When user insert there own function to read the output
+# ------------------------------------------------------------------------------
+userReadOutput <- function(inputFiles){
+  
+  myDataFrame <- NULL
+  
+  
+  return(myDataFrame)
+  
+}
+
 
