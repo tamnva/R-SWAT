@@ -147,41 +147,50 @@
 
 	  # Read information from header of HRU file
 	  for (i in 1:nchar(hruHeader)){
-	    if(substr(hruHeader,i,i+3) == "HRU:"){
+	    if(substr(hruHeader,i,i+2) == "HRU"){
 	      hruID <- i
 	    }
-	    if(substr(hruHeader,i,i+8) == "Subbasin:"){
+	    if(substr(hruHeader,i,i+7) == "Subbasin"){
 	      subID <- i
 	    }
-	    if(substr(hruHeader,i,i+4) == "Soil:"){
+	    if(substr(hruHeader,i,i+3) == "Soil"){
 	      soilID <- i
 	    }
-	    if(substr(hruHeader,i,i+5) == "Slope:"){
+	    if(substr(hruHeader,i,i+4) == "Slope"){
 	      slopeID <- i
 	    }
-	    if(substr(hruHeader,i,i+4) == "Luse:"){
+	    if(substr(hruHeader,i,i+3) == "Luse"){
 	      luseID <- i
 	    }
 	  }
 
 	  result <- list()
 
-	  # get HRU number
-	  result$hru <- as.numeric(substr(hruHeader,hruID + 4, luseID - 1))
-
 	  # get subbasin number
-	  result$sub <- as.numeric(substr(hruHeader,subID + 9, hruID - 1))
+	  result$sub <- substr(hruHeader,subID, hruID - 1)
+    result$sub <- gsub("Subbasin", " ",result$sub )
+    result$sub <- as.numeric(gsub(":", " ",result$sub ))
+
+	  # get HRU number
+	  result$hru <- substr(hruHeader,hruID , luseID - 1)
+	  result$hru <- gsub("HRU", " ",result$hru )
+	  result$hru <- as.numeric(gsub(":", " ",result$hru ))
 
 	  # get soil name
-	  result$soil <- trimws(substr(hruHeader,soilID + 5,slopeID - 1))
+	  result$soil <- substr(hruHeader,soilID, slopeID - 1)
+	  result$soil <- gsub("Soil", " ",result$soil )
+	  result$soil <- trimws(gsub(":", " ",result$soil ))
 
 	  # get land use name
-	  result$lu <- trimws(substr(hruHeader,luseID + 5, soilID - 1))
-
+	  result$lu <- substr(hruHeader,luseID, soilID - 1)
+	  result$lu <- gsub("Luse", " ",result$lu )
+	  result$lu <- trimws(gsub(":", " ",result$lu ))
+	  
 	  # get slope class
-	  result$slope <- trimws(strsplit(substr(hruHeader,
-	                                         slopeID + 6,
-	                                         nchar(hruHeader)), " ")[[1]][2])
+	  result$slope <- substr(hruHeader, slopeID, nchar(hruHeader))
+	  result$slope <- gsub("Slope", " ",result$slope )
+	  result$slope <- trimws(gsub(":", " ",result$slope ))
+	  result$slope <- strsplit(result$slope, "\\s+")[[1]][1]
 
 	  return(result)
 	}
@@ -199,9 +208,17 @@
 
     # remove output.hru from list files
     file <- basename(lstFiles)
-    temp <- match("output.hru", file)
     
-    if(!is.na(temp)){
+    # remove all files that are not hru files
+    temp <- c()
+    for (i in 1:length(file)){
+      if (nchar(file[i]) != 13){
+        temp <- c(temp, i)
+      }
+    }
+
+    
+    if(!is.null(temp)){
       file <- file[-temp]
       lstFiles <- lstFiles[-temp]      
     }
