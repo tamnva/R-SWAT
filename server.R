@@ -81,12 +81,18 @@ server <- function(input, output, session) {
   observe({
     req(input$checkCurrentSimulation)
     if (file.exists(globalVariable$CurrentSimulationReportFile)){
-      currentSim <- read.table(globalVariable$CurrentSimulationReportFile,
-                               header = FALSE)
-      colnames(currentSim) <- c('Finished simulation', 'Simulation number', 
-                                'Out of', 'Total simulations', 'On core', 
-                                'Core number', 'Date', 'Time')
-      output$tableCurrentSimulation <- renderDataTable(currentSim)
+
+      fileContent <- readLines(globalVariable$CurrentSimulationReportFile, -1,
+                               warn = FALSE)  
+      printFileContent <- list()
+      for (i in 1:length(fileContent)){
+        printFileContent[[i]] <- fileContent[i]
+      }
+      
+      output$tableCurrentSimulation <- renderUI({
+        return(lapply(printFileContent, p))
+        }) 
+      
     }
   })
   
@@ -149,11 +155,12 @@ server <- function(input, output, session) {
     output$tableObsVarDisplay <- renderDataTable(mergeDataFrameDiffRow(globalVariable$observedData))
   })
   
+  
   observe({
     
     req(input$checkDisplayTableSensitivity)
     
-    if (globalVariable$checkSimComplete){
+    if (globalVariable$checkSimComplete & !is.null(globalVariable$objValue)){
 
       if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)"){
         # Get parameter values
@@ -501,7 +508,7 @@ server <- function(input, output, session) {
                     roots = volumes, 
                     filetypes=c('', 'exe'),
                     session = session)
-    
+  
     SWATexeFile <- parseFilePaths(volumes, input$getSWATexe)
     
     if(length(SWATexeFile$datapath) == 1){
@@ -704,7 +711,10 @@ table, minColumn and maxColumn means values in the column Min and Max from the a
       
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                            'SWATShinyObject.rds',
-                                           sep =''))     
+                                           sep ='')) 
+      
+      globalVariable$checkSimComplete <<- TRUE
+      
     } else {
       # Message show all input was saved
       showModal(modalDialog(
@@ -720,40 +730,15 @@ table, minColumn and maxColumn means values in the column Min and Max from the a
   #-----------------------------------------------------------------------------
   observeEvent(input$calObjFunction, {
     
-    # Initial text for print out
-    txtForPrint <- "Calculating objective function..."
-    
-    # Check if the CurrentSimulationReportFile.log file exist
-    check <- file.exists(globalVariable$CurrentSimulationReportFile)
-    
-    
-    if (check){
-      if(nrow(read.table(globalVariable$CurrentSimulationReportFile, 
-                         header = FALSE)) == nrow(globalVariable$parameterValue)){
-        
-      } else {
-        check = FALSE
-        txtForPrint <- paste(txtForPrint, "Error: Not all simulations were finished", sep ="")
-      }
-    } else {
+    if (globalVariable$checkSimComplete){
       
-      # If the log file does not exist, print out message
-      txtForPrint <- paste(txtForPrint, "Error: Could not find: .\\Output\\", 
-                           "CurrentSimulationReportFile.log",
-                           sep ="")
-    }
-    
-    
-    showModal(modalDialog(
-      title = "Important message",
-      txtForPrint,
-      easyClose = TRUE,
-      size = "l"
-    ))
-    
-    
-    if (check){
-      #--------------------
+      showModal(modalDialog(
+        title = "Important message",
+        "Calculating objective function ...",
+        easyClose = TRUE,
+        size = "l"
+      ))
+      
       # Read input data
       nSim <- as.integer(nrow(globalVariable$parameterValue)/globalVariable$ncores)
       nSim <- rep(nSim, globalVariable$ncores)
@@ -806,7 +791,6 @@ table, minColumn and maxColumn means values in the column Min and Max from the a
       # Calculate objective function values
         globalVariable$objValue <<- globalVariable$objValue/nVariables
         
-      #--------------------
       # Update numeric input (threshold objective function)
         minObjValue <- min(globalVariable$objValue)
         maxObjValue <- max(globalVariable$objValue)
@@ -827,10 +811,15 @@ table, minColumn and maxColumn means values in the column Min and Max from the a
                           max = nVariables,
                           step = 1)
         
+    } else {
+      showModal(modalDialog(
+        title = "Important message",
+        "Not all simulations were finised ...",
+        easyClose = TRUE,
+        size = "l"
+      ))
     }
     
-    globalVariable$checkSimComplete <<- check
-    globalVariable$textCheckSimComplete <<- txtForPrint
     saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                          'SWATShinyObject.rds',
                                          sep =''))    
