@@ -22,8 +22,7 @@ generalSettingUI <- function(id) {
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
                    1. Working folder: All files created by this tool are saved 
-                   in this folder. IMPORTANT: Use <span> <span style=
-                   'color: red;'> FORWARD SLASH '/' instead of BACKSLASH
+                   in this folder
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
