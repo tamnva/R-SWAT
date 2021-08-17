@@ -158,7 +158,7 @@ runSwatUI <- function(id) {
       conditionalPanel(
         condition = "input.checkCurrentSimulation == 1",
         column(width = 10,
-               dataTableOutput('tableCurrentSimulation'),
+               uiOutput('tableCurrentSimulation'),
                
         ),
       ),
