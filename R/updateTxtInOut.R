@@ -214,6 +214,11 @@
     for (i in 1:length(file)){
       if (nchar(file[i]) != 13){
         temp <- c(temp, i)
+      } else {
+        fname <- substr(file[i],1,9)
+        if (is.na(as.numeric(fname))){
+          temp <- c(temp, i)
+        }
       }
     }
 
