@@ -1,4 +1,3 @@
-library(markdown)
 
 # Dependency packages
   packages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
