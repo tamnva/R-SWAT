@@ -2,7 +2,7 @@
 
 - This is an interactive web-based app (written in [R](https://cran.r-project.org/bin/windows/base/) language with [shiny](https://shiny.rstudio.com/) package) for parallel parameter sensitivity, calibration, and uncertainty analysis with the Soil and Water Assessment Tool ([SWAT](https://swat.tamu.edu/)).
 - The latest version of this app is always in the "master" branch.
-- If you like to contribute to the code, have any suggestions, report errors, and scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/swatshiny) specially designed for this app. Tutorial videos can be found in [SWATshiny youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
+- If you would like to contribute to the code, have any suggestions, want to report errors, and have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/swatshiny) specially designed for this app. Tutorial videos can be found in [SWATshiny youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - This is the first version (v1.0), the app will be continued to be developed to serve the SWAT community. If you would like to contribute to the development of this app, please let me know. **Together we can make this app much better as my time and R knowledge for this app are very limited.**
 - **Whenever** you **use** this app (again), just go the [my GitHub](https://github.com/tamnva/SWATshiny) repository and **download the newest version**.
 
