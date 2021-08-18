@@ -11,18 +11,25 @@ ui <- dashboardPage(
   
   # ---------------------------------------------------------------------Sidebar
   dashboardSidebar(
+
+    sidebarMenu(
+      menuItem("About this app", 
+               tabName = "intro", 
+               icon = icon("book"), 
+               selected = TRUE)
+    ),
     
     sidebarMenu(
       menuItem("1. General Setting", 
                tabName = "generalSetting", 
                icon = icon("cog"), 
-               selected = TRUE)
+               selected = FALSE)
     ),
     
     sidebarMenu(
       menuItem("2. Parameter sampling", 
                tabName = "paramSampling", 
-               icon = icon("balance-scale"),
+               icon = icon("dice-five"),
                selected = FALSE)
     ),
     
@@ -58,6 +65,9 @@ ui <- dashboardPage(
     # Tab item for General Setting
     tabItems(
 
+      tabItem(tabName = "intro",
+              introductionUI("introductionUI")),
+      
       tabItem(tabName = "generalSetting",
               generalSettingUI("generalSettingUI")),
       

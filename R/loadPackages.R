@@ -1,3 +1,4 @@
+library(markdown)
 
 # Dependency packages
   packages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
@@ -20,4 +21,3 @@
   library(excelR)
   library(doParallel)
   library(sensitivity)
-  
