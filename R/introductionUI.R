@@ -1,5 +1,5 @@
 
-# Module hruUI function
+# Graphical user interface for introduction
 
 introductionUI <- function(id) {
 

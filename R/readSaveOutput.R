@@ -1,6 +1,6 @@
-
 # ------------------------------------------------------------------------------
-# Read output from reservoir (rsv), output is always at daily timestep
+# Read output from output.rch, output.sub, output.hru files, 
+# Output from these files are always at daily time step, without warm up period
 # ------------------------------------------------------------------------------
 readOutputRchFile <- function(workingDirectory, 
                            coreNumber, 
@@ -11,9 +11,9 @@ readOutputRchFile <- function(workingDirectory,
                            rchNumber,
                            output){
   
-  # rchNumber is a list with length of colNumber
   
-  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", fileName, sep = "")
+  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", 
+                    fileName, sep = "")
   
   getOutputRsvData <- read.table(fileName, header = FALSE, sep = "", skip = 9)
   timeSeries <- seq(fileCioInfo$startEval, fileCioInfo$endSim, by="days")
@@ -36,9 +36,6 @@ readOutputRchFile <- function(workingDirectory,
                                                     to = nrow(getOutputRsvData), 
                                                     by = nRch),
                                                 colNumber[i]]
-        # Trim data to the calibration range
-        # Output in .rsv file is always at daily
-        # Data in this file does not include the  warm up
         output[[varNumber]] <- output[[varNumber]][c(trim[1]:trim[2])]        
     }
   }
@@ -47,7 +44,7 @@ readOutputRchFile <- function(workingDirectory,
 }
 
 #-------------------------------------------------------------------------------
-# Function to get the reservoir number in the extract output table
+# Get reach (rch), subbasin, or hru number from output.rch ,hru, subbasin files
 # ------------------------------------------------------------------------------
 getRchNumber <- function(inputText){
 
@@ -71,7 +68,7 @@ getRchNumber <- function(inputText){
 }
 
 #-------------------------------------------------------------------------------
-# Read watout.dat file, output is always at daily timestep
+# Read watout.dat file, data is always at daily timestep, include warm-up period
 # ------------------------------------------------------------------------------
 readWatoutFile <- function(workingDirectory, 
                            coreNumber, 
@@ -81,9 +78,9 @@ readWatoutFile <- function(workingDirectory,
                            fileCioInfo,
                            output){
   
-  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", fileName, sep = "")
+  fileName <- paste(workingDirectory, "/TxtInOut_", 
+                    coreNumber, "/", fileName, sep = "")
   
-  # Output in this file is always at daily time step and include warmup period
   getWatoutData <- read.table(fileName, header = FALSE, sep = "", skip = 6)
   timeSeries <- seq(fileCioInfo$startSim, fileCioInfo$endSim, by="days")
   
@@ -100,6 +97,7 @@ readWatoutFile <- function(workingDirectory,
 
 #-------------------------------------------------------------------------------
 # Save output
+#-------------------------------------------------------------------------------
 saveOutput <- function(workingDirectory,
                        coreNumber,                   
                        fileName,   
@@ -148,9 +146,12 @@ saveOutput <- function(workingDirectory,
   if(!dir.exists(outputDirectory)) dir.create(outputDirectory)
   
   for (i in 1:length(output)){
-    OutputFileName <- paste(outputDirectory, '/Output_Variable_', i, '.txt', sep ='')
-    write.table(as.character(simulationNumber), OutputFileName, append = TRUE,row.names = FALSE,col.names = FALSE)
-    write.table(output[[i]], OutputFileName, append = TRUE,sep = '\t', row.names = FALSE, col.names = FALSE)
+    OutputFileName <- paste(outputDirectory, '/Output_Variable_', i, 
+                            '.txt', sep ='')
+    write.table(as.character(simulationNumber), OutputFileName, append = TRUE,
+                row.names = FALSE,col.names = FALSE)
+    write.table(output[[i]], OutputFileName, append = TRUE,sep = '\t', 
+                row.names = FALSE, col.names = FALSE)
   }  
     
   
@@ -189,22 +190,11 @@ getFileCioInfo <- function(TxtInOut){
     "%Y%m%d")
   }
   
-  # Output TimeStep code
-  
   info <- list()
   info$startSim <- startSim
   info$startEval <- startEval
   info$endSim <- endSim
   info$timeStepCode <- as.numeric(substr(fileCio[59],13,16))
-  
-  #if (info$timeStepCode == 0){
-  #  info$timeSeries = seq(startEval, endSim, by="months")
-  #} else if (info$timeStepCode == 1){
-  #  info$timeSeries =  seq(startEval, endSim, by="days")
-  #} else {
-  #  info$timeSeries = seq(startEval, endSim, by="years")
-  #}
-  
   
   return(info)
 }

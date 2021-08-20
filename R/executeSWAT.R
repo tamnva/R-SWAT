@@ -1,79 +1,6 @@
-
-# ------------------------------------------------------------------------------
-# Create n directory in R
-  createDirCopyUnchangeFile <- function(workingDirectory, numberOfCores, TxtInOut, exceptFiles, swatExe){
-    
-    existingDir <- list.dirs(path = workingDirectory, full.names = TRUE, recursive = TRUE)
-    
-    for (i in 1:length(existingDir)){
-      temp <- trimws(strsplit(existingDir[i], split="/")[[1]])
-      temp <- temp[length(temp)]
-      
-      if(substr(temp,1,9) == 'TxtInOut_'){
-        unlink(existingDir[i], recursive = TRUE)
-      }
-
-    }
-    
-    # Create new TxtInOut folders
-    for (i in 1:numberOfCores){
-      
-      dir <- paste(workingDirectory, '/', 'TxtInOut', '_', i, sep ='')
-      
-      dir.create(dir)
-      
-      # Copy all unchange files
-      copyAllExcept(TxtInOut, dir, exceptFiles)
-      
-      # Check if exe exist then delete
-      temp <- strsplit(swatExe, split="/")[[1]]
-      temp <- trimws(temp[length(temp)])
-      if (file.exists(paste(dir, '/', temp, sep =''))) {
-        file.remove(paste(dir, '/', temp, sep =''))
-      }
-      
-      # Copy swat.exe file
-      file.copy(swatExe, dir)
-    }
-    
-    # Create output directory
-    dir <- paste(workingDirectory, '/Output', sep ='')
-    if(file.exists(dir)) {
-      unlink(dir, recursive=TRUE,force = TRUE)
-      dir.create(dir)
-    } else {
-      dir.create(dir)
-    }
-  }
-
-
-# ------------------------------------------------------------------------------
-# split parameter values to ncores
-  splitParameterValue <- function(numberOfCores, parameterValue){
-    subParameterSet <- list()
-    numberParameterSet <- nrow(parameterValue)           
-    numberSubset <- as.integer(numberParameterSet/numberOfCores)
-    
-    if (numberOfCores > 1){
-      for (i in 1:(numberOfCores)){
-        istart <- (i-1) * numberSubset + 1
-        iend <- i * numberSubset
-        
-        if((numberSubset < numberParameterSet/numberOfCores) & (i == numberOfCores)){
-          subParameterSet[[i]] <- parameterValue[istart:nrow(parameterValue),]
-        } else {
-          subParameterSet[[i]] <- parameterValue[istart:iend,]
-        }
-      }      
-    } else {
-      subParameterSet[[1]] <- parameterValue[,]
-    }
-    
-    return(subParameterSet)
-  }
- 
 # ------------------------------------------------------------------------------
 # Function to call SWAT in sequential (from parameter set 1 to n)
+# ------------------------------------------------------------------------------
   runSWATSequential <- function(coreNumber, 
                                 workingDirectory, 
                                 swatExe, 
@@ -151,6 +78,8 @@
   
 # ------------------------------------------------------------------------------   
 # Run SWAT parallel on n cores with m parameter sets
+# ------------------------------------------------------------------------------
+  
   runSWATpar <- function(workingDirectory, 
                          TxtInOutFolder, 
                          outputExtraction, 
@@ -166,7 +95,8 @@
     
     # Create n directory in R
     if(copyUnchangeFiles){
-      createDirCopyUnchangeFile(workingDirectory, ncores, TxtInOutFolder, caliParam$file, swatExe)
+      createDirCopyUnchangeFile(workingDirectory, ncores, 
+                                TxtInOutFolder, caliParam$file, swatExe)
     }
     
     # --------------------------------------------------------------------------
@@ -194,5 +124,82 @@
     parallel::stopCluster(cl)     
   }
 
+# ------------------------------------------------------------------------------
+# Create n directory in R
+# ------------------------------------------------------------------------------
   
+  createDirCopyUnchangeFile <- function(workingDirectory, numberOfCores, 
+                                        TxtInOut, exceptFiles, swatExe){
+    
+    existingDir <- list.dirs(path = workingDirectory, 
+                             full.names = TRUE, recursive = TRUE)
+    
+    for (i in 1:length(existingDir)){
+      temp <- trimws(strsplit(existingDir[i], split="/")[[1]])
+      temp <- temp[length(temp)]
+      
+      if(substr(temp,1,9) == 'TxtInOut_'){
+        unlink(existingDir[i], recursive = TRUE)
+      }
+      
+    }
+    
+    # Create new TxtInOut folders
+    for (i in 1:numberOfCores){
+      
+      dir <- paste(workingDirectory, '/', 'TxtInOut', '_', i, sep ='')
+      
+      dir.create(dir)
+      
+      # Copy all unchange files
+      copyAllExcept(TxtInOut, dir, exceptFiles)
+      
+      # Check if exe exist then delete
+      temp <- strsplit(swatExe, split="/")[[1]]
+      temp <- trimws(temp[length(temp)])
+      if (file.exists(paste(dir, '/', temp, sep =''))) {
+        file.remove(paste(dir, '/', temp, sep =''))
+      }
+      
+      # Copy swat.exe file
+      file.copy(swatExe, dir)
+    }
+    
+    # Create output directory
+    dir <- paste(workingDirectory, '/Output', sep ='')
+    if(file.exists(dir)) {
+      unlink(dir, recursive=TRUE,force = TRUE)
+      dir.create(dir)
+    } else {
+      dir.create(dir)
+    }
+  }
+  
+  
+# ------------------------------------------------------------------------------
+# Split parameter values to ncores
+# ------------------------------------------------------------------------------
+  
+  splitParameterValue <- function(numberOfCores, parameterValue){
+    subParameterSet <- list()
+    numberParameterSet <- nrow(parameterValue)           
+    numberSubset <- as.integer(numberParameterSet/numberOfCores)
+    
+    if (numberOfCores > 1){
+      for (i in 1:(numberOfCores)){
+        istart <- (i-1) * numberSubset + 1
+        iend <- i * numberSubset
+        
+        if((numberSubset < numberParameterSet/numberOfCores) & (i == numberOfCores)){
+          subParameterSet[[i]] <- parameterValue[istart:nrow(parameterValue),]
+        } else {
+          subParameterSet[[i]] <- parameterValue[istart:iend,]
+        }
+      }      
+    } else {
+      subParameterSet[[1]] <- parameterValue[,]
+    }
+    
+    return(subParameterSet)
+  }  
   
