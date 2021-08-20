@@ -641,7 +641,7 @@ table, minColumn and maxColumn means values in the column Min and Max from the a
     checkList <- checkList & !is.null(globalVariable$SWATexeFile) 
     checkList <- checkList & !is.null(globalVariable$fileCioInfo)
     checkList <- checkList & !is.null(globalVariable$dateRangeCali)
-    
+  
     if (checkList){
 
       # First get or generate parameter set
@@ -678,6 +678,7 @@ table, minColumn and maxColumn means values in the column Min and Max from the a
                                              'SWATShinyObject.rds',
                                              sep =''))
       
+
       # Message show all input was saved
       showModal(modalDialog(
         title = "Save current input",
@@ -827,18 +828,3 @@ table, minColumn and maxColumn means values in the column Min and Max from the a
   }
 
   # globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 
-  # x <- morris(model = NULL, factors = 20, r = 4, design = list(type = "oat", levels = 5, grid.jump = 3))
-  # minimum parameter values
-  # binf <- c(1:20)
-  # bsup <- c(21:40)
-  # x <- morris(model = SWAT, factors = nParam, r = 4, binf = minColumn, bsup = maxColumn, design = list(type = "oat", levels = 5, grid.jump = 3))
-  # y <- runif(84)
-  # tell(x,y)
-  # plot(x)
-  # eval(parse(text = "x <- 2+3"))
-  # morris(model = SWAT, factors = nParameters, r = 4, binf = minColumn, bsup = maxColumn, design = list(type = 'oat', levels = 5, grid.jump = 3))
-  #-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-# Display parameter sensitivity analyis approach
-#-----------------------------------------------------------------------------L
-

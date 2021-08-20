@@ -80,7 +80,11 @@ dataOutputExtraction = data.frame(FileType = c('watout.dat'),
                                
 
 columnsOutputExtraction = data.frame(title= colnames(dataOutputExtraction),
-                                  source = I(list(c('watout.dat', 'output.rch_Under_Development_DO_NOT_TRY'),
+                                  source = I(list(c('watout.dat', 
+                                                    'output.rch',
+                                                    'output.sub',
+                                                    'output.hru',
+                                                    'output.rsv_UNDER_DEVELOPMENT_DONOT_TRY'),
                                                   NA,
                                                   NA, 
                                                   NA)),
@@ -431,18 +435,22 @@ getNumberOutputVar <- function(outputExtraction){
   for (i in 1:nrow(outputExtraction)) {
     if (outputExtraction[i,1] == "watout.dat"){
       nOutputVar <- nOutputVar + length(strsplit(outputExtraction[i,3], ",")[[1]])
-    } else if(outputExtraction[i,1] == "output.rch"){
-      nOutputVar <- nOutputVar + length(strsplit(outputExtraction[i,3], ",")[[1]])*
-                                length(strsplit(outputExtraction[i,4], ",")[[1]])
+    } else if(outputExtraction[i,1] == "output.rch" |
+              outputExtraction[i,1] == "output.hru" |
+              outputExtraction[i,1] == "output.sub" |
+              outputExtraction[i,1] == "output.rsv"){
+      if ((nchar(outputExtraction[i,3]) > 0) & (nchar(outputExtraction[i,4]) > 0)){
+        nOutputVar <- nOutputVar + sum(lengths(getRchNumber(outputExtraction[i,4])))       
+      }
     } else {
       #print("Error: Function getNumberOutputVar")
-      #print("ERROR: current option is reading from watout.dat and output.rch")
+      #print("ERROR: current option is reading from watout.dat and output.rsv")
+      # check if length column == length reach
       nOutputVar <- NULL
     }
   }
-  
-  return(nOutputVar)
 
+  return(nOutputVar)
 }
 
 # ------------------------------------------------------------------------------
@@ -504,19 +512,27 @@ printVariableNameObservedFiles <- function(outputExtraction){
         output$reach[counter] <- NA
         output$observedFile[counter] <- paste("obs_var_", counter ,".txt", sep = "")
       }
-    } else if (outputExtraction$FileType[i] == "output.rch") {
+    }else if ((outputExtraction$FileType[i] == "output.rsv") | 
+              (outputExtraction$FileType[i] == "output.rch") | 
+              (outputExtraction$FileType[i] == "output.hru") | 
+              (outputExtraction$FileType[i] == "output.sub") | 
+              (outputExtraction$FileType[i] == "output.swr")){
       columnNr <- strsplit(outputExtraction$Column[i], split = ",")[[1]]
-      reachNr <- strsplit(outputExtraction$Reach[i], split = ",")[[1]]
-      for (j in 1:length(columnNr)){
-        for (k in 1:length(reachNr)){
-          counter <- counter + 1
-          output$varNumber[counter] <- counter
-          output$column[counter] <- columnNr[j]
-          output$file[counter] <- outputExtraction$FileName[i]
-          output$reach[counter] <- reachNr[k]
-          output$observedFile[counter] <- paste("obs_var_", counter ,".txt", sep = "")          
-        }
+      rsvNr <- getRchNumber(outputExtraction$Reach[i])
+      
+      if (length(columnNr) == length(rsvNr)){
+        for (j in 1:length(columnNr)){
+          for (k in 1:length(rsvNr[[j]])){
+            counter <- counter + 1
+            output$varNumber[counter] <- counter
+            output$column[counter] <- columnNr[j]
+            output$file[counter] <- outputExtraction$FileName[i]
+            output$reach[counter] <- rsvNr[[j]][k]
+            output$observedFile[counter] <- paste("obs_var_", counter ,".txt", sep = "") 
+          }
+        }        
       }
+      
     } else {
       counter <- counter + 1
       output$varNumber[counter] <- NA
@@ -534,25 +550,14 @@ printVariableNameObservedFiles <- function(outputExtraction){
                     reach = output$reach,
                     observedFile = output$observedFile)
   colnames(data) <- c("Variable number",
-                     "Ouput file name",
+                     "Output file name",
                      "Column number",
-                     "Reach number",
-                     "Observed file name (see 4.1)")
+                     "Reach/HRU/Subbasin/Reservoir number",
+                     "Observed file name should be (see 4.1)")
   
   
   return(data)
 }
 
-# ------------------------------------------------------------------------------
-# When user insert there own function to read the output
-# ------------------------------------------------------------------------------
-userReadOutput <- function(inputFiles){
-  
-  myDataFrame <- NULL
-  
-  
-  return(myDataFrame)
-  
-}
 
 

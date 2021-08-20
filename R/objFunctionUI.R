@@ -74,6 +74,7 @@ objFunctionUI <- function(id) {
       
       conditionalPanel(
         condition = "input.checkDisplayObsVar == 1",
+      
         column(width = 10,
                dataTableOutput('tableObsVarDisplay'),
                

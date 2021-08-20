@@ -125,6 +125,7 @@
                  outputExtraction[,1],
                  fromToDate, 
                  outputExtraction[,3], 
+                 outputExtraction[,4],
                  fileCioInfo,
                  subParameterSet[i,1])
       
