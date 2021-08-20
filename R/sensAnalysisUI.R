@@ -1,5 +1,5 @@
 
-# Module hruUI function
+# Graphical user interface for Sensitivity analysis
 
 sensAnalysisUI <- function(id) {
 
@@ -11,24 +11,30 @@ sensAnalysisUI <- function(id) {
   tagList(
     
     fluidRow(
-    #---------------------------------------------------------------------------
-    column(width = 10,
-           HTML("<b>","1. Display the sensitivity analysis approach","</b>"),
-    ),
-    column(width = 1,
-           tippy("Help?", tooltip = "<span style='font-size:15px;'>
+      #-------------------------------------------------------------------------
+      # 1. Display the sensitivity analysis approach
+      #------------------------------------------------------------------------- 
+      column(width = 10,
+             HTML("<b>","1. Display the sensitivity analysis approach","</b>"),
+      ),
+      column(width = 1,
+             tippy("Help?", tooltip = "<span style='font-size:15px;'>
                    You cannot change this option, it is automatically link to 
                    '2.2. Pameter sampling' approach
                    <span>", 
-                 allowHTML = TRUE, 
-                 trigger = "click",
-                 theme = "light"),
-    ), 
-    
-    column(width = 10,
-           verbatimTextOutput("printSelectedParaSensiApproach", placeholder = TRUE),
-    ),
-    
+                   allowHTML = TRUE, 
+                   trigger = "click",
+                   theme = "light"),
+      ), 
+      
+      column(width = 10,
+             verbatimTextOutput("printSelectedParaSensiApproach", 
+                                placeholder = TRUE),
+      ),
+
+    #---------------------------------------------------------------------------
+    # 2. Display parameter sensitivity ranking
+    #---------------------------------------------------------------------------     
     column(width = 10,
            HTML("<b>","2. Display parameter sensitivity ranking","</b>"),
     ),
@@ -44,7 +50,8 @@ sensAnalysisUI <- function(id) {
     ), 
 
     column(width = 10,
-           checkboxInput('checkDisplayTableSensitivity', 'Diplay', value = FALSE, width = NULL),
+           checkboxInput('checkDisplayTableSensitivity', 'Diplay', 
+                         value = FALSE, width = NULL),
     ),
     
     conditionalPanel(
@@ -64,6 +71,5 @@ sensAnalysisUI <- function(id) {
     
     #--------------------------------------------------------------------------- 
     ),
-      
     )}
 

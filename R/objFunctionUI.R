@@ -1,5 +1,5 @@
 
-# Module hruUI function
+# Graphical user interface for Objective function
 
 objFunctionUI <- function(id) {
 
@@ -12,14 +12,17 @@ objFunctionUI <- function(id) {
     
     fluidRow(
 
-      # -----------------------------------------------------Objective function 
+      #-------------------------------------------------------------------------
+      # 1. Objective function
+      #-------------------------------------------------------------------------  
       column(width = 10,
              HTML("<b>","1. Objective function","</b>"),
       ),
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
-                   Input information in case of Sensi_Cali_(LHS) is the number of model evaluations. In case of
-                   Parameter from external file is the path to the file
+                   Input information in case of Sensi_Cali_(LHS) is the number 
+                   of model evaluations. In case of parameter from external file 
+                   is the path to the file
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -32,7 +35,9 @@ objFunctionUI <- function(id) {
                          height = "1px"),
       ),
       
-      #-------------------------------------------------Load observed data files
+      #-------------------------------------------------------------------------
+      # 2. Get observed data files
+      #------------------------------------------------------------------------- 
       
       column(width = 10,
              HTML("<b>","2. Get observed data files","</b>"),
@@ -60,7 +65,8 @@ objFunctionUI <- function(id) {
       ),
       
       column(width = 10,
-             checkboxInput('checkDisplayObsVar', 'Display obseved variable', value = FALSE, width = NULL),
+             checkboxInput('checkDisplayObsVar', 'Display obseved variable', 
+                           value = FALSE, width = NULL),
       ),
       
       column(width = 1,
@@ -80,6 +86,11 @@ objFunctionUI <- function(id) {
                
         ),
       ),
+      
+      
+      #-------------------------------------------------------------------------
+      # 3. Calculate objective function
+      #------------------------------------------------------------------------- 
       div( style = "margin-top: 15em",  
            column(width = 10,
                   HTML("<b>","3. Calculate objective function","</b>"),
@@ -92,7 +103,8 @@ objFunctionUI <- function(id) {
       ),
       
       column(width = 10,
-             checkboxInput('checkDisplayObjFunction', 'Check here to display result', value = FALSE, width = NULL),
+             checkboxInput('checkDisplayObjFunction', 'Check here to display result', 
+                           value = FALSE, width = NULL),
       ),
       
       column(width = 1,

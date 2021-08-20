@@ -1,5 +1,5 @@
 
-# Module hruUI function
+# Graphical interface for parameter sampling
 
 paramSamplingUI <- function(id) {
 
@@ -12,9 +12,11 @@ paramSamplingUI <- function(id) {
     
     fluidRow(
 
-      # -----------------------------------------------Parameter selection table
+      #-------------------------------------------------------------------------
+      # 1. Parameter selection table
+      #-------------------------------------------------------------------------
       column(width = 10,
-             HTML("<b>","1. Select SWAT parameters to calibration and/or 
+             HTML("<b>","1. Select SWAT parameters for calibration and/or 
                   sensitivity analyis","</b>"),
       ),
       
@@ -79,7 +81,9 @@ paramSamplingUI <- function(id) {
            ),
       ),
 
-      # ---------------------------------------------Parameter sampling approach
+      #-------------------------------------------------------------------------
+      # 2. Parameter sampling
+      #-------------------------------------------------------------------------
       column(width = 10,
              HTML("<b>",
                         "2. Parameter sampling",

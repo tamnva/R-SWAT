@@ -1,5 +1,5 @@
 
-# Module hruUI function
+# Graphical interface for Gerernal setting
 
 generalSettingUI <- function(id) {
 
@@ -11,7 +11,9 @@ generalSettingUI <- function(id) {
   tagList(
     
     fluidRow( 
-      # Input UI 
+      #-------------------------------------------------------------------------
+      # 1. Working folder
+      #-------------------------------------------------------------------------
       column(width = 10,
              textInput("workingFolder",
                        "1. Working folder",
@@ -19,6 +21,7 @@ generalSettingUI <- function(id) {
                        width = "100%"
              ),
       ),
+      
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
                    1. Working folder: All files created by this tool are saved 
@@ -28,6 +31,10 @@ generalSettingUI <- function(id) {
                    trigger = "click",
                    theme = "light"),
       ),
+
+      #-------------------------------------------------------------------------
+      # 2. TxtInOut folder
+      #-------------------------------------------------------------------------
       column(width = 10,
              textInput("TxtInOutFolder",
                        "2. TxtInOut folder",
@@ -70,7 +77,10 @@ generalSettingUI <- function(id) {
         ),
       ),
       
-      
+
+      #-------------------------------------------------------------------------
+      # 3. Select executable SWAT file 
+      #------------------------------------------------------------------------- 
       column(width = 10,
              HTML("<b>",
                         "3. Select executable SWAT file",
@@ -86,7 +96,7 @@ generalSettingUI <- function(id) {
                    trigger = "click",
                    theme = "light"),
       ),
-      
+
       column(width = 10,
              shinyFilesButton("getSWATexe", "Click here to select" ,
                               title = "Please select the executable SWAT file:",
@@ -98,6 +108,9 @@ generalSettingUI <- function(id) {
              verbatimTextOutput("printSWATexe", placeholder = TRUE),
       ),
 
+      #-------------------------------------------------------------------------
+      # 4. Files with list of all SWAT parameters 
+      #-------------------------------------------------------------------------
       div( style = "margin-top: 15em",  
            column(width = 10,
                   HTML("<b>",
@@ -162,6 +175,8 @@ generalSettingUI <- function(id) {
                dataTableOutput('tableSWATParam'),
         ),
       ),
+      
+      #----------------------------------------------------add more content here
   
     )
     

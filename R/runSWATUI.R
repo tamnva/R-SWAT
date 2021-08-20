@@ -1,5 +1,5 @@
 
-# Module runSWATUI function
+# Graphical user interface for Run SWAT
 
 runSwatUI <- function(id) {
 
@@ -11,7 +11,9 @@ runSwatUI <- function(id) {
   tagList(
     
     fluidRow(
-      # -----------------------------------------------------------Model outputs            
+      #-------------------------------------------------------------------------
+      # 1. Define model outputs for extraction
+      #-------------------------------------------------------------------------           
       column(width = 10,
              HTML("<b>","1. Define model outputs for extraction","</b>"),
       ),
@@ -49,9 +51,11 @@ runSwatUI <- function(id) {
         ),
       ),
       
-      # -------------------------------------------------------Evaluation period
+      #-------------------------------------------------------------------------
+      # 2. Select date range for calibration
+      #-------------------------------------------------------------------------  
       column(width = 10,
-             dateRangeInput("dateRangeCali", "3. Select date range",
+             dateRangeInput("dateRangeCali", "2. Select date range",
                             start = "2001-01-01",
                             end   = "2010-12-31"),
              
@@ -67,10 +71,13 @@ runSwatUI <- function(id) {
                    trigger = "click",
                    theme = "light"),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 3. Select number of parallel runs (cores)
+      #-------------------------------------------------------------------------       
       column(width = 10,
              sliderInput("ncores", 
-                         "2. Select number of parallel runs (cores)", 
+                         "3. Select number of parallel runs (cores)", 
                          value = 4, 
                          min = 1, 
                          max = detectCores(),
@@ -92,10 +99,13 @@ runSwatUI <- function(id) {
                    trigger = "click",
                    theme = "light"),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 4. Run SWAT
+      #-------------------------------------------------------------------------        
       div( style = "margin-top: 5em",  
            column(width = 10,
-                  HTML("<b>","3. Run SWAT","</b>"),
+                  HTML("<b>","4. Run SWAT","</b>"),
            ),
       ),
 
@@ -120,10 +130,13 @@ runSwatUI <- function(id) {
              actionButton("runSWAT", "Click here to run SWAT"),
              verbatimTextOutput('printRuning'),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 5. See simulation report
+      #-------------------------------------------------------------------------       
       div( style = "margin-top: 15em",  
            column(width = 10,
-                  HTML("<b>","4. See simulation report","</b>"),
+                  HTML("<b>","5. See simulation report","</b>"),
            ),
       ),
 
@@ -138,9 +151,6 @@ runSwatUI <- function(id) {
                    trigger = "click",
                    theme = "light"),
       ),
-      #-------------------------------------------------------------------------
-      # Display report of the simulation when all simulations are finished
-      #-------------------------------------------------------------------------
       
       column(width = 5,
              checkboxInput('checkCurrentSimulation', 
@@ -162,10 +172,6 @@ runSwatUI <- function(id) {
                
         ),
       ),
-
-      #-------------------------------------------------------------------------
-      # Display parameter sets
-      #-------------------------------------------------------------------------
       
       conditionalPanel(
         condition = "input.checkDisplayParameterSet == 1",
@@ -174,10 +180,9 @@ runSwatUI <- function(id) {
                            width = "100%", 
                            height = "1px"),
         ),
-      ),      
+      ),   
+      #-------------------------------------------------------------------------
       
     )
-    
-    #----------------
   )}
 
