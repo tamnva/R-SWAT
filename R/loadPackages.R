@@ -1,4 +1,3 @@
-
 # Dependency packages
   packages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
                 'shinyFiles', 'tippy', 'excelR', 'shiny', 'doParallel',

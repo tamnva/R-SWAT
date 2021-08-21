@@ -1,5 +1,5 @@
 
-# Module paraOptUncerUI function
+# Graphical user interface for Optimization/Uncertainty
 
 paraOptUncerUI <- function(id) {
 
@@ -11,7 +11,9 @@ paraOptUncerUI <- function(id) {
   tagList(
     
     fluidRow(
-      #---------------------------------------------------------------------------
+      #-------------------------------------------------------------------------
+      # 1. Input behavioral threshold
+      #------------------------------------------------------------------------- 
       column(width = 10,
              numericInput("behThreshold", 
                           "1. Input behavioral threshold",
@@ -24,7 +26,10 @@ paraOptUncerUI <- function(id) {
       column(width = 10,
              verbatimTextOutput("printMaxBehThreshold", placeholder = TRUE),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 2. Input variable number to plot
+      #-------------------------------------------------------------------------       
       column(width = 10,
              sliderInput("plotVarNumber", 
                          "2. Input variable number to plot", 
@@ -64,7 +69,8 @@ paraOptUncerUI <- function(id) {
 
       # Display behavioral parameter range
       column(width = 10,
-             checkboxInput("checkTableBehaParam", "Display table of behavioral parameter range"),
+             checkboxInput("checkTableBehaParam", 
+                           "Display table of behavioral parameter range"),
       ),
       conditionalPanel(
         condition = "input.checkTableBehaParam== 1",

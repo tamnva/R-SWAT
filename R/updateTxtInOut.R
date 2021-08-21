@@ -1,7 +1,6 @@
-
 # ------------------------------------------------------------------------------
 # Convert subbasin number to subbasin name
-
+# ------------------------------------------------------------------------------
   subtofilename <- function(sub){
     if(sub < 10){
       filename <- paste("0000", sub, "0000", sep="")
@@ -19,6 +18,7 @@
 
 # ------------------------------------------------------------------------------
 # Update numbers in a file
+# ------------------------------------------------------------------------------
 
 	updateSingleFile <- function(toDir,
 	                             file,
@@ -121,6 +121,7 @@
 
 # ------------------------------------------------------------------------------
 # Update multiple files in a folder
+# ------------------------------------------------------------------------------
 
 	updateMultiFile <-  function(toDir, caliParam){
 
@@ -142,7 +143,7 @@
 
 #-------------------------------------------------------------------------------
 # Get HRU information from a single hru file
-
+# ------------------------------------------------------------------------------
 	getHruHeader <- function(hruHeader){
 
 	  # Read information from header of HRU file
@@ -198,7 +199,7 @@
 
 #-------------------------------------------------------------------------------
 # Get HRU information from all HRU files (in TxtInOut folder)
-
+# ------------------------------------------------------------------------------
   getHruInfo <- function(TxtInOut){
 
     # list of .hru files in TxtInOut folder
@@ -266,7 +267,8 @@
 
 #-------------------------------------------------------------------------------
 # Get subset of HRU based on land use, soil type, slope, subbasin selection
-
+# ------------------------------------------------------------------------------
+  
   hruSubset <- function(HRUinfo, selectCriteria){
 
     hru <- HRUinfo
@@ -297,6 +299,7 @@
 
 #-------------------------------------------------------------------------------
 # Read all SWAT parameters form "swat_param.txt" file
+# ------------------------------------------------------------------------------
 
 	loadSwatParam <- function(swatParamFile){
 	  
@@ -321,6 +324,7 @@
 
 #-------------------------------------------------------------------------------
 # Load param_change.txt file
+# ------------------------------------------------------------------------------	
 	
 	loadParamChangeFileContent <- function(HRUinfo, paraSelection, SWATParam, TxtInOutFolder){
 
@@ -454,7 +458,8 @@
 	}
 	
 #-------------------------------------------------------------------------------	
-# Load param_change.txt file
+# Get parameter value
+#-------------------------------------------------------------------------------
 	getParameterValue <- function(parameter, parameterValue){
 	  for (i in 1:length(parameter)){
 	    for (j in 1:length(parameter[[i]])){
@@ -464,23 +469,10 @@
 	  return(parameter)
 	}
 
-#-------------------------------------------------------------------------------	
-# Sensi_Cali_(LHS)
-	lhsRange <- function(nIter, paramRange){
-	  
-	  nParam <- nrow(paramRange)
-	  paramSampling <- randomLHS(nIter, nParam)
-	  
-	  for (i in 1:nParam){
-	    paramSampling[,i] <- paramRange[i,1] +  paramSampling[,i] * (paramRange[i,2] - paramRange[i,1])
-	  }
-	  
-	  paramSampling <- cbind(c(1:nrow(paramSampling)), paramSampling)
-	  return(paramSampling)
-	}	
 
 #-------------------------------------------------------------------------------	
-# copy all files in a folder except files
+# Copy all files in a folder except files
+#-------------------------------------------------------------------------------	
 	copyAllExcept <- function(fromDir, toDir, exceptFiles){
 	  
 	  listFiles <- list.files(fromDir, full.names = FALSE)
@@ -491,7 +483,8 @@
 	}	
 
 #-------------------------------------------------------------------------------	
-# read content of all Files
+# Read content of all files that are going to be updated
+#-------------------------------------------------------------------------------	
 	readContentFiles <- function(fileDirectory, files){
 	  
 	  files <- paste(fileDirectory, "/", files, sep = "")
@@ -505,7 +498,8 @@
 	}		
 
 #-------------------------------------------------------------------------------
-# get parameter range from paraSelection matrix
+# Get parameter range from paraSelection matrix
+#-------------------------------------------------------------------------------	
 	getParamRange <- function(paraSelection){
 	  
 	  parameterRange <- as.matrix(paraSelection[,3:4])

@@ -1,5 +1,5 @@
 
-# Module runSWATUI function
+# Graphical user interface for Run SWAT
 
 runSwatUI <- function(id) {
 
@@ -11,22 +11,32 @@ runSwatUI <- function(id) {
   tagList(
     
     fluidRow(
-      # -----------------------------------------------------------Model outputs            
+      #-------------------------------------------------------------------------
+      # 1. Define model outputs for extraction
+      #-------------------------------------------------------------------------           
       column(width = 10,
              HTML("<b>","1. Define model outputs for extraction","</b>"),
       ),
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
-                   Current option is reading from file type 'watout.dat'. You 
-                   can read from multiple 'watout.dat' file type, just add as many 
-                   rows as you do so. In this case, input the column number
-                   as many as you want, seperated by comma (for example 4,5), 
-                   leave the reach number empty as reading watout.dat files does
-                   not need this.Reading from output.rch is under developement 
-                   (don't try this). <span> ", 
+                   You can read from multiple 'watout.dat' file type with different 
+                   names, add more rows if you do so. The column specifies which 
+                   columns from that file you want to extract (e.g., column 4 and 
+                   5 and 7) -> the input should be '4,5,7' with comma to seperate 
+                   the column name. In case of reading from watout.dat file type,
+                   leave the reach number empty. In case of reading from .rch, 
+                   .sub, .hru, the reach number is also the subbasin or hru number.
+                   For example, you want to read from column 4 reach number 1,2 and
+                   from columnn 5 reach number 1,2,3, column 7 reach number 3. Input
+                   to the Column should be '4,5,7', to the Reach should be 
+                   '1,2 * 1,2,3 * 3' Note * must be use to seperate this expression. Currently
+                   incase of reading from .hru, .sub, .rch the file name and file type 
+                   must be identical. Please check the tick box below to ensure that 
+                   all numbers you enter here appear in the display table
+                   <span> ", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
       
       column(width = 10,
@@ -49,9 +59,11 @@ runSwatUI <- function(id) {
         ),
       ),
       
-      # -------------------------------------------------------Evaluation period
+      #-------------------------------------------------------------------------
+      # 2. Select date range for calibration
+      #-------------------------------------------------------------------------  
       column(width = 10,
-             dateRangeInput("dateRangeCali", "3. Select date range",
+             dateRangeInput("dateRangeCali", "2. Select date range",
                             start = "2001-01-01",
                             end   = "2010-12-31"),
              
@@ -65,12 +77,15 @@ runSwatUI <- function(id) {
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 3. Select number of parallel runs (cores)
+      #-------------------------------------------------------------------------       
       column(width = 10,
              sliderInput("ncores", 
-                         "2. Select number of parallel runs (cores)", 
+                         "3. Select number of parallel runs (cores)", 
                          value = 4, 
                          min = 1, 
                          max = detectCores(),
@@ -90,12 +105,15 @@ runSwatUI <- function(id) {
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 4. Run SWAT
+      #-------------------------------------------------------------------------        
       div( style = "margin-top: 5em",  
            column(width = 10,
-                  HTML("<b>","3. Run SWAT","</b>"),
+                  HTML("<b>","4. Run SWAT","</b>"),
            ),
       ),
 
@@ -113,17 +131,20 @@ runSwatUI <- function(id) {
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
       
       column(width = 10,
              actionButton("runSWAT", "Click here to run SWAT"),
              verbatimTextOutput('printRuning'),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 5. See simulation report
+      #-------------------------------------------------------------------------       
       div( style = "margin-top: 15em",  
            column(width = 10,
-                  HTML("<b>","4. See simulation report","</b>"),
+                  HTML("<b>","5. See simulation report","</b>"),
            ),
       ),
 
@@ -136,11 +157,8 @@ runSwatUI <- function(id) {
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
-      #-------------------------------------------------------------------------
-      # Display report of the simulation when all simulations are finished
-      #-------------------------------------------------------------------------
       
       column(width = 5,
              checkboxInput('checkCurrentSimulation', 
@@ -162,10 +180,6 @@ runSwatUI <- function(id) {
                
         ),
       ),
-
-      #-------------------------------------------------------------------------
-      # Display parameter sets
-      #-------------------------------------------------------------------------
       
       conditionalPanel(
         condition = "input.checkDisplayParameterSet == 1",
@@ -174,10 +188,9 @@ runSwatUI <- function(id) {
                            width = "100%", 
                            height = "1px"),
         ),
-      ),      
+      ),   
+      #-------------------------------------------------------------------------
       
     )
-    
-    #----------------
   )}
 
