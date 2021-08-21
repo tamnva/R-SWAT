@@ -24,7 +24,7 @@ sensAnalysisUI <- function(id) {
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ), 
       
       column(width = 10,
@@ -41,12 +41,12 @@ sensAnalysisUI <- function(id) {
     
     column(width = 1,
            tippy("Help?", tooltip = "<span style='font-size:15px;'>
-                   Check this box to display parameter sensitivity ranking in 
-                   of figure and table
+                   Check this box to display parameter sensitivity ranking 
+                   results in of form of figure and table
                    <span>", 
                  allowHTML = TRUE, 
                  trigger = "click",
-                 theme = "light"),
+                 theme = "translucent"),
     ), 
 
     column(width = 10,

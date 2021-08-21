@@ -29,7 +29,7 @@ generalSettingUI <- function(id) {
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
 
       #-------------------------------------------------------------------------
@@ -46,12 +46,12 @@ generalSettingUI <- function(id) {
       
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
-             2. TxtInOut folder: The folder which contains TxtInOut files created 
-             by ArcSWAT or QSWAT, etc...
+             2. TxtInOut folder: The TxtInOut folder which contains all SWAT 
+             input files
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
       
       column(width = 10,
@@ -67,7 +67,7 @@ generalSettingUI <- function(id) {
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
       
       conditionalPanel(
@@ -89,12 +89,12 @@ generalSettingUI <- function(id) {
       
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
-                   3. Select executable SWAT file: Select the executable swat 
-                   files, for example, swat_32debug.exe
+                   3. Select executable SWAT file: Select an executable swat 
+                   file, for example, swat_32debug.exe
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
 
       column(width = 10,
@@ -123,21 +123,18 @@ generalSettingUI <- function(id) {
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
                             4. Files with list of all SWAT parameters: 
                             The file name must be 'swatParam.txt'
-                            ASCII file format that contains a description 
-                            (parameter name, location, number format, 
-                            theoretical min and max values) of all SWAT 
-                            parameters. If any parameter that you want to calibrate
-                            but missing in this file, simply open this file 
-                            manually and add to the file. The theoretical min 
-                            and max values are used to restrict the parameters
-                            that you are going to modified for calibration or 
-                            sensitivity analysis will not out of this range. I 
-                            would suggest checking the theoretical min and max values of 
-                            your selected parameters
+                            ASCII file format. If there are  parameter that you 
+                            want to calibrate but are missing in this file, 
+                            simply open this file manually and add to the file. 
+                            The theoretical min and max values are used to 
+                            restrict the parameters that you are going to modified
+                            will not out of this range. I would suggest checking 
+                            the theoretical min and max values of your selected 
+                            parameters.
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
-                   theme = "light"),
+                   theme = "translucent"),
       ),
       
       column(width = 10,
@@ -155,18 +152,6 @@ generalSettingUI <- function(id) {
              checkboxInput('checkSWATParamFile', 
                            'Display content of the SWAT parameter file', 
                            value = FALSE, width = NULL),
-      ),
-      
-      column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
-                   The file name must be 'swatParam.txt'. If the format is 
-                   correct, a table with a list of parameters and their 
-                   properties (location, number format,min, max values,..) will 
-                   appear when you tick this box.
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "light"),
       ),
       
       conditionalPanel(
