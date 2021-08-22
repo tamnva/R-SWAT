@@ -438,14 +438,16 @@
 	      change$file <- unique(c(change$file, files))
 	      nfiles <- length(change$file)
 	      
-	      for (j in (counter+1):nfiles){
-	        change$atLine[[j]] <- atLine
-	        change$atPosition[[j]] <- matrix(atPosition, ncol = 2, byrow = TRUE) 
-	        change$numberFormat[[j]] <- numberFormat
-	        change$changeMethod[[j]] <- changeMethod
-	        change$applyValue[[j]] <- i
-	        change$absoluteMin[[j]] <- absoluteMin
-	        change$absoluteMax[[j]] <- absoluteMax
+	      if (nfiles > counter){
+	        for (j in (counter+1):nfiles){
+	          change$atLine[[j]] <- atLine
+	          change$atPosition[[j]] <- matrix(atPosition, ncol = 2, byrow = TRUE) 
+	          change$numberFormat[[j]] <- numberFormat
+	          change$changeMethod[[j]] <- changeMethod
+	          change$applyValue[[j]] <- i
+	          change$absoluteMin[[j]] <- absoluteMin
+	          change$absoluteMax[[j]] <- absoluteMax
+	        }	        
 	      }
 	    }	    
 	    counter <- nfiles	    
