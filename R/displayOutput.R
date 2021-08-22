@@ -65,23 +65,57 @@ mergeDataFrameDiffRow <- function(inputDataFrameList){
 # ------------------------------------------------------------------------------
 getNumberOutputVar <- function(outputExtraction){
   nOutputVar <- 0
+  userReadSwatOutput <- c()
   for (i in 1:nrow(outputExtraction)) {
     if (outputExtraction[i,1] == "watout.dat"){
-      nOutputVar <- nOutputVar + length(strsplit(outputExtraction[i,3], ",")[[1]])
+      temp <- length(strsplit(outputExtraction[i,3], ",")[[1]])
+      nOutputVar <- nOutputVar + temp
+      
+      if (!is.na(temp)){
+        if (is.numeric(temp)){
+          if(temp > 0){
+            userReadSwatOutput <- c(userReadSwatOutput, rep(FALSE, temp))          
+          }
+        }        
+      }
+
     } else if(outputExtraction[i,1] == "output.rch" |
               outputExtraction[i,1] == "output.hru" |
               outputExtraction[i,1] == "output.sub" |
               outputExtraction[i,1] == "output.rsv"){
       if ((nchar(outputExtraction[i,3]) > 0) & (nchar(outputExtraction[i,4]) > 0)){
-        nOutputVar <- nOutputVar + sum(lengths(getRchNumber(outputExtraction[i,4])))       
+        temp <- sum(lengths(getRchNumber(outputExtraction[i,4])))  
+        nOutputVar <- nOutputVar + temp
+        if (!is.na(temp)){
+          if (is.numeric(temp)){
+            if(temp > 0){
+              userReadSwatOutput <- c(userReadSwatOutput, rep(FALSE, temp))          
+            }
+          }        
+        }
+      }
+    } else if(outputExtraction[i,1] == "userReadSwatOutput") {
+      temp <- as.numeric(outputExtraction[i,3])
+      nOutputVar <- nOutputVar + temp
+      if (!is.na(temp)){
+        if (is.numeric(temp)){
+          if(temp > 0){
+            userReadSwatOutput <- c(userReadSwatOutput, rep(TRUE, temp))          
+          }
+        }        
       }
     } else {
       # TODO: add check if length column == length reach
+      userReadSwatOutput <- NULL
       nOutputVar <- NULL
     }
   }
   
-  return(nOutputVar)
+  output <- list()
+  output$nOutputVar <- nOutputVar
+  output$userReadSwatOutput <- userReadSwatOutput
+  
+  return(output)
 }
 
 
@@ -133,7 +167,22 @@ printVariableNameObservedFiles <- function(outputExtraction){
           }
         }        
       }
+    } else if (outputExtraction$FileType[i] == "userReadSwatOutput"){
       
+      if (!is.null(outputExtraction$Column[i]) & !is.na(outputExtraction$Column[i])){
+        if (!is.numeric(outputExtraction$Column[i])){
+          columnNr <- as.numeric(outputExtraction$Column[i])
+          for (j in 1:columnNr){
+            counter <- counter + 1
+            output$varNumber[counter] <- counter
+            output$column[counter] <- NA
+            output$file[counter] <- paste("userReadSwatOutput_var_", j, sep ="")
+            output$reach[counter] <- NA
+            output$observedFile[counter] <- paste("obs_var_", counter ,
+                                                  ".txt", sep = "")
+          }        
+        }        
+      }      
     } else {
       counter <- counter + 1
       output$varNumber[counter] <- NA

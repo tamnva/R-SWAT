@@ -134,7 +134,13 @@ saveOutput <- function(workingDirectory,
                                   fileCioInfo,
                                   getRchNumber(rchNumber[i]),
                                   output)
-      } else {
+    } else if (fileType[i] == "userReadSwatOutput"){
+      workingDir <- paste(workingDirectory, "/TxtInOut_", coreNumber, sep = "")
+      setwd(workingDir)
+      userExtractData <- userReadSwatOutput()
+      output <- appendListObject(output, userExtractData)
+        
+    } else {
       print("Unkown output files, please modify saveOutput function")
     }
   }
@@ -197,4 +203,20 @@ getFileCioInfo <- function(TxtInOut){
   info$timeStepCode <- as.numeric(substr(fileCio[59],13,16))
   
   return(info)
+}
+
+#-------------------------------------------------------------------------------
+# Append list object
+#-------------------------------------------------------------------------------
+
+appendListObject <- function(listA, listB){
+  
+  counter <- length(listA)
+  
+  for (i in 1:length(listB)){
+    counter <- counter + 1
+    listA[[counter]] <- listB[[i]]
+  }
+  
+  return(listA)
 }

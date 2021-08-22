@@ -82,4 +82,4 @@ septwq.dat
                0    | ISNOW: 0=do not print snowband.out; 1=print output.snw
                0    | IMGT: 0=do not print output.mtg; 1=print output.mgt
                0    | IWTR: Code for printing output.pot and output.wtr files
-               0    | ICALEN: Code for printing out calendar or julian dates to .rch, .sub and .hru files
+               1    | ICALEN: Code for printing out calendar or julian dates to .rch, .sub and .hru files

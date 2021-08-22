@@ -269,7 +269,9 @@ model runs are (nParameters + 1) * r")
     outputExtraction <- excel_to_R(input$tableOutputExtraction)
     if(is.null(outputExtraction)) outputExtraction <- dataOutputExtraction
     globalVariable$outputExtraction  <<- outputExtraction  
-    globalVariable$nOutputVar  <<- getNumberOutputVar(outputExtraction)
+    OutputVar  <- getNumberOutputVar(outputExtraction)
+    globalVariable$nOutputVar <<- OutputVar$nOutputVar
+    globalVariable$userReadSwatOutput <<- OutputVar$userReadSwatOutput    
     output$tableOutputExtractionDisplayOnly <- renderDataTable(
       printVariableNameObservedFiles(outputExtraction)
     )
@@ -511,6 +513,9 @@ model runs are (nParameters + 1) * r")
         globalVariable$observedData[[i]] <<- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
         colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
       }
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+                                           'SWATShinyObject.rds',
+                                           sep ='')) 
     }
   })
   
@@ -544,9 +549,6 @@ model runs are (nParameters + 1) * r")
       nSim[globalVariable$ncores] <- nSim[globalVariable$ncores] + 
         nrow(globalVariable$parameterValue) - sum(nSim)
       
-      ntimestep <- as.numeric(globalVariable$dateRangeCali[2]- 
-                                globalVariable$dateRangeCali[1]) + 2
-      
       nVariables <- globalVariable$nOutputVar
       
       simData <- list()
@@ -558,6 +560,14 @@ model runs are (nParameters + 1) * r")
       for (i in 1:globalVariable$ncores){
         #loop over number of variables
         for (j in 1:nVariables){
+
+          if (globalVariable$userReadSwatOutput[j]){
+            ntimestep <- nrow(globalVariable$observedData[[j]]) + 1
+          } else {
+            ntimestep <- as.numeric(globalVariable$dateRangeCali[2]- 
+                                      globalVariable$dateRangeCali[1]) + 2
+          }
+          
           if ((i == 1)) {
             simData[[j]] <- list()
             globalVariable$perCriteria[[j]] <<- list()
@@ -578,6 +588,7 @@ model runs are (nParameters + 1) * r")
             
             globalVariable$perCriteria[[j]][[counter[j]]] <<- perCriteria(globalVariable$observedData[[j]][,2],
                                                                           simData[[j]][[counter[j]]])
+            
             if((i == 1) & (j == 1)) {
               perIndex <- match(globalVariable$objFunction$Index[1], 
                                 colnames(globalVariable$perCriteria[[j]][[counter[j]]]))
@@ -586,7 +597,9 @@ model runs are (nParameters + 1) * r")
               globalVariable$perCriteria[[j]][[counter[j]]][perIndex]         
           }
         }
+        
       }
+   
       # Calculate objective function values
       globalVariable$objValue <<- globalVariable$objValue/nVariables
       
@@ -621,7 +634,8 @@ model runs are (nParameters + 1) * r")
     
     saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                          'SWATShinyObject.rds',
-                                         sep =''))    
+                                         sep =''))  
+
   })
 
 
