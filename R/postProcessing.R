@@ -139,7 +139,9 @@ prFactor <- function(obs, low, up){
   
 
 
-#-------------------------------------------------------------------------------  
+#------------------------------------------------------------------------------- 
+# TODO 
+# ------------------------------------------------------------------------------
   uncertaintyAnalysis <- function(outData, obsData, objFunction, 
                                   objCriteria, behaThreshold){
     
@@ -164,3 +166,19 @@ prFactor <- function(obs, low, up){
     return(result)
     
   }
+  
+#------------------------------------------------------------------------------- 
+# Check if the extracted output is defined by user or not 
+# ------------------------------------------------------------------------------
+  checkUserReadSwatOutput <- function(outputExtraction, varNumber){
+    
+    findRow <- which(outputExtraction$FileType == "userReadSwatOutput")
+    
+    if (length(findRow > 0)){
+      output <- TRUE
+    } else {
+      output <- FALSE
+    }
+}
+  
+  
