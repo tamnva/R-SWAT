@@ -1,7 +1,7 @@
 # Dependency packages
   packages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
                 'shinyFiles', 'tippy', 'excelR', 'shiny', 'doParallel',
-                'sensitivity')
+                'sensitivity', 'ggplot2')
 
 # Install dependency packages if necessary
   install.packages(setdiff(packages,rownames(installed.packages())),
