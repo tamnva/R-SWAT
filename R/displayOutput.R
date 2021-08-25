@@ -208,5 +208,30 @@ printVariableNameObservedFiles <- function(outputExtraction){
   return(data)
 }
 
+# ------------------------------------------------------------------------------
+# Plot function for simulated values, observed and 95 PPU
+# ------------------------------------------------------------------------------
+plotSimulated <- function(inputDataFrame){
+  inputDataFrame$date <- as.Date(inputDataFrame$date, "%Y-%m-%d")
+  myplot <- ggplot(inputDataFrame) + 
+    #95 PPU
+    geom_ribbon(aes(x = date, ymin = lower, ymax = upper, color = "95PPU"), 
+                size = 0.0, fill = "red", alpha = 0.3) +
+    # Best simulation
+    geom_line(aes(x = date, y = best, color = "Best simulation"), alpha = 0.6) +
+    # Observed data
+    geom_line(aes(x = date, y = median, color = "Median"), alpha = 0.5) +
+    # Observed data
+    geom_line(aes(x = date, y = observed, color = "Observed"), alpha = 0.6) +
+    scale_colour_manual(name= '', values=c("95PPU" = "red", 
+                                           "Best simulation" = "red",
+                                           "Median" = "black",
+                                           "Observed" = "darkblue")) +
+    # Axis name
+    labs(x ="Date", y = " ") +
+    scale_x_date(date_labels = "%m-%Y") +
+    theme_bw()
+  return(ggplotly(myplot))
+}
 
 
