@@ -847,14 +847,13 @@ model runs are (nParameters + 1) * r")
                                                                globalVariable$objFunction$Index[1],
                                                                globalVariable$observedData)
       
-      dataPlot <- cbind(globalVariable$dataPlotVariableNumber$ppuSimData, 
-                        Date = as.Date(globalVariable$observedData[[input$plotVarNumber]]$Date, "%Y-%m-%d"),
-                        Value = globalVariable$observedData[[input$plotVarNumber]]$Value
-      )
+      tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData
+      tempVar <- cbind(tempVar, globalVariable$observedData[[input$plotVarNumber]]$Value)
       
-      PlotVariableNumber <- plot_ly(dataPlot, x = ~Date, y = ~bestSim, name = 'Simulated (best)', type = 'scatter', mode = 'lines') 
-      PlotVariableNumber <- PlotVariableNumber %>% add_trace(y = ~Value, name = 'Observed', mode = 'lines')
-      output$PlotVariableNumber <- renderPlotly(PlotVariableNumber) 
+      colnames(tempVar) <- c("date", "lower", "median", "upper", "best", "observed")
+
+
+      output$PlotVariableNumber <- renderPlotly(plotSimulated(tempVar)) 
       
       # Table
       columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'), 
