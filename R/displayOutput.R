@@ -234,4 +234,11 @@ plotSimulated <- function(inputDataFrame){
   return(ggplotly(myplot))
 }
 
-
+plotSensitivity <- function(xval, yval, para){
+  myData <- data.frame(x = xval, y = yval, Parameters = para)
+    #95 PPU
+    myplot <- ggplot(data = myData, aes(x=x, y=y, colour = Parameters)) + 
+      geom_point() +
+      theme_bw()
+  return(myplot)
+}

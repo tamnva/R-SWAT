@@ -50,7 +50,7 @@ sensAnalysisUI <- function(id) {
     ), 
 
     column(width = 10,
-           checkboxInput('checkDisplayTableSensitivity', 'Diplay', 
+           checkboxInput('checkDisplayTableSensitivity', 'Diplay parameter sensitivity plot', 
                          value = FALSE, width = NULL),
     ),
     
@@ -60,15 +60,21 @@ sensAnalysisUI <- function(id) {
              plotlyOutput("plotlySensitivity"),
              
       ),
-      
-      column(width = 10,
+    ),
+
+    column(width = 10,
+           checkboxInput('checkDisplayTableSensitivityTable', 'Diplay parameter sensitivity table', 
+                         value = FALSE, width = NULL),
+    ),
+    
+    conditionalPanel(
+      condition = "input.checkDisplayTableSensitivityTable == 1",
+      column(width = 10, 
              excelOutput("tableSensitivity", 
                          width = "100%", 
                          height = "1px"),
       ),
-
-    ),
-    
+    ),    
     #--------------------------------------------------------------------------- 
     ),
     )}
