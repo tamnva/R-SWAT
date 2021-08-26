@@ -741,18 +741,12 @@ model runs are (nParameters + 1) * r")
                                                           rowDrag = FALSE,
                                                           columnResize = FALSE,
                                                           wordWrap = FALSE))
-        
-        figSensitivity  <- plot_ly(y = tableSensitivity$p_Value,
-                                   x = tableSensitivity$Absolute_t_Stat,         
-                                   type = "scatter", 
-                                   mode   = 'markers', 
-                                   name = rownamesTableSensitivity)
-        
-        ytitle <- list(title = "P-value --> increasing sensitivity")
-        xtitle <- list(title = "increasing sensitivity <-- Absolute t-Stat")
-        figSensitivity <- figSensitivity  %>% layout(xaxis = xtitle , yaxis = ytitle , showlegend = TRUE)
-        
-        output$plotlySensitivity <- renderPlotly(figSensitivity)
+        myPlot <- plotSensitivity(tableSensitivity$Absolute_t_Stat, 
+                                  tableSensitivity$p_Value,
+                                  tableSensitivity$Parameter_Name) +
+                 labs(x ="increasing sensitivity <-- Absolute t-Stat", y = "P-value --> increasing sensitivity") 
+       
+        output$plotlySensitivity <- renderPlotly(ggplotly(myPlot))
         
       } else if (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)"){
         
@@ -785,17 +779,13 @@ model runs are (nParameters + 1) * r")
                                                           columnResize = FALSE,
                                                           wordWrap = FALSE))
         
-        figSensitivity  <- plot_ly(y = tableSensitivity$sigma,
-                                   x = tableSensitivity$mu.star,         
-                                   type = "scatter", 
-                                   mode   = 'markers', 
-                                   name = globalVariable$paraSelection[,1])
+        myPlot <- plotSensitivity(tableSensitivity$mu.star, 
+                                  tableSensitivity$sigma,
+                                  tableSensitivity$Parameter) +
+          labs(x ="mu.star --> increasing sensitivity", y = "sigma --> increasing parameter interation") 
         
-        ytitle <- list(title = "sigma --> increasing parameter interation")
-        xtitle <- list(title = "mu.star --> increasing sensitivity")
-        figSensitivity <- figSensitivity  %>% layout(xaxis = xtitle , yaxis = ytitle , showlegend = TRUE)
+        output$plotlySensitivity <- renderPlotly(ggplotly(myPlot))
         
-        output$plotlySensitivity <- renderPlotly(figSensitivity)        
       } else {
         
       }
