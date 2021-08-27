@@ -110,8 +110,20 @@ objFunctionUI <- function(id) {
              actionButton("calObjFunction", "Click here to calculate objection"),
              verbatimTextOutput('printObjFunction'),
       ),
+
+      column(width = 10, 
+             checkboxInput('checkDisplayObjFunctionPlot', 'Check here to display plot', 
+                           value = FALSE, width = NULL),
+      ),
       
-      column(width = 10,
+      conditionalPanel(
+        condition = "input.checkDisplayObjFunctionPlot == 1",
+        column(width = 10, height = 200,
+               plotlyOutput("plotObjFunction",height = 'auto'),
+        ),
+      ), 
+      
+      column(width = 10, 
              checkboxInput('checkDisplayObjFunction', 'Check here to display result', 
                            value = FALSE, width = NULL),
       ),
