@@ -242,3 +242,25 @@ plotSensitivity <- function(xval, yval, para){
       theme_bw()
   return(myplot)
 }
+
+
+plotObjFuncParaValue <- function(globalVariable){
+  nIter <- nrow(globalVariable$parameterValue)
+  nPara <- nrow(globalVariable$paraSelection)
+  Objective_function <- rep(globalVariable$objValue, nPara)
+  Parameter_Value <- c()
+  Parameter <- c()
+  
+  for(i in 1:length(globalVariable$paraSelection$Parameter)){
+    Parameter_Value <- c(Parameter_Value, globalVariable$parameterValue[,i+1])
+    Parameter <- c(Parameter, rep(globalVariable$paraSelection$Parameter[i], nIter))
+  }
+  
+  temp <- data.frame(Objective_function, Parameter_Value, Parameter) 
+  myPlot <- ggplot(temp, aes(x = Parameter_Value, y = Objective_function, color = Parameter)) + 
+    geom_point()+ facet_wrap(vars(Parameter), scales = "free")
+  
+  myPlot <- ggplotly(myPlot)
+  
+  return(myPlot)
+}

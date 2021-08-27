@@ -638,6 +638,21 @@ model runs are (nParameters + 1) * r")
 
   })
 
+  # ****************************************************************************  
+  # Calculate objective function: Display objective function values
+  # ****************************************************************************
+  observe({
+    req(input$checkDisplayObjFunctionPlot)
+    # Get parameter values
+    
+    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
+      output$plotObjFunction <- renderPlotly(plotObjFuncParaValue(globalVariable))
+    } else {
+      output$plotObjFunction <- NULL
+    }
+  })
+  
+  
 
   # ****************************************************************************  
   # Calculate objective function: Display objective function values
