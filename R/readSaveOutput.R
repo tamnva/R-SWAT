@@ -106,7 +106,8 @@ saveOutput <- function(workingDirectory,
                        colNumber,
                        rchNumber,
                        fileCioInfo,
-                       simulationNumber){  #for output file name
+                       simulationNumber,
+                       firstRun){  #for output file name
   
   # Set output as list object
   output <- list()
@@ -154,10 +155,14 @@ saveOutput <- function(workingDirectory,
   for (i in 1:length(output)){
     OutputFileName <- paste(outputDirectory, '/Output_Variable_', i, 
                             '.txt', sep ='')
-    write.table(as.character(simulationNumber), OutputFileName, append = TRUE,
-                row.names = FALSE,col.names = FALSE)
-    write.table(output[[i]], OutputFileName, append = TRUE,sep = '\t', 
-                row.names = FALSE, col.names = FALSE)
+    
+      if (!firstRun){file.create(OutputFileName)}
+    
+      write.table(as.character(simulationNumber), OutputFileName, append = TRUE,
+                  row.names = FALSE,col.names = FALSE)
+      write.table(output[[i]], OutputFileName, append = TRUE,sep = '\t', 
+                  row.names = FALSE, col.names = FALSE)      
+
   }  
     
   

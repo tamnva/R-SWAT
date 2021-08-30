@@ -8,7 +8,8 @@
                                 subParameterSet, 
                                 outputExtraction, 
                                 fileCioInfo,
-                                fromToDate){
+                                fromToDate,
+                                firstRun){
     
     # Set working directory
     setwd(paste(workingDirectory, 
@@ -54,7 +55,8 @@
                  outputExtraction[,3], 
                  outputExtraction[,4],
                  fileCioInfo,
-                 subParameterSet[i,1])
+                 subParameterSet[i,1],
+                 firstRun)
       
       # Write .log file
       write(paste('Finished_simulation_number ', 
@@ -89,40 +91,56 @@
                          caliParam,
                          copyUnchangeFiles,
                          fileCioInfo,
-                         fromToDate
+                         fromToDate,
+                         firstRun
                          ){
     
     
     # Create n directory in R
     if(copyUnchangeFiles){
       createDirCopyUnchangeFile(workingDirectory, ncores, 
-                                TxtInOutFolder, caliParam$file, swatExe)
+                                TxtInOutFolder, caliParam$file, 
+                                swatExe, firstRun)
     }
     
     # --------------------------------------------------------------------------
     subParameterSet <- splitParameterValue(ncores, parameterValue)
     
-    cl <- parallel::makeCluster(ncores)
-    doParallel::registerDoParallel(cl)
-    foreach(i = 1:ncores, .combine = 'c', .export=c("runSWATSequential",
-                                                    "getParameterValue", 
-                                                    "updateMultiFile",
-                                                    "updateMultiFile",
-                                                    "updateSingleFile",
-                                                    "saveOutput",
-                                                    "userReadSwatOutput")) %dopar% {
-                                                      
-      runSWATSequential(i, 
+    if (ncores == 1){
+      runSWATSequential(1, 
                         workingDirectory, 
                         swatExe, 
                         caliParam, 
-                        subParameterSet[[i]], 
+                        subParameterSet[[1]], 
                         outputExtraction, 
                         fileCioInfo,
-                        fromToDate)
-                                                             
+                        fromToDate,
+                        firstRun)      
+    } else {
+      cl <- parallel::makeCluster(ncores)
+      doParallel::registerDoParallel(cl)
+      foreach(i = 1:ncores, .combine = 'c', .export=c("runSWATSequential",
+                                                      "getParameterValue", 
+                                                      "updateMultiFile",
+                                                      "updateMultiFile",
+                                                      "updateSingleFile",
+                                                      "saveOutput",
+                                                      "userReadSwatOutput")) %dopar% {
+                                                        
+                                                        runSWATSequential(i, 
+                                                                          workingDirectory, 
+                                                                          swatExe, 
+                                                                          caliParam, 
+                                                                          subParameterSet[[i]], 
+                                                                          outputExtraction, 
+                                                                          fileCioInfo,
+                                                                          fromToDate,
+                                                                          firstRun)
+                                                        
+                                                      }
+      parallel::stopCluster(cl)      
     }
-    parallel::stopCluster(cl)     
+     
   }
 
 # ------------------------------------------------------------------------------
@@ -130,27 +148,31 @@
 # ------------------------------------------------------------------------------
   
   createDirCopyUnchangeFile <- function(workingDirectory, numberOfCores, 
-                                        TxtInOut, exceptFiles, swatExe){
+                                        TxtInOut, exceptFiles, swatExe,
+                                        firstRun){
     
-    existingDir <- list.dirs(path = workingDirectory, 
-                             full.names = TRUE, recursive = TRUE)
-    
-    for (i in 1:length(existingDir)){
-      temp <- trimws(strsplit(existingDir[i], split="/")[[1]])
-      temp <- temp[length(temp)]
+    if (firstRun){
+      existingDir <- list.dirs(path = workingDirectory, 
+                               full.names = TRUE, recursive = TRUE)
       
-      if(substr(temp,1,9) == 'TxtInOut_'){
-        unlink(existingDir[i], recursive = TRUE)
-      }
-      
+      for (i in 1:length(existingDir)){
+        temp <- trimws(strsplit(existingDir[i], split="/")[[1]])
+        temp <- temp[length(temp)]
+        
+        if(substr(temp,1,9) == 'TxtInOut_'){
+          unlink(existingDir[i], recursive = TRUE)
+        }
+        
+      }      
     }
-    
+
     # Create new TxtInOut folders
     for (i in 1:numberOfCores){
       
-      dir <- paste(workingDirectory, '/', 'TxtInOut', '_', i, sep ='')
-      
-      dir.create(dir)
+      if (firstRun){
+        dir <- paste(workingDirectory, '/', 'TxtInOut', '_', i, sep ='')
+        dir.create(dir)        
+      }
       
       # Copy all unchange files
       copyAllExcept(TxtInOut, dir, exceptFiles)
@@ -167,12 +189,14 @@
     }
     
     # Create output directory
-    dir <- paste(workingDirectory, '/Output', sep ='')
-    if(file.exists(dir)) {
-      unlink(dir, recursive=TRUE,force = TRUE)
-      dir.create(dir)
-    } else {
-      dir.create(dir)
+    if (firstRun){
+      dir <- paste(workingDirectory, '/Output', sep ='')
+      if(file.exists(dir)) {
+        unlink(dir, recursive=TRUE,force = TRUE)
+        dir.create(dir)
+      } else {
+        dir.create(dir)
+      }      
     }
   }
   
