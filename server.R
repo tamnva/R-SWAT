@@ -237,14 +237,7 @@ SWAT means it will take results from the SWAT model, nParameters is the number o
 table, minColumn and maxColumn means values in the column Min and Max from the above table, The number of
 model runs are (nParameters + 1) * r")
     } else if(globalVariable$paraSampling$samplingApproach == "Cali_(DDS)"){
-      output$printHelpInputinfo <- renderText("Please write the number of iterations and parallel approach. For example,
-      10, 2
-means 10 iterations and the parallel approach is 2, they must be seperated by the comma 
-Parallel approach = 1 => DDS is run independently from each core.
-Parallel approach = 2 => the best parameterset among all cores at ith iteration is used for the next iteration)
-The number mof model runs = number of iterations * number of parallel runs (cores)
-Please go to step 4.1 to provide information about the objective function (1) and observed data files (2) 
-before '3. Run SWAT'")
+      output$printHelpInputinfo <- renderText("Please contact developer for using this option")
     } else {
       output$printSelectedParaSensiApproach <- NULL
     }
@@ -384,11 +377,10 @@ before '3. Run SWAT'")
       # Message show all input was saved
       showModal(modalDialog(
         title = "Save current input",
-        HTML("All current inputs were save to the file 'SWATShinyObject.rds'.<br> 
-      in the working folder. SWAT is running, close this message .<br>
-      You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
-      in the working folder to see the current simulation. If your simulation .<br>
-      is interupted you can restart from the last simulations using these two files"),
+        HTML("All current inputs were saved to the file 'SWATShinyObject.rds' in the working folder.<br> 
+      SWAT is running, close this message. You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
+      in the working folder to see the current simulation. Future option (not yet implemented): enable option .<br>
+      to restart from the last simulations if your simulation is interupted"),
         easyClose = TRUE,
         size = "l"
       ))
@@ -567,12 +559,11 @@ before '3. Run SWAT'")
         #-----------------------------------------------------------------------
       }
 
+      globalVariable$checkSimComplete <<- TRUE
       
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                            'SWATShinyObject.rds',
                                            sep ='')) 
-      
-      globalVariable$checkSimComplete <<- TRUE
       
     } else {
       # Message show all input was saved
@@ -637,6 +628,25 @@ before '3. Run SWAT'")
       output$tableDisplayParameterSet <- NULL
     }
   })
+
+  # ****************************************************************************  
+  # 6. Get SWATShinyObject.rds file
+  # ****************************************************************************  
+  observe({
+    volumes <- getVolumes()
+    shinyFileChoose(input, "getSWATShinyObject", 
+                    roots = volumes, 
+                    filetypes=c('', 'rds'),
+                    session = session)
+    
+    SWATShinyObjectFile <- parseFilePaths(volumes, input$getSWATShinyObject)
+    
+    if(length(SWATShinyObjectFile$datapath) == 1){
+      output$printSWATShinyObject <- renderText(SWATShinyObjectFile$datapath)
+      globalVariable <<- readRDS(SWATShinyObjectFile$datapath)
+    }
+  })
+  
   
   #-----------------------------------------------------------------------------
   # Tab 4. Evaluate output
@@ -685,9 +695,6 @@ before '3. Run SWAT'")
         globalVariable$observedData[[i]] <<- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
         colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
       }
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')) 
     }
   })
   
@@ -757,10 +764,6 @@ before '3. Run SWAT'")
         size = "l"
       ))
     }
-    
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                         'SWATShinyObject.rds',
-                                         sep =''))  
 
   })
 
@@ -930,10 +933,6 @@ before '3. Run SWAT'")
       } else {
         
       }
-      
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')) 
       
     }
   })  
