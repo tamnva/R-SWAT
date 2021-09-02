@@ -68,7 +68,7 @@ getNumberOutputVar <- function(outputExtraction){
   userReadSwatOutput <- c()
   for (i in 1:nrow(outputExtraction)) {
     if (outputExtraction[i,1] == "watout.dat"){
-      temp <- length(strsplit(outputExtraction[i,3], ",")[[1]])
+      temp <- length(strsplit(as.character(outputExtraction[i,3]), ",")[[1]])
       nOutputVar <- nOutputVar + temp
       
       if (!is.na(temp)){
