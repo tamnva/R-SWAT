@@ -349,14 +349,13 @@ model runs are (nParameters + 1) * r")
         morrisCommand <- gsub("nParameters", "length(globalVariable$paraSelection$Max)", morrisCommand)
         
         # call morris to generate parameters
-        morrisObject <<- eval(parse(text = morrisCommand))
+        morrisObject <- eval(parse(text = morrisCommand))
         globalVariable$parameterValue <<- cbind(c(1:nrow(morrisObject$X)), morrisObject$X)
         globalVariable$morrisObject <<- morrisObject
-        
       } else if (globalVariable$paraSampling$samplingApproach == "Cali_(DDS)"){
         # Generate initial parameter set
         globalVariable$parameterValue <<- lhsRange(globalVariable$ncores,
-                                                   getParamRange(globalVariable$paraSelection))        
+                                                   getParamRange(globalVariable$paraSelection))
       } else {
         Print("Other parameter sampling approaches are under development")
       }
@@ -389,7 +388,8 @@ model runs are (nParameters + 1) * r")
       copyUnchangeFiles <- TRUE
       firstRun <- TRUE
       
-      if (globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)"){
+      if ((globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") |
+        (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)")){
         # Run SWAT in parallel
         runSWATpar(globalVariable$workingFolder, 
                    globalVariable$TxtInOutFolder, 
@@ -969,10 +969,10 @@ model runs are (nParameters + 1) * r")
   observe({
     req(input$checkPlotVariableNumber)
     if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
-      globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue, 
-                                                               globalVariable$simData, 
+      globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue,
+                                                               globalVariable$simData,
                                                                globalVariable$parameterValue,
-                                                               input$behThreshold, 
+                                                               input$behThreshold,
                                                                input$plotVarNumber,
                                                                globalVariable$objFunction$Index[1],
                                                                globalVariable$observedData)

@@ -195,17 +195,19 @@ runSwatUI <- function(id) {
       #------------------------------------------------------------------------- 
       column(width = 10,
              HTML("<b>",
-                  "6. Load previous results",
+                  "6. Load previous results (optional - for loading previous results)",
                   "</b>"),
       ),
       
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
-                   6. Load previous results: This option currently only works if
-                   you have finished step 5 (meaning that all simulations were 
-                   finished. If the model is interupted during model run, this 
-                   option cannot be used). In addition, if you changed your working
-                   directory, please go back to 'General Setting' and update your
+                   6. Load previous results: This option can be used in the case 
+                   that you have finised step 5, close your project and want to open
+                   the project again without starting from the first step. It only 
+                   works if you have finished step 5 (meaning that all 
+                   simulations were finished. If the model is interupted during model  
+                   run, this option cannot be used). In addition, if you changed your 
+                   working directory, please go back to 'General Setting' and update your
                    working directory before proceding to the next step. All other
                    settings in the user interface will not be considered by this 
                    program unless you click it.
@@ -216,7 +218,7 @@ runSwatUI <- function(id) {
       ),
       
       column(width = 10,
-             shinyFilesButton("getSWATShinyObject", "Click here to select" ,
+             shinyFilesButton("getSWATShinyObject", "Click here to select SWATShinyObject.rds file from previous run" ,
                               title = "Please select 'SWATShinyObject.rds' file",
                               multiple = FALSE,
                               buttonType = "default",
