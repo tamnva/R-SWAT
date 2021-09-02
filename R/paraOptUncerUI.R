@@ -41,7 +41,9 @@ paraOptUncerUI <- function(id) {
              ),
       
       column(width = 10,
-             checkboxInput("checkPlotVariableNumber", "Display plot"),
+             checkboxInput("checkPlotVariableNumber", 
+                           "Display plot (this will also save all results to the file 'SWATShinyObject.rds')",
+                           width = '100%'),
              ),
 
       conditionalPanel(

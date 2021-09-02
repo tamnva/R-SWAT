@@ -236,7 +236,8 @@ other input fields could be modifed, see function morris in the sensitivity pack
 SWAT means it will take results from the SWAT model, nParameters is the number of parameters in the above
 table, minColumn and maxColumn means values in the column Min and Max from the above table, The number of
 model runs are (nParameters + 1) * r")
-      
+    } else if(globalVariable$paraSampling$samplingApproach == "Cali_(DDS)"){
+      output$printHelpInputinfo <- renderText("Please contact developer for using this option")
     } else {
       output$printSelectedParaSensiApproach <- NULL
     }
@@ -348,15 +349,19 @@ model runs are (nParameters + 1) * r")
         morrisCommand <- gsub("nParameters", "length(globalVariable$paraSelection$Max)", morrisCommand)
         
         # call morris to generate parameters
-        morrisObject <<- eval(parse(text = morrisCommand))
+        morrisObject <- eval(parse(text = morrisCommand))
         globalVariable$parameterValue <<- cbind(c(1:nrow(morrisObject$X)), morrisObject$X)
         globalVariable$morrisObject <<- morrisObject
-        
+      } else if (globalVariable$paraSampling$samplingApproach == "Cali_(DDS)"){
+        # Generate initial parameter set
+        globalVariable$parameterValue <<- lhsRange(globalVariable$ncores,
+                                                   getParamRange(globalVariable$paraSelection))
       } else {
         Print("Other parameter sampling approaches are under development")
       }
       
-      #  Load all files that are going to be updated
+      # Run the SWAT model
+      # Load all files that are going to be updated
       globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo, 
                                                               globalVariable$paraSelection,
                                                               globalVariable$SWATParam, 
@@ -371,36 +376,194 @@ model runs are (nParameters + 1) * r")
       # Message show all input was saved
       showModal(modalDialog(
         title = "Save current input",
-        HTML("All current inputs were save to the file 'SWATShinyObject.rds'.<br> 
-      in the working folder. SWAT is running, close this message .<br>
-      You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
-      in the working folder to see the current simulation. If your simulation .<br>
-      is interupted you can restart from the last simulations using these two files"),
+        HTML("All current inputs were saved to the file 'SWATShinyObject.rds' in the working folder.<br> 
+      SWAT is running, close this message. You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
+      in the working folder to see the current simulation. Future option (not yet implemented): enable option .<br>
+      to restart from the last simulations if your simulation is interupted"),
         easyClose = TRUE,
         size = "l"
       ))
       
       # Copy unchanged file for the first simulation
       copyUnchangeFiles <- TRUE
+      firstRun <- TRUE
       
-      
-      # Run SWAT in parallel
-      runSWATpar(globalVariable$workingFolder, 
-                 globalVariable$TxtInOutFolder, 
-                 globalVariable$outputExtraction, 
-                 globalVariable$ncores, 
-                 globalVariable$SWATexeFile, 
-                 globalVariable$parameterValue,
-                 globalVariable$caliParam,
-                 copyUnchangeFiles,
-                 globalVariable$fileCioInfo,
-                 globalVariable$dateRangeCali)
+      if ((globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") |
+        (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)")){
+        # Run SWAT in parallel
+        runSWATpar(globalVariable$workingFolder, 
+                   globalVariable$TxtInOutFolder, 
+                   globalVariable$outputExtraction, 
+                   globalVariable$ncores, 
+                   globalVariable$SWATexeFile, 
+                   globalVariable$parameterValue,
+                   globalVariable$caliParam,
+                   copyUnchangeFiles,
+                   globalVariable$fileCioInfo,
+                   globalVariable$dateRangeCali,
+                   firstRun)       
+      } else {
+        #-----------------------------------------------------------------------
+        # Run SWAT
+        runSWATpar(globalVariable$workingFolder, 
+                   globalVariable$TxtInOutFolder, 
+                   globalVariable$outputExtraction, 
+                   globalVariable$ncores, 
+                   globalVariable$SWATexeFile, 
+                   globalVariable$parameterValue,
+                   globalVariable$caliParam,
+                   copyUnchangeFiles,
+                   globalVariable$fileCioInfo,
+                   globalVariable$dateRangeCali,
+                   firstRun)
+ 
+        # Set firstRun = FALSE -> don't need to copy unchanged files again
+        firstRun = FALSE
+        
+        # Run SWAT with first initial parameter set
+        nIters <- as.numeric(strsplit(globalVariable$paraSampling$InputInfo, 
+                                      split = ",", 
+                                      fixed = TRUE)[[1]][1])
+        
+        # Get parallel mode
+        parallelMode <- as.numeric(strsplit(globalVariable$paraSampling$InputInfo, 
+                                            split = ",", 
+                                            fixed = TRUE)[[1]][2])
+        
+        # Objective function with initial parameter set
+        temp <- calObjFunction(globalVariable$parameterValue,
+                               globalVariable$ncores, 
+                               globalVariable$nOutputVar,
+                               globalVariable$userReadSwatOutput, 
+                               globalVariable$observedData, 
+                               globalVariable$workingFolder, 
+                               globalVariable$objFunction$Index, 
+                               globalVariable$dateRangeCali)
+
+        newPar <- globalVariable$parameterValue
+        
+        # Assign best parameter to the global variables
+        if(parallelMode == 1){
+          globalVariable$objValue <<- temp$objValue
+          globalVariable$perCriteria <<- temp$perCriteria
+          globalVariable$simData <<- temp$simData          
+        } else {
+          idBest <- which(temp$objValue == max(temp$objValue))
+          if (length(idBest) > 1) {idBest = idBest[1]}
+
+          # Take the better parameter set/data if exist
+          globalVariable$parameterValue <<- globalVariable$parameterValue[idBest, ]
+          globalVariable$objValue <<- temp$objValue[idBest]
+          for (k in 1:globalVariable$nOutputVar){
+            globalVariable$perCriteria[[k]] <<- temp$perCriteria[[k]][[idBest]]
+            globalVariable$simData[[k]] <<- temp$simData[[k]][[idBest]]                  
+          }
+                    
+        }
+        
+        # Loop over number of iteration
+        for (i in 1:nIters){
+          print(paste("Iteration ", i, " objective function value = ", 
+                      globalVariable$objValue, sep =""))
+
+          # Take better parameter + Generate new parameter set with DDS
+          if (parallelMode == 1) {
+            # Take the better parameter set/data if exist
+            for (j in 1:nrow(newPar)){
+              if(temp$objValue[j] > globalVariable$objValue[j]){
+                globalVariable$parameterValue[j, ] <<- newPar[j, ]
+                globalVariable$objValue[j] <<- temp$objValue[j]
+                for (k in 1:globalVariable$nOutputVar){
+                  globalVariable$perCriteria[[k]][[j]] <<- temp$perCriteria[[k]][[j]]
+                  globalVariable$simData[[k]][[j]] <<- temp$simData[[k]][[j]]                  
+                }
+              }
+            }
+            
+            # Generate new parameter set
+            newPar <- data.frame(min = globalVariable$paraSelection$Min,
+                                 max = globalVariable$paraSelection$Max)
+            parameterValue <- globalVariable$parameterValue[,2:ncol(globalVariable$parameterValue)]
+            newPar <- cbind(newPar, t(parameterValue))
+            newPar <- dds(newPar, globalVariable$ncores, i, nIters, 0.2, parallelMode) 
+            
+            print(globalVariable$objValue)
+          } else {
+            
+            idBest <- which(temp$objValue == max(temp$objValue))
+            if (length(idBest) > 1) {idBest = idBest[1]}
+            
+            if(temp$objValue[idBest] > globalVariable$objValue){
+              globalVariable$parameterValue <<- newPar[idBest, ]
+              globalVariable$objValue <<- temp$objValue[idBest]
+              for (k in 1:globalVariable$nOutputVar){
+                globalVariable$perCriteria[[k]] <<- temp$perCriteria[[k]][[idBest]]
+                globalVariable$simData[[k]] <<- temp$simData[[k]][[idBest]]                  
+              }
+            }
+
+            # Generate new parameter set
+            newPar <- data.frame(min = globalVariable$paraSelection$Min,
+                               max = globalVariable$paraSelection$Max,
+                               parameterValue = globalVariable$parameterValue[2:length(globalVariable$parameterValue)])
+            newPar <- dds(newPar, globalVariable$ncores, i, nIters, 0.2, parallelMode)
+            
+          }
+          
+          
+          # Run SWAT
+          runSWATpar(globalVariable$workingFolder, 
+                     globalVariable$TxtInOutFolder, 
+                     globalVariable$outputExtraction, 
+                     globalVariable$ncores, 
+                     globalVariable$SWATexeFile, 
+                     newPar,
+                     globalVariable$caliParam,
+                     FALSE,
+                     globalVariable$fileCioInfo,
+                     globalVariable$dateRangeCali,
+                     firstRun)
+ 
+       
+          # Caculate objective function
+          temp <- calObjFunction(newPar,
+                                 globalVariable$ncores, 
+                                 globalVariable$nOutputVar,
+                                 globalVariable$userReadSwatOutput, 
+                                 globalVariable$observedData, 
+                                 globalVariable$workingFolder, 
+                                 globalVariable$objFunction$Index, 
+                                 globalVariable$dateRangeCali)
+
+        }
+        
+        
+        # Take best parameter set
+        idBest <- which(temp$objValue == max(temp$objValue))
+        if (length(idBest) > 1) {idBest = idBest[1]}
+        
+        # Take the better parameter set/data if exist
+        
+        if(temp$objValue[idBest] > globalVariable$objValue){
+          globalVariable$parameterValue <<- newPar[idBest, ]
+          globalVariable$objValue <<- temp$objValue[idBest]
+          for (k in 1:globalVariable$nOutputVar){
+            globalVariable$perCriteria[[k]] <<- temp$perCriteria[[k]][[idBest]]
+            globalVariable$simData[[k]] <<- temp$simData[[k]][[idBest]]                  
+          }
+        }
+        
+        print("Best objective function value")
+        print(globalVariable$objValue)
+        
+        #-----------------------------------------------------------------------
+      }
+
+      globalVariable$checkSimComplete <<- TRUE
       
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                            'SWATShinyObject.rds',
                                            sep ='')) 
-      
-      globalVariable$checkSimComplete <<- TRUE
       
     } else {
       # Message show all input was saved
@@ -465,6 +628,25 @@ model runs are (nParameters + 1) * r")
       output$tableDisplayParameterSet <- NULL
     }
   })
+
+  # ****************************************************************************  
+  # 6. Get SWATShinyObject.rds file
+  # ****************************************************************************  
+  observe({
+    volumes <- getVolumes()
+    shinyFileChoose(input, "getSWATShinyObject", 
+                    roots = volumes, 
+                    filetypes=c('', 'rds'),
+                    session = session)
+    
+    SWATShinyObjectFile <- parseFilePaths(volumes, input$getSWATShinyObject)
+    
+    if(length(SWATShinyObjectFile$datapath) == 1){
+      output$printSWATShinyObject <- renderText(SWATShinyObjectFile$datapath)
+      globalVariable <<- readRDS(SWATShinyObjectFile$datapath)
+    }
+  })
+  
   
   #-----------------------------------------------------------------------------
   # Tab 4. Evaluate output
@@ -513,9 +695,6 @@ model runs are (nParameters + 1) * r")
         globalVariable$observedData[[i]] <<- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
         colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
       }
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')) 
     }
   })
   
@@ -543,65 +722,19 @@ model runs are (nParameters + 1) * r")
         size = "l"
       ))
       
-      # Read input data
-      nSim <- as.integer(nrow(globalVariable$parameterValue)/globalVariable$ncores)
-      nSim <- rep(nSim, globalVariable$ncores)
-      nSim[globalVariable$ncores] <- nSim[globalVariable$ncores] + 
-        nrow(globalVariable$parameterValue) - sum(nSim)
-      
-      nVariables <- globalVariable$nOutputVar
-      
-      simData <- list()
-      
-      counter <- rep(0, nVariables)
-      globalVariable$objValue <<-  rep(0, nrow(globalVariable$parameterValue))
-      
-      #Loop over number of cores
-      for (i in 1:globalVariable$ncores){
-        #loop over number of variables
-        for (j in 1:nVariables){
+      # Caculate objective function
+      temp <- calObjFunction(globalVariable$parameterValue,
+                             globalVariable$ncores, 
+                             globalVariable$nOutputVar,
+                             globalVariable$userReadSwatOutput, 
+                             globalVariable$observedData, 
+                             globalVariable$workingFolder, 
+                             globalVariable$objFunction$Index, 
+                             globalVariable$dateRangeCali)
 
-          if (globalVariable$userReadSwatOutput[j]){
-            ntimestep <- nrow(globalVariable$observedData[[j]]) + 1
-          } else {
-            ntimestep <- as.numeric(globalVariable$dateRangeCali[2]- 
-                                      globalVariable$dateRangeCali[1]) + 2
-          }
-          
-          if ((i == 1)) {
-            simData[[j]] <- list()
-            globalVariable$perCriteria[[j]] <<- list()
-            globalVariable$simData[[j]] <<- list()
-          }
-          
-          #Loop over number of simulation
-          fileNameSimData <- paste(globalVariable$workingFolder, "/Output/Core_", 
-                                   i, "/Output_Variable_", j, ".txt", sep = "")
-          tempSimData <- read.table(fileNameSimData, header = FALSE, sep = "")
-          for (k in 1:nSim[i]){
-            sIndex <- (k-1)*ntimestep + 1
-            eIndex <- k*ntimestep
-            counter[j] <- counter[j] + 1
-            
-            simData[[j]][[counter[j]]] <- tempSimData[(sIndex + 1):eIndex, 1]
-            globalVariable$simData[[j]][[counter[j]]] <<- simData[[j]][[counter[j]]]
-            
-            globalVariable$perCriteria[[j]][[counter[j]]] <<- perCriteria(globalVariable$observedData[[j]][,2],
-                                                                          simData[[j]][[counter[j]]])
-            
-            if((i == 1) & (j == 1)) {
-              perIndex <- match(globalVariable$objFunction$Index[1], 
-                                colnames(globalVariable$perCriteria[[j]][[counter[j]]]))
-            }
-            globalVariable$objValue[counter[j]] <<- globalVariable$objValue[counter[j]] + 
-              globalVariable$perCriteria[[j]][[counter[j]]][perIndex]         
-          }
-        }
-        
-      }
-   
-      # Calculate objective function values
-      globalVariable$objValue <<- globalVariable$objValue/nVariables
+      globalVariable$objValue <<- temp$objValue
+      globalVariable$perCriteria <<- temp$perCriteria
+      globalVariable$simData <<- temp$simData
       
       # Update numeric input (threshold objective function)
       minObjValue <- min(globalVariable$objValue)
@@ -620,7 +753,7 @@ model runs are (nParameters + 1) * r")
                         "2. Input variable number to plot", 
                         value = 1, 
                         min = 1, 
-                        max = nVariables,
+                        max = globalVariable$nOutputVar,
                         step = 1)
       
     } else {
@@ -631,10 +764,6 @@ model runs are (nParameters + 1) * r")
         size = "l"
       ))
     }
-    
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                         'SWATShinyObject.rds',
-                                         sep =''))  
 
   })
 
@@ -805,10 +934,6 @@ model runs are (nParameters + 1) * r")
         
       }
       
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')) 
-      
     }
   })  
   
@@ -844,10 +969,10 @@ model runs are (nParameters + 1) * r")
   observe({
     req(input$checkPlotVariableNumber)
     if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
-      globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue, 
-                                                               globalVariable$simData, 
+      globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue,
+                                                               globalVariable$simData,
                                                                globalVariable$parameterValue,
-                                                               input$behThreshold, 
+                                                               input$behThreshold,
                                                                input$plotVarNumber,
                                                                globalVariable$objFunction$Index[1],
                                                                globalVariable$observedData)
@@ -909,3 +1034,4 @@ model runs are (nParameters + 1) * r")
 }
   
   # globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 
+  # Warning in if (temp$objValue[idBest] > globalVariable$objValue) { :the condition has length > 1 and only the first element will be used

@@ -168,17 +168,72 @@ prFactor <- function(obs, low, up){
   }
   
 #------------------------------------------------------------------------------- 
-# Check if the extracted output is defined by user or not 
+# Calculate objective function
 # ------------------------------------------------------------------------------
-  checkUserReadSwatOutput <- function(outputExtraction, varNumber){
-    
-    findRow <- which(outputExtraction$FileType == "userReadSwatOutput")
-    
-    if (length(findRow > 0)){
-      output <- TRUE
-    } else {
-      output <- FALSE
+calObjFunction <- function(parameterValue, ncores, 
+                           nOutputVar,userReadSwatOutput, 
+                           observedData, workingFolder, 
+                           index, dateRangeCali){
+  
+  output <- list()
+  
+  nSim <- as.integer(nrow(parameterValue)/ncores)
+  nSim <- rep(nSim, ncores)
+  nSim[ncores] <- nSim[ncores] + nrow(parameterValue) - sum(nSim)
+  
+  simData <- list()
+  
+  counter <- rep(0, nOutputVar)
+  output$objValue <-  rep(0, nrow(parameterValue))
+  
+  #Loop over number of cores
+  for (i in 1:ncores){
+    #loop over number of variables
+    for (j in 1:nOutputVar){
+      
+      if (userReadSwatOutput[j]){
+        ntimestep <- nrow(observedData[[j]]) + 1
+      } else {
+        ntimestep <- as.numeric(dateRangeCali[2]- dateRangeCali[1]) + 2
+      }
+      
+      if ((i == 1)) {
+        simData[[j]] <- list()
+        output$perCriteria[[j]] <- list()
+        output$simData[[j]] <- list()
+      }
+      
+      #Loop over number of simulation
+      fileNameSimData <- paste(workingFolder, "/Output/Core_", 
+                               i, "/Output_Variable_", j, ".txt", sep = "")
+      tempSimData <- read.table(fileNameSimData, header = FALSE, sep = "")
+      for (k in 1:nSim[i]){
+        sIndex <- (k-1)*ntimestep + 1
+        eIndex <- k*ntimestep
+        counter[j] <- counter[j] + 1
+        
+        simData[[j]][[counter[j]]] <- tempSimData[(sIndex + 1):eIndex, 1]
+        output$simData[[j]][[counter[j]]] <- simData[[j]][[counter[j]]]
+        
+        output$perCriteria[[j]][[counter[j]]] <- perCriteria(observedData[[j]][,2],
+                                                             simData[[j]][[counter[j]]])
+        
+        if((i == 1) & (j == 1)) {
+          perIndex <- match(index[1], 
+                            colnames(output$perCriteria[[j]][[counter[j]]]))
+        }
+        output$objValue[counter[j]] <- output$objValue[counter[j]] + 
+          output$perCriteria[[j]][[counter[j]]][perIndex]         
+      }
     }
+    
+  }
+  
+  # Calculate objective function values
+  output$objValue <- output$objValue/nOutputVar
+  
+  return(output) 
 }
+
   
   

@@ -331,6 +331,7 @@
      # List of all file types (according to the spatial resolution)
 	  hruBasedFile <- c("hru", "gw", "mgt", "chm", "sdr", "sep", "sol")
 	  subBasedFile <- c("sub", "rte", "swq", "pnd")
+	  resFile <- c("res")
 	  basinBasedFile <- c("wwq", "bsn")
 
 	  # Convert paraSelection to list object
@@ -369,6 +370,8 @@
 	        selectCriteria$slope <- trimws(strsplit(paraSelection[i,8], split=",")[[1]])	
 	      } else if (fileType %in% subBasedFile){
 	        selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
+	      } else if (fileType %in% resFile){
+	        selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
 	      } else {
 	      }
 	      
@@ -378,7 +381,7 @@
 	        files <- hruSubset(HRUinfo, selectCriteria)
 	        files <- gsub("hru", fileType, files)
 	      } else if (fileType %in% subBasedFile){
-          if (selectCriteria$sub == "All") { 
+          if ("All" %in% selectCriteria$sub) { 
             selectCriteria$sub <- c(1:max(HRUinfo$sub))
           } else {
             selectCriteria$sub <- as.numeric(selectCriteria$sub)
@@ -387,7 +390,19 @@
 	          if (j == 1) {files <- NULL}
 	          files <- c(files, paste(subtofilename(
 	            as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
-	        }	        
+	        }
+	      } else if (fileType %in% resFile){
+	        if ("All" %in% selectCriteria$sub) { 
+	          files <- list.files(TxtInOutFolder,'.res') 
+	        } else {
+	          selectCriteria$sub <- as.numeric(selectCriteria$sub)
+	        }
+	        for(j in 1:length(selectCriteria$sub)){
+	          if (j == 1) {files <- NULL}
+	          files <- c(files, paste(subtofilename(
+	            as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
+	        }
+	        
 	      } else {
 	        files <- paste("basins.", fileType, sep="")
 	      }	      
