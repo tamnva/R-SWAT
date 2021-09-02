@@ -552,10 +552,9 @@ model runs are (nParameters + 1) * r")
             globalVariable$simData[[k]] <<- temp$simData[[k]][[idBest]]                  
           }
         }
-        
-        print("Best objective function value")
-        print(max(globalVariable$objValue))
-        
+        print(paste("Iteration ", i, " objective function value = ", 
+                    max(globalVariable$objValue), sep =""))        
+
         #-----------------------------------------------------------------------
       }
 
