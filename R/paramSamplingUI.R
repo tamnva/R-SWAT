@@ -54,7 +54,7 @@ paramSamplingUI <- function(id) {
                    Parameters defined at the hru level (in files .hru, .gw, .mgt,
                    .chm, .sdr, .sep, .sol files) you should fill in all fields 
                    of this table. Parameter defined at the subbasin level (in 
-                   files .sub, .rte, .wq, .pnd files), the land use, soil, slope 
+                   files .sub, .rte, .wq, .pnd .res files), the land use, soil, slope 
                    can be left empty. Basin parameters (.wwq, .bsn files), the 
                    subbasin, landuse, soil, slope cells can be left emtpy. If 
                    you select all subbasins/landuse/soil or slope, just type 
