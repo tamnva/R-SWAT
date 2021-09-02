@@ -441,7 +441,7 @@ model runs are (nParameters + 1) * r")
                                globalVariable$dateRangeCali)
 
         newPar <- globalVariable$parameterValue
-        
+
         # Assign best parameter to the global variables
         if(parallelMode == 1){
           globalVariable$objValue <<- temp$objValue
@@ -463,8 +463,8 @@ model runs are (nParameters + 1) * r")
         
         # Loop over number of iteration
         for (i in 1:nIters){
-          print(paste("Iteration ", i, " objective function value = ", 
-                      globalVariable$objValue, sep =""))
+          print(paste("Iteration ", i - 1, " objective function value = ", 
+                      max(globalVariable$objValue), sep =""))
 
           # Take better parameter + Generate new parameter set with DDS
           if (parallelMode == 1) {
@@ -544,7 +544,7 @@ model runs are (nParameters + 1) * r")
         
         # Take the better parameter set/data if exist
         
-        if(temp$objValue[idBest] > globalVariable$objValue){
+        if(temp$objValue[idBest] > max(globalVariable$objValue)){
           globalVariable$parameterValue <<- newPar[idBest, ]
           globalVariable$objValue <<- temp$objValue[idBest]
           for (k in 1:globalVariable$nOutputVar){
@@ -552,10 +552,9 @@ model runs are (nParameters + 1) * r")
             globalVariable$simData[[k]] <<- temp$simData[[k]][[idBest]]                  
           }
         }
-        
-        print("Best objective function value")
-        print(globalVariable$objValue)
-        
+        print(paste("Iteration ", i, " objective function value = ", 
+                    max(globalVariable$objValue), sep =""))        
+
         #-----------------------------------------------------------------------
       }
 
