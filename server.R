@@ -237,7 +237,14 @@ SWAT means it will take results from the SWAT model, nParameters is the number o
 table, minColumn and maxColumn means values in the column Min and Max from the above table, The number of
 model runs are (nParameters + 1) * r")
     } else if(globalVariable$paraSampling$samplingApproach == "Cali_(DDS)"){
-      output$printHelpInputinfo <- renderText("Please contact developer for using this option")
+      output$printHelpInputinfo <- renderText("Please write the number of iterations and parallel approach. For example,
+                          10, 1
+means 10 iterations and the parallel approach is 1, they must be seperated by the comma 
+Parallel approach = 1 => DDS is run independently from each core.
+Parallel approach = 2 => the best parameterset among all cores at ith iteration is used for the next iteration)
+The number mof model runs = number of iterations * number of parallel runs (cores)
+Please go to step 4.1 to provide information about the objective function (1) and observed data files (2) 
+before '3. Run SWAT'")
     } else {
       output$printSelectedParaSensiApproach <- NULL
     }
@@ -269,8 +276,8 @@ model runs are (nParameters + 1) * r")
   observe({
     outputExtraction <- excel_to_R(input$tableOutputExtraction)
     if(is.null(outputExtraction)) outputExtraction <- dataOutputExtraction
-    globalVariable$outputExtraction  <<- outputExtraction  
-    OutputVar  <- getNumberOutputVar(outputExtraction)
+    globalVariable$outputExtraction <<- outputExtraction  
+    OutputVar <- getNumberOutputVar(outputExtraction)
     globalVariable$nOutputVar <<- OutputVar$nOutputVar
     globalVariable$userReadSwatOutput <<- OutputVar$userReadSwatOutput    
     output$tableOutputExtractionDisplayOnly <- renderDataTable(
@@ -342,7 +349,7 @@ model runs are (nParameters + 1) * r")
       } else if (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)"){
 
         # Get and edit the input text (InputInfo) command
-        morrisCommand <-  globalVariable$paraSampling$InputInfo
+        morrisCommand <- globalVariable$paraSampling$InputInfo
         morrisCommand <- gsub("SWAT", "NULL", morrisCommand)
         morrisCommand <- gsub("minColumn", "globalVariable$paraSelection$Min", morrisCommand)
         morrisCommand <- gsub("maxColumn", "globalVariable$paraSelection$Max", morrisCommand)
@@ -686,6 +693,8 @@ model runs are (nParameters + 1) * r")
                     session = session)
     
     observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile)
+    
+    # Get observed data
     if(length(observedDataFile$datapath) > 0){
       output$printObservedDataFile <- renderText(observedDataFile$datapath)
       globalVariable$observedDataFile <<- sortObservedDataFile(as.character(observedDataFile$datapath))
@@ -694,6 +703,11 @@ model runs are (nParameters + 1) * r")
         globalVariable$observedData[[i]] <<- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
         colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
       }
+      
+      # Save observed data to globalVariables
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+                                           'SWATShinyObject.rds',
+                                           sep ='')) 
     }
   })
   
