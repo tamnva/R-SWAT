@@ -237,6 +237,9 @@ SWAT means it will take results from the SWAT model, nParameters is the number o
 table, minColumn and maxColumn means values in the column Min and Max from the above table, The number of
 model runs are (nParameters + 1) * r")
     } else if(globalVariable$paraSampling$samplingApproach == "Cali_(DDS)"){
+      output$printSelectedParaSensiApproach <- renderText(paste("You selected: Cali_(DDS) for parameter optimization, ", 
+                                                                "not for sensitivtity analysis, skip this step (4.2) and proceed to the next step (4.3)", sep ="")) 
+      
       output$printHelpInputinfo <- renderText("Please write the number of iterations and parallel approach. For example,
                           10, 1
 means 10 iterations and the parallel approach is 1, they must be seperated by the comma 
