@@ -30,7 +30,6 @@
     
     # Loop over number of parameter sets
     for (i in 1:nrow(subParameterSet)) {
-      
       # Assign parameter values to caliParam
       caliParam$applyValue <- getParameterValue(caliParam$paramFlag, 
                                                 subParameterSet[i,2:nParam]

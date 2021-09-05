@@ -234,6 +234,9 @@ plotSimulated <- function(inputDataFrame){
   return(ggplotly(myplot))
 }
 
+# ------------------------------------------------------------------------------
+# Plot sensitivity LHS - morris
+# ------------------------------------------------------------------------------
 plotSensitivity <- function(xval, yval, para){
   myData <- data.frame(x = xval, y = yval, Parameters = para)
     #95 PPU
@@ -243,7 +246,9 @@ plotSensitivity <- function(xval, yval, para){
   return(myplot)
 }
 
-
+# ------------------------------------------------------------------------------
+# Plot objective function - parameter value
+# ------------------------------------------------------------------------------
 plotObjFuncParaValue <- function(globalVariable){
   nIter <- nrow(globalVariable$parameterValue)
   nPara <- nrow(globalVariable$paraSelection)
@@ -264,3 +269,25 @@ plotObjFuncParaValue <- function(globalVariable){
   
   return(myPlot)
 }
+
+# ------------------------------------------------------------------------------
+# Plot sensitivity - sobol
+# ------------------------------------------------------------------------------
+plotSensiSobol <- function(paraSelection, tableSensitivity){
+
+  data <- tableSensitivity[1:nrow(paraSelection),]
+  colnames(data) <- c("paraName", "original", "bias", "stdErr", "min", "max")
+  
+  myPlot <- ggplot(data,aes(x=paraName,y=original)) +
+    geom_point(shape=21, fill="blue", color="blue", size=3) +
+    geom_errorbar(aes(x=paraName,ymax=max,ymin=min),position="dodge", width=.0, colour='blue', size=0.5) +
+    xlab(" ") +
+    ylab("Sensitivity --> Increasing sensitivity") +
+    coord_flip() +
+    theme_bw()
+  
+  myPlot <- ggplotly(myPlot)
+
+  return(myPlot)
+}
+

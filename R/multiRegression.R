@@ -57,3 +57,16 @@ lhsRange <- function(nIter, paramRange){
   paramSampling <- cbind(c(1:nrow(paramSampling)), paramSampling)
   return(paramSampling)
 }
+
+#-------------------------------------------------------------------------------	
+# Generate random number for Sobol method
+#-------------------------------------------------------------------------------	
+runifSobol <- function(min, max, nrows, ncols){
+  output <- data.frame(matrix(runif(ncols * nrows), nrow = nrows))
+  
+  for (i in 1:ncols){
+    output[,i] <- min[i] + output[,i]*(max[i] - min[i])
+  }
+  
+  return(output)
+}
