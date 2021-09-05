@@ -235,5 +235,22 @@ calObjFunction <- function(parameterValue, ncores,
   return(output) 
 }
 
+#------------------------------------------------------------------------------- 
+# Binding list object (with 3 level of list)
+# ------------------------------------------------------------------------------
+bindList <- function(toList, inList){
+  
+  nOutputVar <- length(lengths(toList))
+  lengthToList <- length(lengths(toList[[1]]))
+  lengthInList <- length(lengths(inList[[1]]))
+  
+  for (i in 1:nOutputVar){
+    for (j in 1:lengthInList){
+      toList[[i]][[lengthToList + j]] <- inList[[i]][[j]]   
+    }
+  }
+  
+  return(toList)
+}
   
   
