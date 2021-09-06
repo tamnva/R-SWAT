@@ -248,7 +248,7 @@ before '3. Run SWAT'")
     } else if (globalVariable$paraSampling$samplingApproach == "Sensi_(Sobol)") {
       output$printSelectedParaSensiApproach <- renderText("You used Sobol' sensitivity indices (variance-based sensitivity analysis) for global sensitivity analysis - more detail see 'sensitivity' R package")   
       output$printHelpInputinfo <- renderText("Please write sobol command in the InputInfo and the number of iterations (seperated by ;). For example,
-        sobol(model = SWAT, X1, X2, order = 2, nboot = 100); 10
+        sobol(model = SWAT, X1, X2, order = 1, nboot = 100); 10
 The first 3 input fields MUST be 'model = SWAT, X1, X2', 
 other input fields could be modifed, see function sobol in the sensitivity package for help. In the first
 3 fields, this tool automatically gets information from the above table as input for this function. E.g.,
