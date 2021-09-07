@@ -1190,8 +1190,80 @@ The number of model runs are (number of parameters + 1) * number of iterations (
     }    
     
   })
+  #-----------------------------------------------------------------------------
+  # Tab 5. Visualization
+  #-----------------------------------------------------------------------------  
+  # 5.1. Visualize watout  
+  # ****************************************************************************  
+  # Update selected column watout.dat file type
+  # ****************************************************************************
+  observe({
+    req(input$watoutFile)
+    # update select input
+    globalVariable$visualWatoutData <<- readWatout(input$watoutFile$datapath)
+    globalVariable$visualWatoutHeader <<- readWatoutHeader(input$watoutFile$datapath)
+    
+    updateSelectizeInput(session, "selectColWatout",
+                         choices = globalVariable$visualWatoutHeader,
+                         selected = globalVariable$visualWatoutHeader[2]
+    )   
+  })
+
+  # ****************************************************************************  
+  # Update selected column observed
+  # ****************************************************************************  
+  observe({
+    req(input$observedFile)
+    # update select input
+    globalVariable$visualObserveData <<- read.table(input$observedFile$datapath, header = TRUE, sep = "")
+    updateSelectizeInput(session, "selectColObs",
+                         choices = colnames(globalVariable$visualObserveData),
+                         selected = globalVariable$visualObserveData[2]
+    )
+  })
   
+  # ****************************************************************************  
+  # Plot watout file
+  # ****************************************************************************
+  observe({
+    req(input$watoutFile)
+  
+    if(is.data.frame(globalVariable$visualWatoutData)){
+      if (!is.null(input$observedFile$datapath)){
+        if (input$selectColObs %in% colnames(globalVariable$visualObserveData)){
+          pltWatout <- plotWatout(globalVariable$visualWatoutData, globalVariable$visualWatoutHeader, input$selectColWatout, 
+                                  globalVariable$visualObserveData, input$selectColObs)
+          output$plotWatout <- renderPlotly(pltWatout$plot)
+        }
+
+      } else {
+
+        if (input$selectColWatout %in% globalVariable$visualWatoutHeader){
+          pltWatout <- plotWatout(globalVariable$visualWatoutData, globalVariable$visualWatoutHeader, input$selectColWatout, 
+                                  NULL, NULL)
+          output$plotWatout <- renderPlotly(pltWatout$plot)
+        }
+
+      }
+    }
+    
+  })
+
+  # 5.1. Visualize output.hru
+  
+  # ****************************************************************************  
+  # Update selected column watout.dat file type
+  # ****************************************************************************
+  
+  
+  
+  
+  
+  
+  #-----------------------------------------------------------------------------  
 }
-  
+
+
+
   # globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 
   # Warning in if (temp$objValue[idBest] > globalVariable$objValue) { :the condition has length > 1 and only the first element will be used
