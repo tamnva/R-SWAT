@@ -43,7 +43,7 @@ ui <- dashboardPage(
       menuItem("4. Evaluate output", 
                tabName = "evalOutputTab",
                icon = icon("chart-line"),
-               startExpanded = TRUE, 
+               startExpanded = FALSE, 
                selected = FALSE,
                menuSubItem("4.1.Objective function", 
                            tabName = "objFunctionTab", 
@@ -55,6 +55,14 @@ ui <- dashboardPage(
                           tabName = "paraOptUncerTab", 
                           selected = FALSE))
       
+    ),
+    sidebarMenu(
+      menuItem("Visualization", tabName = "visual",icon = icon("eye"),
+               startExpanded = FALSE, selected = FALSE,
+               menuSubItem("watout.dat", tabName = "watout", selected = FALSE),
+               menuSubItem("output.hru_under_development", tabName = "hru", selected = FALSE),
+               menuSubItem("output.rch_under_development", tabName = "rch", selected = FALSE),
+               menuSubItem("output.sub_under_development", tabName = "outputsub"))
     )
   ),
 
@@ -83,7 +91,16 @@ ui <- dashboardPage(
               sensAnalysisUI("sensAnalysisUI")),
       
       tabItem(tabName = "paraOptUncerTab",
-              paraOptUncerUI("paraOptUncerUI"))
+              paraOptUncerUI("paraOptUncerUI")),
+      
+      # Visualization
+      tabItem(tabName = "watout",
+              watoutUI("watoutUI")
+      ),
+      
+      tabItem(tabName = "hru",
+              hruUI("hruUI")
+      )
      
     )
   ) 
