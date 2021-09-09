@@ -41,7 +41,7 @@ watoutUI <- function(id) {
       
       column(width = 4,
              fileInput("observedFile",
-                       "2. Select observed data file", 
+                       "2. Add observed data file", 
                        multiple = TRUE
              )
       ),
