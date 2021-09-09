@@ -254,7 +254,27 @@ other input fields could be modifed, see function sobol in the sensitivity packa
 3 fields, this tool automatically gets information from the above table as input for this function. E.g.,
 SWAT means it will take results from the SWAT model, X1, X2 are two sets of random parameter vlaues. 
 The number of model runs are (number of parameters + 1) * number of iterations (if order = 1) or
-                              much higher (if order = 2)")    
+                              much higher (if order = 2)")
+    } else if(globalVariable$paraSampling$samplingApproach == "Read_User_Parameter_File"){
+      output$printSelectedParaSensiApproach <- renderText(paste("You selected: Read_User_Parameter_File, ", 
+      "For parameter sensitivity analysis, please use your external program. ",
+      "Or skip this step (4.2) and proceed to the next step (4.3)", sep ="")) 
+      
+      output$printHelpInputinfo <- renderText("Please paste the link to your parameter file in the InputInfo. For example,
+      
+              C:/data/examples/readUserParameterFile/myParameterSet.txt
+                          
+The format (free format, different fields are seperated by space) of this file MUST be as follows (see in the example file myParameterSet.txt)
+ - 1st line is the header, next lines is your parameterset values
+ - 1st column is for parameter 1 (in the table above), 2nd column is for parameter 2 and so on
+ - An empty line at the end of the file
+
+Example (NOTE: In this case, the parameter ranges (min, max) in the table above were not used, but you still need to put some values in that table)
+
+GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.rte    SURLAG.bsn
+60.1          0.1       0.12         0.2          0.55       2.5         1.5          4.5
+70.1          0.2       0.22         0.12         0.65       3.5         3.5          5.5
+                                              ")
     } else {
       output$printSelectedParaSensiApproach <- NULL
     }
@@ -395,17 +415,29 @@ The number of model runs are (number of parameters + 1) * number of iterations (
         # Generate initial parameter set
         globalVariable$parameterValue <<- lhsRange(globalVariable$ncores,
                                                    getParamRange(globalVariable$paraSelection))
+      } else if (globalVariable$paraSampling$samplingApproach == "Read_User_Parameter_File"){
+        
+        # Generate initial parameter set
+        parameterValue <- as.matrix(read.table(file = trimws(globalVariable$paraSampling$InputInfo),
+                                     header = TRUE, sep =""))
+        parameterValue <- cbind(c(1:nrow(parameterValue)),parameterValue)
+        colnames(parameterValue) <- NULL
+        rownames(parameterValue) <- NULL
+        
+        globalVariable$parameterValue <<- parameterValue
+        
       } else {
-        Print("Other parameter sampling approaches are under development")
+        print("Other parameter sampling approaches are under development")
       }
       
       # Run the SWAT model
       # Load all files that are going to be updated
+
       globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo, 
                                                               globalVariable$paraSelection,
                                                               globalVariable$SWATParam, 
                                                               globalVariable$TxtInOutFolder)
-      
+
       # Save global variables
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                            'SWATShinyObject.rds',
@@ -430,9 +462,13 @@ The number of model runs are (number of parameters + 1) * number of iterations (
       # Run SWAT for all iteration ---------------------------------------------  
       if ((globalVariable$paraSampling$samplingApproach == "Sensi_Cali_(LHS)") |
         (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)") |
-        (globalVariable$paraSampling$samplingApproach == "Sensi_(Sobol)")){
-        # Run SWAT in parallel
+        (globalVariable$paraSampling$samplingApproach == "Sensi_(Sobol)") |
+        (globalVariable$paraSampling$samplingApproach == "Read_User_Parameter_File")){
 
+        # Check max number of cores
+        globalVariable$ncores <<- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
+
+        # run parallel
         runSWATpar(globalVariable$workingFolder, 
                    globalVariable$TxtInOutFolder, 
                    globalVariable$outputExtraction, 
@@ -1083,6 +1119,9 @@ The number of model runs are (number of parameters + 1) * number of iterations (
         myPlot <- plotSensiSobol(globalVariable$paraSelection, tableSensitivity)
         output$plotlySensitivity <- renderPlotly(ggplotly(myPlot))
         
+      } else if(globalVariable$paraSampling$samplingApproach == "Read_User_Parameter_File"){
+        output$plotlySensitivity <- NULL
+        output$tableSensitivity <- NULL
       } else {
         
       }

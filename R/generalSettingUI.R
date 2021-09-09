@@ -17,7 +17,7 @@ generalSettingUI <- function(id) {
       column(width = 10,
              textInput("workingFolder",
                        "1. Working folder",
-                       "C:/Users/nguyenta/Documents/DemoSWATshiny",
+                       "C:/data/workingFolder",
                        width = "100%"
              ),
       ),
@@ -38,7 +38,7 @@ generalSettingUI <- function(id) {
       column(width = 10,
              textInput("TxtInOutFolder",
                        "2. TxtInOut folder",
-                       "C:/Users/nguyenta/Documents/DemoSWATshiny/TxtInOut",
+                       "C:/data/TxtInOut",
                        width = "100%"
              ),
              
