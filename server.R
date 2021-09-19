@@ -1291,14 +1291,173 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
   # 5.1. Visualize output.hru
   
   # ****************************************************************************  
-  # Update selected column watout.dat file type
+  # Get HRU raster file
   # ****************************************************************************
+  observe({
+    volumes <- getVolumes()
+    shinyFileChoose(input, "getHruRaster", 
+                    roots = volumes, 
+                    filetypes=c('', 'adf'),
+                    session = session)
+    
+    hruRasterFile <- parseFilePaths(volumes, input$getHruRaster)
+    
+    if(length(hruRasterFile$datapath) == 1){
+      hruRasterFile <- as.character(hruRasterFile$datapath)
+      output$printHruRaster <- renderText(hruRasterFile)
+      
+      if (file.exists(hruRasterFile)){
+
+        globalVariable$hruRaster <<- raster(hruRasterFile)
+      } else {
+        globalVariable$hruRaster <<- NULL
+      }
+    }
+  })
   
+  # ****************************************************************************  
+  # Get TxtInOut directory 
+  # ****************************************************************************
+  observe({
+    req(input$hruTempAgg)
+  })
+  # Update select date rnage
+  observe({
+    
+    req(input$hruTxtInOutFolder)
+    
+    fileCio <- trimws(paste(input$hruTxtInOutFolder, '/file.cio', sep=''))
+    
+    if (file.exists(fileCio)){
+
+      globalVariable$hruFileCioInfo <<- getFileCioInfo(input$hruTxtInOutFolder)
+      
+      updateDateInput(session, "hruPlotDate",
+                      min = globalVariable$hruFileCioInfo$startEval,
+                      max = globalVariable$hruFileCioInfo$endSim, 
+                      value = globalVariable$hruFileCioInfo$startEval[1])  
+      
+      updateDateRangeInput(session, "hruInputDateRange",
+                           start = globalVariable$hruFileCioInfo$startEval,
+                           end = globalVariable$hruFileCioInfo$endSim,
+                           min = globalVariable$hruFileCioInfo$startEval,
+                           max = globalVariable$hruFileCioInfo$endSim)
+      
+      
+      updateDateInput(session, "hruPlotMonth",
+                      min = globalVariable$hruFileCioInfo$startEval,
+                      max = globalVariable$hruFileCioInfo$endSim, 
+                      value = globalVariable$hruFileCioInfo$startEval[1])  
+      
+      updateDateRangeInput(session, "hruInputMonthRange",
+                           start = globalVariable$hruFileCioInfo$startEval,
+                           end = globalVariable$hruFileCioInfo$endSim,
+                           min = globalVariable$hruFileCioInfo$startEval,
+                           max = globalVariable$hruFileCioInfo$endSim)
+      
+      updateDateInput(session, "hruPlotYear",
+                      min = globalVariable$hruFileCioInfo$startEval,
+                      max = globalVariable$hruFileCioInfo$endSim, 
+                      value = globalVariable$hruFileCioInfo$startEval[1])
+      
+      updateDateRangeInput(session, "hruInputYearRange",
+                           start = globalVariable$hruFileCioInfo$startEval,
+                           end = globalVariable$hruFileCioInfo$endSim,
+                           min = globalVariable$hruFileCioInfo$startEval,
+                           max = globalVariable$hruFileCioInfo$endSim)
+      
+    }
+    
+    fileHru <- trimws(paste(input$hruTxtInOutFolder, '/output.hru', sep=''))
+   
+    if(file.exists(fileHru)){
+      ouputHruHeader <- readOutputHruHeader(fileHru)
+      updateSelectizeInput(session, "hruSelectCol",
+                           choices = ouputHruHeader,
+                           selected = ouputHruHeader[1])
+    } else {
+      updateSelectizeInput(session, "hruSelectCol",
+                           choices = NULL)      
+    }
+    
+    
+  })
+ 
+  # ****************************************************************************  
+  # get HRU data
+  # ****************************************************************************
+  observe({
+    
+    req(input$hruTxtInOutFolder)
+    
+    fileHru <- trimws(paste(input$hruTxtInOutFolder, '/output.hru', sep=''))
+    
+    if(file.exists(fileHru)){
+      # Read HRU data
+      globalVariable$hruData <<- read.table(fileHru, header = TRUE, sep = "", skip = 8)
+    } else {
+      globalVariable$hruData <<- NULL
+    }
+  })
   
-  
-  
-  
-  
+  # ****************************************************************************  
+  # Plot hru
+  # ****************************************************************************
+  observe({
+    
+    req(input$hruTxtInOutFolder, 
+        input$hruSelectCol,
+        input$hruTempAgg)
+   
+    if (input$hruTempAgg == 'Daily'){
+      globalVariable$hruInputDateRange <<- input$hruInputDateRange
+      globalVariable$hruPlotDate <<- input$hruPlotDate       
+    } else if (input$hruTempAgg == 'Monthly'){
+      globalVariable$hruInputDateRange <<- input$hruInputMonthRange
+      globalVariable$hruPlotDate <<- input$hruPlotMonth  
+    } else {
+      globalVariable$hruInputDateRange <<- input$hruInputYearRange
+      globalVariable$hruPlotDate <<- input$hruPlotYear 
+    }
+      
+    if (!is.null(globalVariable$hruData)){
+      hruPlotData <- subsetOutputHru(globalVariable$hruData, 
+                                     globalVariable$hruInputDateRange[1], 
+                                     globalVariable$hruInputDateRange[2], 
+                                     input$hruSelectCol, 
+                                     input$hruTempAgg)
+      if(!is.null(globalVariable$hruRaster)){
+
+        hruRaster <- hruRasterValue(globalVariable$hruRaster, 
+                                    hruPlotData, 
+                                    globalVariable$hruPlotDate)
+        
+        outputText <- as.character(globalVariable$hruPlotDate)
+        if (input$hruTempAgg == "Monthly"){
+          outputText <- substr(outputText,1,7)
+        } else if (input$hruTempAgg == "Yearly"){
+          outputText <- substr(outputText,1,4)
+        }
+        outputText <- paste("You selected Variable: ", 
+                            input$hruSelectCol, 
+                            ", Timestep: ",
+                            input$hruTempAgg,
+                            ", Time: ",
+                            outputText,
+                            sep = "")
+        output$hruPlotTitle <- renderText(outputText)  
+        output$hruPlotHRU <- renderPlot({plot(hruRaster)})
+
+      } else {
+        output$hruPlotHRU <- NULL
+      }
+      
+    } else {
+      output$hruPlotHRU <- NULL
+    }
+    
+    
+  })
   #-----------------------------------------------------------------------------  
 }
 

@@ -77,6 +77,118 @@ plotWatout <- function(watoutData = watoutData, watoutHeader = watoutHeader, var
   
 }
 
+# HRU --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Get variable number in watout.dat file type
+# ------------------------------------------------------------------------------
+readOutputHruHeader <- function(fileName){
+  
+  outputHruHeader <- readLines(fileName, 9)
+
+  outputHruHeader <- strsplit(outputHruHeader[9], "\\s+")[[1]]
+  outputHruHeader <- outputHruHeader[outputHruHeader != ""]
+  temp <- c('LULC', 'HRU', 'GIS', 'SUB', 'MGT', 'MO', 'DA', 'YR')
+  outputHruHeader <- outputHruHeader[-match(temp,outputHruHeader )]
+  
+  return(outputHruHeader)
+}
+
+# ------------------------------------------------------------------------------
+# Subset of HRU based on column name and temporal aggregation
+# ------------------------------------------------------------------------------
+subsetOutputHru <- function(hruData, sDate, eDate, colNam, tempAgg){
+  
+  # Deleteme
+#  outputHruFile <- "C:/data/TxtInOut/output.hru"
+#  hruData <- read.table(outputHruFile, header = TRUE, sep = "", skip = 8)
+#  sDate <-  as.Date("20000101", "%Y%m%d")
+#  eDate <-  as.Date("20071231", "%Y%m%d")
+# tempAgg <- "Monthly"
+# colNam <- 'AREAkm2'
+  
+  # number of hrus
+  nHrus <- max(hruData[,2])
+  nTimeSteps <- nrow(hruData)/nHrus
+  colNr <- match(colNam, colnames(hruData))
+  
+  # Aggregated result
+  hru <- as.data.frame(matrix(rep(NA, nHrus*nTimeSteps), ncol = nHrus, nrow = nTimeSteps))
+ 
+  # Time step 
+  plotPeriod <- seq(sDate, eDate, by ="days")
+  byMonth <- strftime(plotPeriod, "%m")
+  byYear <- strftime(plotPeriod, "%Y")
+    
+  # convert to vector
+  for (i in 1:nTimeSteps){
+    startLocation <- (i-1)*nHrus + 1
+    endLocation <- i*nHrus
+    hru[i,] <- as.vector(hruData[startLocation:endLocation, colNr])
+  }
+  
+  if (tempAgg == "Monthly"){
+
+    hru <- aggregate(x = hru, by = list(byMonth, byYear), FUN = "sum")
+    hru <- hru[,-c(2)]
+    hru[,1] <- unique(paste(byYear, "-", byMonth, sep =""))
+
+    
+  } else if (tempAgg == "Yearly"){
+    hru <- aggregate(x = hru, by = list(byYear), FUN = "sum")
+    hru[,1] <- unique(byYear)
+    
+  } else {
+    hru <- cbind(as.character(plotPeriod), hru)
+  }
+  
+  return(hru)
+  
+}
+
+
+# ------------------------------------------------------------------------------
+# Subset of HRU based on column name and temporal aggregation
+# ------------------------------------------------------------------------------
+hruRasterValue <- function(hruRaster, hruAggregate, selectedDate){
+
+  temp <- hruAggregate[1,1]
+  
+  if (nchar(temp) == 7){
+    selectedDate <- paste(strftime(selectedDate, "%Y"), "-", strftime(selectedDate, "%m"),
+                          sep ="")
+  } else if (nchar(temp) == 4) {
+    selectedDate <- strftime(selectedDate, "%Y")  
+  } else {
+    selectedDate <- as.character(selectedDate)
+  }
+    
+
+  rowNr <- match(selectedDate, hruAggregate[,1])
+  output <- as.numeric(hruAggregate[rowNr, 2:ncol(hruAggregate)])
+  
+  val <- values(hruRaster)
+
+ 
+  for(i in 1:length(val)){
+    if(!is.na(val[i])){
+      val[i] <- output[val[i]]      
+    }
+  }
+  
+  
+  values(hruRaster) <- val
+  
+  return(hruRaster)
+  
+}
+
+
+
+
+
+
+
+
 #watoutData <- readWatout("C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/TxtInOut/watout.dat")
 #watoutHeader <- readWatoutHeader("C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/TxtInOut/watout.dat")
 #varName1 <- "FLOWm^3/s"

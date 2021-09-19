@@ -60,8 +60,8 @@ ui <- dashboardPage(
       menuItem("Visualization", tabName = "visual",icon = icon("eye"),
                startExpanded = FALSE, selected = FALSE,
                menuSubItem("watout.dat", tabName = "watout", selected = FALSE),
-               menuSubItem("output.hru_under_development", tabName = "hru", selected = FALSE),
-               menuSubItem("output.rch_under_development", tabName = "rch", selected = FALSE),
+               menuSubItem("output.hru", tabName = "hru", selected = FALSE),
+               menuSubItem("output.rch", tabName = "rch", selected = FALSE),
                menuSubItem("output.sub_under_development", tabName = "outputsub"))
     )
   ),
@@ -100,6 +100,10 @@ ui <- dashboardPage(
       
       tabItem(tabName = "hru",
               hruUI("hruUI")
+      ),
+      
+      tabItem(tabName = "rch",
+              rchUI("rchUI")
       )
      
     )
