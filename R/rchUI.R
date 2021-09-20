@@ -32,20 +32,18 @@ rchUI <- function(id) {
       
       column(width = 4,
              selectInput("rchSelectedReach", 
-                         "Select Reach number(s) to plot", 
+                         "4. Select Reach number(s) to plot", 
                          choices = NULL,
                          multiple = TRUE, 
                          width = "100%")
       ), 
       column(width = 4,
              selectInput("rchSelectedVariable", 
-                         "Select variable(s) to plot", 
+                         "5. Select variable(s) to plot", 
                          choices = NULL,
                          multiple = TRUE, 
                          width = "100%")
       ),
-
-
     ),
 
     fluidRow(

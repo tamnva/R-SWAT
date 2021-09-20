@@ -11,7 +11,6 @@ server <- function(input, output, session) {
   globalVariable <- list()
   displayOutput <- list()
   globalVariable$checkSimComplete <- FALSE
-
     
   #-----------------------------------------------------------------------------
   # Tab 1. General Setting
@@ -1308,9 +1307,9 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
       
       if (file.exists(hruRasterFile)){
 
-        globalVariable$hruRaster <<- raster(hruRasterFile)
+        displayOutput$hruRaster <<- raster(hruRasterFile)
       } else {
-        globalVariable$hruRaster <<- NULL
+        displayOutput$hruRaster <<- NULL
       }
     }
   })
@@ -1330,41 +1329,41 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     
     if (file.exists(fileCio)){
 
-      globalVariable$hruFileCioInfo <<- getFileCioInfo(input$hruTxtInOutFolder)
+      displayOutput$hruFileCioInfo <<- getFileCioInfo(input$hruTxtInOutFolder)
       
       updateDateInput(session, "hruPlotDate",
-                      min = globalVariable$hruFileCioInfo$startEval,
-                      max = globalVariable$hruFileCioInfo$endSim, 
-                      value = globalVariable$hruFileCioInfo$startEval[1])  
+                      min = displayOutput$hruFileCioInfo$startEval,
+                      max = displayOutput$hruFileCioInfo$endSim, 
+                      value = displayOutput$hruFileCioInfo$startEval[1])  
       
       updateDateRangeInput(session, "hruInputDateRange",
-                           start = globalVariable$hruFileCioInfo$startEval,
-                           end = globalVariable$hruFileCioInfo$endSim,
-                           min = globalVariable$hruFileCioInfo$startEval,
-                           max = globalVariable$hruFileCioInfo$endSim)
+                           start = displayOutput$hruFileCioInfo$startEval,
+                           end = displayOutput$hruFileCioInfo$endSim,
+                           min = displayOutput$hruFileCioInfo$startEval,
+                           max = displayOutput$hruFileCioInfo$endSim)
       
       
       updateDateInput(session, "hruPlotMonth",
-                      min = globalVariable$hruFileCioInfo$startEval,
-                      max = globalVariable$hruFileCioInfo$endSim, 
-                      value = globalVariable$hruFileCioInfo$startEval[1])  
+                      min = displayOutput$hruFileCioInfo$startEval,
+                      max = displayOutput$hruFileCioInfo$endSim, 
+                      value = displayOutput$hruFileCioInfo$startEval[1])  
       
       updateDateRangeInput(session, "hruInputMonthRange",
-                           start = globalVariable$hruFileCioInfo$startEval,
-                           end = globalVariable$hruFileCioInfo$endSim,
-                           min = globalVariable$hruFileCioInfo$startEval,
-                           max = globalVariable$hruFileCioInfo$endSim)
+                           start = displayOutput$hruFileCioInfo$startEval,
+                           end = displayOutput$hruFileCioInfo$endSim,
+                           min = displayOutput$hruFileCioInfo$startEval,
+                           max = displayOutput$hruFileCioInfo$endSim)
       
       updateDateInput(session, "hruPlotYear",
-                      min = globalVariable$hruFileCioInfo$startEval,
-                      max = globalVariable$hruFileCioInfo$endSim, 
-                      value = globalVariable$hruFileCioInfo$startEval[1])
+                      min = displayOutput$hruFileCioInfo$startEval,
+                      max = displayOutput$hruFileCioInfo$endSim, 
+                      value = displayOutput$hruFileCioInfo$startEval[1])
       
       updateDateRangeInput(session, "hruInputYearRange",
-                           start = globalVariable$hruFileCioInfo$startEval,
-                           end = globalVariable$hruFileCioInfo$endSim,
-                           min = globalVariable$hruFileCioInfo$startEval,
-                           max = globalVariable$hruFileCioInfo$endSim)
+                           start = displayOutput$hruFileCioInfo$startEval,
+                           end = displayOutput$hruFileCioInfo$endSim,
+                           min = displayOutput$hruFileCioInfo$startEval,
+                           max = displayOutput$hruFileCioInfo$endSim)
       
     }
     
@@ -1394,9 +1393,9 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     
     if(file.exists(fileHru)){
       # Read HRU data
-      globalVariable$hruData <<- read.table(fileHru, header = TRUE, sep = "", skip = 8)
+      displayOutput$hruData <<- read.table(fileHru, header = TRUE, sep = "", skip = 8)
     } else {
-      globalVariable$hruData <<- NULL
+      displayOutput$hruData <<- NULL
     }
   })
   
@@ -1410,29 +1409,29 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
         input$hruTempAgg)
    
     if (input$hruTempAgg == 'Daily'){
-      globalVariable$hruInputDateRange <<- input$hruInputDateRange
-      globalVariable$hruPlotDate <<- input$hruPlotDate       
+      displayOutput$hruInputDateRange <<- input$hruInputDateRange
+      displayOutput$hruPlotDate <<- input$hruPlotDate       
     } else if (input$hruTempAgg == 'Monthly'){
-      globalVariable$hruInputDateRange <<- input$hruInputMonthRange
-      globalVariable$hruPlotDate <<- input$hruPlotMonth  
+      displayOutput$hruInputDateRange <<- input$hruInputMonthRange
+      displayOutput$hruPlotDate <<- input$hruPlotMonth  
     } else {
-      globalVariable$hruInputDateRange <<- input$hruInputYearRange
-      globalVariable$hruPlotDate <<- input$hruPlotYear 
+      displayOutput$hruInputDateRange <<- input$hruInputYearRange
+      displayOutput$hruPlotDate <<- input$hruPlotYear 
     }
       
-    if (!is.null(globalVariable$hruData)){
-      hruPlotData <- subsetOutputHru(globalVariable$hruData, 
-                                     globalVariable$hruInputDateRange[1], 
-                                     globalVariable$hruInputDateRange[2], 
+    if (!is.null(displayOutput$hruData)){
+      hruPlotData <- subsetOutputHru(displayOutput$hruData, 
+                                     displayOutput$hruInputDateRange[1], 
+                                     displayOutput$hruInputDateRange[2], 
                                      input$hruSelectCol, 
                                      input$hruTempAgg)
-      if(!is.null(globalVariable$hruRaster)){
+      if(!is.null(displayOutput$hruRaster)){
 
-        hruRaster <- hruRasterValue(globalVariable$hruRaster, 
+        hruRaster <- hruRasterValue(displayOutput$hruRaster, 
                                     hruPlotData, 
-                                    globalVariable$hruPlotDate)
+                                    displayOutput$hruPlotDate)
         
-        outputText <- as.character(globalVariable$hruPlotDate)
+        outputText <- as.character(displayOutput$hruPlotDate)
         if (input$hruTempAgg == "Monthly"){
           outputText <- substr(outputText,1,7)
         } else if (input$hruTempAgg == "Yearly"){
@@ -1457,6 +1456,25 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     }
     
     
+  })
+  
+  # 6.1. Visualize output.rch
+  # ****************************************************************************  
+  # Get output.rch  file
+  # ****************************************************************************
+  observe({
+    req(input$rchFileCio)
+    displayOutput$rchFileCioInfo <<- getFileCioInfo(input$rchFileCio$datapath)
+  })
+  
+  observe({
+    req(input$outputRchFile)
+    #displayOutput$outputRchFile <<- readOutputRch(input$outputRchFile$datapath)
+  })
+  
+  observe({
+    req(input$rchObservedFile)
+    #displayOutput$rchObservedFile <<- readObsFile(input$rchObservedFile$datapath)
   })
   #-----------------------------------------------------------------------------  
 }

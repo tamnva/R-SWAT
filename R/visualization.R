@@ -182,11 +182,81 @@ hruRasterValue <- function(hruRaster, hruAggregate, selectedDate){
   
 }
 
+# ------------------------------------------------------------------------------
+# Plot output.rch
+# ------------------------------------------------------------------------------
+readOutputRch <- function(outputRchFile){
+  
+  # outputRchFile <- "C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/TxtInOut/output.rch"
+  output <- read.table(outputRchFile, header = FALSE, sep = "", skip = 9)
+  colnames(output)  <- paste("Column_", c(1:ncol(output)), sep = "")
+  output <- output[,-c(1)]
+  return(output)
+}
+
+# ------------------------------------------------------------------------------
+# Subset and temperol aggreagation of output.rch
+# ------------------------------------------------------------------------------
+subsetOutputRch <- function(readOutputRch, tempAgg, colNam, dataPeriod, rchNr){
+  
+  # readOutputRch <- output
+  # colNam <- c("Column_8")
+  # dataPeriod <- c(as.Date("20000101", "%Y%m%d"), as.Date("20071231", "%Y%m%d"))
+  # rchNr <- 2
+  
+  nRchs <- max(readOutputRch[,1])
+  nTimeSteps <- nrow(readOutputRch)/nRchs
+  colNr <- match(colNam, colnames(readOutputRch))
+  
+  # Aggregated result
+  rchIdx <- seq(rchNr, nrow(readOutputRch), nRchs)
+  readOutputRch <- readOutputRch[rchIdx,]
+  output <- matrix(readOutputRch[, colNr], ncol = 1)
+  
+  # Time step 
+  dataPeriod <- seq(dataPeriod[1], dataPeriod[2], by ="days")
+  byMonth <- strftime(dataPeriod, "%m")
+  byYear <- strftime(dataPeriod, "%Y")
+  
+  if (tempAgg == "Monthly"){
+    
+    output <- aggregate(x = output, by = list(byMonth, byYear), FUN = "sum")
+    output <- output[,-c(2)]
+    output[,1] <- unique(paste(byYear, "-", byMonth, sep =""))
+    
+    
+  } else if (tempAgg == "Yearly"){
+    output <- aggregate(x = output, by = list(byYear), FUN = "sum")
+    output[,1] <- paste(output[,1],"01-01", sep = "")
+  } else {
+    output <- cbind(date = as.character(dataPeriod), data.frame(output))
+  }
+  
+  result <- list()
+  result$output <- output
+  result$plot <- plot(output)
+  
+  return(result)
+}
 
 
-
-
-
+# ------------------------------------------------------------------------------
+# Plot output.rch subset
+# ------------------------------------------------------------------------------
+plotOutputRchSubset <- function(subsetOutputRch, subsetObsRch){
+  
+  # subsetOutputRch <- output
+  colnames(subsetOutputRch) <- c("Date", "Values")
+  subsetOutputRch[,1] <- as.Date(subsetOutputRch[,1], "%Y-%m-%d")
+  
+  myPlot <- ggplot(subsetOutputRch, aes(x=Date,y=Values)) +
+    geom_line(aes(x = Date, y = Values), alpha = 0.6) +
+    labs(x ="Date", y = " ") +
+    scale_x_date(date_labels = "%m-%Y") +
+    theme_bw()
+  
+  return(ggplotly(myPlot))
+}
 
 
 #watoutData <- readWatout("C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/TxtInOut/watout.dat")
