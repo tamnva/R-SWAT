@@ -1460,26 +1460,193 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
   
   # 6.1. Visualize output.rch
   # ****************************************************************************  
-  # Get output.rch  file
+  # Read file.cio information
   # ****************************************************************************
   observe({
     req(input$rchFileCio)
-    displayOutput$rchFileCioInfo <<- getFileCioInfo(input$rchFileCio$datapath)
+    
+    fileName <- input$rchFileCio$datapath
+    if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".cio") {
+      displayOutput$rchFileCioInfo <<- getFileCioInfo(input$rchFileCio$datapath)  
+    } else {
+      displayOutput$rchFileCioInfo <<- NULL
+    }
+    
   })
-  
+
+  # ****************************************************************************  
+  # Read output.rch  file
+  # ****************************************************************************
   observe({
     req(input$outputRchFile)
-    #displayOutput$outputRchFile <<- readOutputRch(input$outputRchFile$datapath)
+    
+    fileName <- input$outputRchFile$datapath
+    if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".rch") {
+      displayOutput$outputRchFile <<- readOutputRch(fileName)
+      
+      updateSelectizeInput(session, "rchSelectedReach",
+                           choices = c(1:max(displayOutput$outputRchFile[,1])))
+      
+      updateSelectizeInput(session, "rchSelectedVariable",
+                           choices = colnames(displayOutput$outputRchFile))
+    } else {
+      displayOutput$outputRchFile <<- NULL
+    }
   })
+
   
+  # ****************************************************************************  
+  # Read observed data  file
+  # **************************************************************************** 
   observe({
     req(input$rchObservedFile)
-    #displayOutput$rchObservedFile <<- readObsFile(input$rchObservedFile$datapath)
+    
+    displayOutput$rchObsData <<- read.table(input$rchObservedFile$datapath, 
+                                           header = TRUE, sep = "")
+    displayOutput$rchObsData[,1] <<- as.Date(displayOutput$rchObsData[,1], 
+                                            "%Y-%m-%d")
+    
+    updateSelectizeInput(session, "rchObsVariable",
+                         choices = colnames(displayOutput$rchObsData)
+                         [2:ncol(displayOutput$rchObsData)])
+    
+    
   })
+  
+  # ****************************************************************************  
+  # Subset observed data file
+  # **************************************************************************** 
+  observe({  
+    req(input$rchObsVariable)
+    
+    if (!is.null(input$rchObsVariable) & 
+        exists("rchObsData", where = displayOutput)){
+      
+      colNr <- match(input$rchObsVariable, colnames(displayOutput$rchObsData))
+      displayOutput$rchSubsetObsData <<- displayOutput$rchObsData[,c(1, colNr)]
+    }
+    
+  }) 
+  
+  # ****************************************************************************  
+  # Plot result
+  # **************************************************************************** 
+  observe({
+    
+    req(input$rchTempAgg)
+    req(input$rchSelectedVariable)
+    req(input$rchSelectedReach)
+
+    if (isTruthy(input$rchObsVariable) & isTruthy(input$rchObservedFile)){
+      if (exists("rchSubsetObsData", where = displayOutput) &
+          exists("outputRchFile", where = displayOutput)&
+          exists("rchFileCioInfo", where = displayOutput)){
+        
+        outputRchSubset <- subsetOutputRch(displayOutput$outputRchFile,
+                                           input$rchTempAgg, 
+                                           input$rchSelectedVariable, 
+                                           c(displayOutput$rchFileCioInfo$startEval, 
+                                             displayOutput$rchFileCioInfo$endSim), 
+                                           input$rchSelectedReach)
+        
+        plt <- plotOutputRchSubset(outputRchSubset, displayOutput$rchSubsetObsData)
+        
+        
+        output$rchPlotRch <- renderPlotly(plt)
+        
+      } else {
+        output$rchPlotRch <- NULL
+      }      
+    } else {
+      if (exists("outputRchFile", where = displayOutput)){
+        
+        outputRchSubset <- subsetOutputRch(displayOutput$outputRchFile,
+                                           input$rchTempAgg, 
+                                           input$rchSelectedVariable, 
+                                           c(displayOutput$rchFileCioInfo$startEval, 
+                                             displayOutput$rchFileCioInfo$endSim), 
+                                           input$rchSelectedReach)
+        temp <- NULL
+        plt <- plotOutputRchSubset(outputRchSubset, temp)
+        
+        
+        output$rchPlotRch <- renderPlotly(plt)
+        
+      } else {
+        output$rchPlotRch <- NULL
+      }
+    }
+
+
+  }) 
+
+  # 7.1. Visualize output.sub
+  # ****************************************************************************  
+  # Read file.cio information
+  # ****************************************************************************
+  observe({
+    req(input$subFileCio)
+    
+    fileName <- input$subFileCio$datapath
+    if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".cio") {
+      displayOutput$subFileCioInfo <<- getFileCioInfo(input$subFileCio$datapath)  
+    } else {
+      displayOutput$subFileCioInfo <<- NULL
+    }
+  })
+  
+  # ****************************************************************************  
+  # Read output.sub  file
+  # ****************************************************************************
+  observe({
+    req(input$outputSubFile)
+    
+    fileName <- input$outputSubFile$datapath
+    if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".sub") {
+      displayOutput$outputSubFile <<- readOutputRch(fileName)
+      
+      updateSelectizeInput(session, "subSelectedSub",
+                           choices = c(1:max(displayOutput$outputSubFile[,1])))
+      
+      updateSelectizeInput(session, "subSelectedVariable",
+                           choices = colnames(displayOutput$outputSubFile))
+    } else {
+      displayOutput$outputSubFile <<- NULL
+    }
+  })
+
+
+  
+  # ****************************************************************************  
+  # Plot result
+  # **************************************************************************** 
+  observe({
+    
+    req(input$subTempAgg)
+    req(input$subSelectedVariable)
+    req(input$subSelectedSub)
+
+    if (exists("outputSubFile", where = displayOutput)&
+        exists("subFileCioInfo", where = displayOutput)){
+      
+      outputSubSubset <- subsetOutputRch(displayOutput$outputSubFile,
+                                         input$subTempAgg, 
+                                         input$subSelectedVariable, 
+                                         c(displayOutput$subFileCioInfo$startEval, 
+                                           displayOutput$subFileCioInfo$endSim), 
+                                         input$subSelectedSub)
+      
+      plt <- plotOutputSubSubset(outputSubSubset)
+      
+      
+      output$subPlotSub <- renderPlotly(plt)
+      
+    } else {
+      output$rchPlotRch <- NULL
+    }        
+    
+  })  
   #-----------------------------------------------------------------------------  
 }
 
-
-
-  # globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 
-  # Warning in if (temp$objValue[idBest] > globalVariable$objValue) { :the condition has length > 1 and only the first element will be used
+# globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 

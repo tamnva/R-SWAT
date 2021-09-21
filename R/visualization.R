@@ -3,8 +3,6 @@
 # ------------------------------------------------------------------------------
 
 readWatout <- function(fileName){
-  # test
-  # fileName <- "C:/Users/nguyenta/Documents/old/SWATShinyVisual/testData/TxtInOut/watout.dat"
   output <- read.table(fileName, header = TRUE, sep = "", skip = 6)
   return(output)
 }
@@ -77,7 +75,6 @@ plotWatout <- function(watoutData = watoutData, watoutHeader = watoutHeader, var
   
 }
 
-# HRU --------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # Get variable number in watout.dat file type
 # ------------------------------------------------------------------------------
@@ -97,14 +94,6 @@ readOutputHruHeader <- function(fileName){
 # Subset of HRU based on column name and temporal aggregation
 # ------------------------------------------------------------------------------
 subsetOutputHru <- function(hruData, sDate, eDate, colNam, tempAgg){
-  
-  # Deleteme
-#  outputHruFile <- "C:/data/TxtInOut/output.hru"
-#  hruData <- read.table(outputHruFile, header = TRUE, sep = "", skip = 8)
-#  sDate <-  as.Date("20000101", "%Y%m%d")
-#  eDate <-  as.Date("20071231", "%Y%m%d")
-# tempAgg <- "Monthly"
-# colNam <- 'AREAkm2'
   
   # number of hrus
   nHrus <- max(hruData[,2])
@@ -183,13 +172,23 @@ hruRasterValue <- function(hruRaster, hruAggregate, selectedDate){
 }
 
 # ------------------------------------------------------------------------------
-# Plot output.rch
+# Read output.rch
 # ------------------------------------------------------------------------------
 readOutputRch <- function(outputRchFile){
   
-  # outputRchFile <- "C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/TxtInOut/output.rch"
   output <- read.table(outputRchFile, header = FALSE, sep = "", skip = 9)
-  colnames(output)  <- paste("Column_", c(1:ncol(output)), sep = "")
+  n <- nchar(outputRchFile)
+  
+  if (substr(outputRchFile, n-3, n)== ".sub"){
+    header <- readLines(outputRchFile, 9)[9]
+    colnames(output) <- c("BIGSUB", getOutputSubHeader(header))
+
+  } else {
+    header <- readLines(outputRchFile, 9)[9]
+    
+    colnames(output) <- c("REACH", getOutputRchHeader(header))
+  }
+  
   output <- output[,-c(1)]
   return(output)
 }
@@ -198,11 +197,6 @@ readOutputRch <- function(outputRchFile){
 # Subset and temperol aggreagation of output.rch
 # ------------------------------------------------------------------------------
 subsetOutputRch <- function(readOutputRch, tempAgg, colNam, dataPeriod, rchNr){
-  
-  # readOutputRch <- output
-  # colNam <- c("Column_8")
-  # dataPeriod <- c(as.Date("20000101", "%Y%m%d"), as.Date("20071231", "%Y%m%d"))
-  # rchNr <- 2
   
   nRchs <- max(readOutputRch[,1])
   nTimeSteps <- nrow(readOutputRch)/nRchs
@@ -223,20 +217,16 @@ subsetOutputRch <- function(readOutputRch, tempAgg, colNam, dataPeriod, rchNr){
     output <- aggregate(x = output, by = list(byMonth, byYear), FUN = "sum")
     output <- output[,-c(2)]
     output[,1] <- unique(paste(byYear, "-", byMonth, sep =""))
-    
+    output[,1] <- paste(output[,1],"-01", sep = "")
     
   } else if (tempAgg == "Yearly"){
     output <- aggregate(x = output, by = list(byYear), FUN = "sum")
-    output[,1] <- paste(output[,1],"01-01", sep = "")
+    output[,1] <- paste(output[,1],"-01-01", sep = "")
   } else {
     output <- cbind(date = as.character(dataPeriod), data.frame(output))
   }
-  
-  result <- list()
-  result$output <- output
-  result$plot <- plot(output)
-  
-  return(result)
+  colnames(output) <- c("date", colNam)
+  return(output)
 }
 
 
@@ -245,26 +235,103 @@ subsetOutputRch <- function(readOutputRch, tempAgg, colNam, dataPeriod, rchNr){
 # ------------------------------------------------------------------------------
 plotOutputRchSubset <- function(subsetOutputRch, subsetObsRch){
   
-  # subsetOutputRch <- output
-  colnames(subsetOutputRch) <- c("Date", "Values")
+  subsetObsRch[,1] <- as.Date(subsetObsRch[,1], "%Y-%m-%d")
   subsetOutputRch[,1] <- as.Date(subsetOutputRch[,1], "%Y-%m-%d")
   
-  myPlot <- ggplot(subsetOutputRch, aes(x=Date,y=Values)) +
-    geom_line(aes(x = Date, y = Values), alpha = 0.6) +
-    labs(x ="Date", y = " ") +
+  plotData <- data.frame(date = subsetOutputRch[,1],
+                         values = subsetOutputRch[,2],
+                         Variable = rep(colnames(subsetOutputRch)[2], nrow(subsetOutputRch)))
+  
+  plotData <- rbind(plotData, data.frame(date = subsetObsRch[,1],
+                                         values = subsetObsRch[,2],
+                                         Variable = rep(colnames(subsetObsRch)[2],
+                                                        nrow(subsetObsRch)))
+                    )
+
+  myPlot <- ggplot(plotData, aes(date, values, colour = Variable, shape = Variable)) +
+    geom_line() +     
+    labs(x =" ", y = " ") +
     scale_x_date(date_labels = "%m-%Y") +
     theme_bw()
   
   return(ggplotly(myPlot))
 }
 
+# ------------------------------------------------------------------------------
+# GetOutputSubHeader from output.sub file
+# ------------------------------------------------------------------------------
+# header <- readLines("C:/data/TxtInOut/output.sub", 9)[9]
 
-#watoutData <- readWatout("C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/TxtInOut/watout.dat")
-#watoutHeader <- readWatoutHeader("C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/TxtInOut/watout.dat")
-#varName1 <- "FLOWm^3/s"
-#observeData <- read.table("C:/Users/nguyenta/Documents/GitHub/SWATshiny/data/obs_var_1.txt", header = TRUE, sep = "")
-#varName2 <- "Qoutlet"
-#test <- plotWatout(watoutData, watoutHeader, varName1, 
-#                  NULL, NULL)
-#plotWatout(watoutData, watoutHeader, "Day", 
-#           NULL, NULL)
+getOutputSubHeader <- function(header){
+  header <- gsub("[()]", "", header)
+  header <- gsub("DOXQ mg/L", " DOXQ_mg/L ", header)
+  header <- gsub("CBODU mg/L", " CBODU_mg/L ", header)
+  header <- gsub("CBODU mg/L", " CBODU_mg/L ", header)
+  header <- gsub("CHOLAmic/L", " CHOLAmic/L ", header)
+  header <- gsub("GWNO3kg/ha", " GWNO3kg/ha ", header)
+  header <- gsub("LATNO3kg/h", " LATNO3kg/h ", header)
+  header <- gsub("LAT Qmm",  " LAT_Q(mm) ", header)
+  header <- gsub("SEDPkg/ha", " SEDPkg/ha ", header)
+  header <- gsub("SOLPkg/ha", " SOLPkg/ha ", header)
+  header <- gsub("NSURQkg/ha", "NSURQkg/ha  ", header)
+  header <- gsub("ORGPkg/ha", " ORGPkg/ha ", header)
+  header <- gsub("ORGNkg/ha", " ORGNkg/ha ", header)
+  header <- gsub("SYLDt/ha", " SYLDt/ha ", header)
+  header <- gsub("WYLDmm", " WYLDmm ", header)
+  header <- gsub("GW_Qmm", " GW_Qmm ", header)
+  header <- gsub("SURQmm", " SURQmm ", header)
+  header <- gsub("PERCmm", " PERCmm ", header)
+  
+  header <- strsplit(header, "\\s+")[[1]]
+  header <- header[header != ""]
+  
+  return(header)
+}
+
+
+# ------------------------------------------------------------------------------
+# GetOutputSubHeader from output.rcg file
+# ------------------------------------------------------------------------------
+# header <- readLines("C:/data/TxtInOut/output.rch", 9)[9]
+
+getOutputRchHeader <- function(header){
+  header <- gsub("TOT Pkg", " TOT_Pkg   ", header)
+  header <- gsub("TOT Nkg", "  TOT_Nkg  ", header)
+  header <- gsub("BACTLP_OUTct", "  BACTLP_OUTct  ", header)
+  header <- gsub("BACTP_OUTct", "  BACTP_OUTct  ", header)
+  header <- gsub("BED_PSTmg", "  BED_PSTmg  ", header)
+  header <- gsub("BURYPSTmg", "  BURYPSTmg  ", header)
+  header <- gsub("REACBEDPSTmg", "  REACBEDPSTmg  ", header)
+  header <- gsub("DIFFUSEPSTmg", "  DIFFUSEPSTmg  ", header)
+  header <- gsub("RESUSP_PSTmg", "  RESUSP_PSTmg  ", header)
+  header <- gsub("SETTLPSTmg", "  SETTLPSTmg  ", header)
+  header <- gsub("SORPST_OUTmg", "  SORPST_OUTmg  ", header)
+  header <- gsub("SORPST_INmg", "  SORPST_INmg  ", header)
+  header <- gsub("SOLPST_OUTmg", "  SOLPST_OUTmg  ", header)
+  header <- gsub("SOLPST_INmg", "  SOLPST_INmg  ", header)
+  header <- strsplit(header, "\\s+")[[1]]
+  header <- header[header != ""]
+  
+  return(header)
+}
+
+# ------------------------------------------------------------------------------
+# Plot output.sub subset
+# ------------------------------------------------------------------------------
+plotOutputSubSubset <- function(subsetOutputSub){
+  
+  subsetOutputSub[,1] <- as.Date(subsetOutputSub[,1], "%Y-%m-%d")
+  
+  plotData <- data.frame(date = subsetOutputSub[,1],
+                         values = subsetOutputSub[,2],
+                         Variable = rep(colnames(subsetOutputSub)[2], nrow(subsetOutputSub)))
+  
+  
+  myPlot <- ggplot(plotData, aes(date, values, colour = Variable, shape = Variable)) +
+    geom_line() +     
+    labs(x =" ", y = " ") +
+    scale_x_date(date_labels = "%m-%Y") +
+    theme_bw()
+  
+  return(ggplotly(myPlot))
+}

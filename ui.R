@@ -62,7 +62,7 @@ ui <- dashboardPage(
                menuSubItem("watout.dat", tabName = "watout", selected = FALSE),
                menuSubItem("output.hru", tabName = "hru", selected = FALSE),
                menuSubItem("output.rch", tabName = "rch", selected = FALSE),
-               menuSubItem("output.sub_under_development", tabName = "outputsub"))
+               menuSubItem("output.sub", tabName = "sub", selected = FALSE))
     )
   ),
 
@@ -104,8 +104,11 @@ ui <- dashboardPage(
       
       tabItem(tabName = "rch",
               rchUI("rchUI")
-      )
-     
+      ),
+
+      tabItem(tabName = "sub",
+              subUI("subUI")
+      )     
     )
   ) 
  #------------------------------------------------------------------------------ 
