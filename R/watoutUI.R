@@ -69,15 +69,10 @@ watoutUI <- function(id) {
     ),
     
     fluidRow(
-      box(status = NULL,
-          width = 11 ,
-          solidHeader = F,
-          plotlyOutput("plotWatout",
-                       width = "100%",
-                       height = "400px")
-          )
-      ),
-    
+      plotlyOutput("plotWatout",
+                   width = "100%",
+                   height = "400px")
+    )
     #----------------
   )}
 

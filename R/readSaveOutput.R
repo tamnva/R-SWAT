@@ -171,7 +171,13 @@ saveOutput <- function(workingDirectory,
 #-------------------------------------------------------------------------------
 # Get fileCio information (warmup + calibration period)
 getFileCioInfo <- function(TxtInOut){
-  fileCio <- readLines(paste(TxtInOut, "/file.cio", sep = ""), 60)
+  
+  if(substr(TxtInOut,(nchar(TxtInOut)-3), nchar(TxtInOut)) == ".cio"){
+    fileCio <- readLines(TxtInOut, 60)
+  } else {
+    fileCio <- readLines(paste(TxtInOut, "/file.cio", sep = ""), 60)
+  }
+
   startSim <- as.Date(paste(substr(fileCio[9],13,17), "0101", sep=""), "%Y%m%d")
   startSim <- startSim + as.numeric(substr(fileCio[10],13,17)) - 1
   
