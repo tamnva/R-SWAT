@@ -380,8 +380,8 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
         # Get and edit the input text (InputInfo) command
         morrisCommand <- globalVariable$paraSampling$InputInfo
         morrisCommand <- gsub("SWAT", "NULL", morrisCommand)
-        morrisCommand <- gsub("minColumn", "globalVariable$paraSelection$Min", morrisCommand)
-        morrisCommand <- gsub("maxColumn", "globalVariable$paraSelection$Max", morrisCommand)
+        morrisCommand <- gsub("minColumn", "as.numeric(globalVariable$paraSelection$Min)", morrisCommand)
+        morrisCommand <- gsub("maxColumn", "as.numeric(globalVariable$paraSelection$Max)", morrisCommand)
         morrisCommand <- gsub("nParameters", "length(globalVariable$paraSelection$Max)", morrisCommand)
         
         # call morris to generate parameters
@@ -398,10 +398,12 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
         nSobol <- as.numeric(sobolCommand[2])
         sobolCommand <- gsub("SWAT", "NULL", sobolCommand[1])
         
-        X1 <- runifSobol(globalVariable$paraSelection$Min, globalVariable$paraSelection$Max, 
+        X1 <- runifSobol(as.numeric(globalVariable$paraSelection$Min), 
+                         as.numeric(globalVariable$paraSelection$Max), 
                               nSobol, nrow(globalVariable$paraSelection))
         
-        X2 <- runifSobol(globalVariable$paraSelection$Min, globalVariable$paraSelection$Max, 
+        X2 <- runifSobol(as.numeric(globalVariable$paraSelection$Min), 
+                         as.numeric(globalVariable$paraSelection$Max), 
                               nSobol, nrow(globalVariable$paraSelection))
         # call sobol to generate parameters
         sobolObject <- eval(parse(text = sobolCommand))
@@ -572,8 +574,8 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
               }
               
               # Generate new parameter set
-              newPar <- data.frame(min = globalVariable$paraSelection$Min,
-                                   max = globalVariable$paraSelection$Max)
+              newPar <- data.frame(min = as.numeric(globalVariable$paraSelection$Min),
+                                   max = as.numeric(globalVariable$paraSelection$Max))
               parameterValue <- saveIterationResult$parameterValue[,2:ncol(saveIterationResult$parameterValue)]
               newPar <- cbind(newPar, t(parameterValue))
               newPar <- dds(newPar, globalVariable$ncores, i, nIters, 0.2, parallelMode) 
@@ -588,8 +590,8 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
                 best$objValue <- temp$objValue[idBest]
               }
               # Generate new parameter set
-              newPar <- data.frame(min = globalVariable$paraSelection$Min,
-                                   max = globalVariable$paraSelection$Max)
+              newPar <- data.frame(min = as.numeric(globalVariable$paraSelection$Min),
+                                   max = as.numeric(globalVariable$paraSelection$Max))
               parameterValue <- saveIterationResult$parameterValue[,2:ncol(saveIterationResult$parameterValue)]
               newPar <- cbind(newPar, t(parameterValue))
               newPar <- dds(newPar, globalVariable$ncores, i, nIters, 0.2, parallelMode)

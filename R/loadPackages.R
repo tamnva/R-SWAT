@@ -1,25 +1,12 @@
 # Dependency packages
-  packages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
-                'shinyFiles', 'tippy', 'excelR', 'shiny', 'doParallel',
-                'sensitivity', 'ggplot2', 'boot', 'rgdal', 'raster')
+dependencyPackages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
+                        'shinyFiles', 'tippy', 'excelR', 'shiny', 'doParallel',
+                        'sensitivity', 'ggplot2', 'boot','rgdal', 'raster')
 
-# Install dependency packages if necessary
-  install.packages(setdiff(packages,rownames(installed.packages())),
-                   repos = 'https://CRAN.R-project.org') 
-
+# Check and install only missing packages
+install.packages(setdiff(dependencyPackages,rownames(installed.packages())), 
+                 dependencies = TRUE) 
+  
 # Load dependency packages
-  library(shiny)
-  library(foreach)
-  library(lhs)
-  library(parallel)
-  library(plotly)
-  library(shinydashboard)
-  library(shinyFiles)
-  library(tippy)
-  library(excelR)
-  library(doParallel)
-  library(sensitivity)
-  library(ggplot2)
-  library(boot)
-  library(raster)
-  library(rgdal)
+invisible(lapply(dependencyPackages, library, character.only = TRUE))
+
