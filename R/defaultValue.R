@@ -43,8 +43,8 @@ dataParaSelection <- data.frame(Parameter = c('GW_DELAY.gw', 'CN2.mgt', 'SOL_K.s
                                Max = c(450,0.25, 0.25, 0.4, 0.99, 10.0, 0.5, 6.0),
                                Subbasin = c('All','All', 'All', 'All', '1,3,5', 'All', 'All', NA),
                                Landuse = c('All','All', 'All', 'All', 'FRSE, RNGB', 'All', NA, NA),
-                               soil = c('B59H5401, B63H8301','All', 'All', 'All', 'All', 'All', NA, NA),
-                               slope = c('0-5', 'All', 'All', '0-5, 5-9999', 'All', 'All', NA, NA))
+                               Soil = c('B59H5401, B63H8301','All', 'All', 'All', 'All', 'All', NA, NA),
+                               Slope = c('0-5', 'All', 'All', '0-5, 5-9999', 'All', 'All', NA, NA))
 
 columnsParaSelection <- data.frame(title= colnames(dataParaSelection),
                                   source = I(list(NA ,

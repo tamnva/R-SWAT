@@ -1031,12 +1031,12 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
                                                           rowDrag = FALSE,
                                                           columnResize = FALSE,
                                                           wordWrap = FALSE))
-        myPlot <- plotSensitivity(tableSensitivity$Absolute_t_Stat, 
-                                  tableSensitivity$p_Value,
-                                  tableSensitivity$Parameter_Name) +
-                 labs(x ="increasing sensitivity <-- Absolute t-Stat", y = "P-value --> increasing sensitivity") 
-       
-        output$plotlySensitivity <- renderPlotly(ggplotly(myPlot))
+        globalVariable$plotParameterSensitivity <<- plotSensitivity(tableSensitivity$Absolute_t_Stat, 
+                                                                   tableSensitivity$p_Value,
+                                                                   tableSensitivity$Parameter_Name) +
+          labs(x ="increasing sensitivity <-- Absolute t-Stat", y = "P-value --> increasing sensitivity") 
+        
+        output$plotlySensitivity <- renderPlotly(ggplotly(globalVariable$plotParameterSensitivity))
         
       } else if (globalVariable$paraSampling$samplingApproach == "Sensi_(Morris)"){
         
@@ -1069,12 +1069,12 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
                                                           columnResize = FALSE,
                                                           wordWrap = FALSE))
         
-        myPlot <- plotSensitivity(tableSensitivity$mu.star, 
+        globalVariable$plotParameterSensitivity <<- plotSensitivity(tableSensitivity$mu.star, 
                                   tableSensitivity$sigma,
                                   tableSensitivity$Parameter) +
-          labs(x ="mu.star --> increasing sensitivity", y = "sigma --> increasing parameter interation") 
+          labs(x ="\u03BC* => increasing sensitivity", y = "\u03C3 => increasing sensitivity") 
         
-        output$plotlySensitivity <- renderPlotly(ggplotly(myPlot))
+        output$plotlySensitivity <- renderPlotly(ggplotly(globalVariable$plotParameterSensitivity))
         
         # Sensitivity analysis with Sobol method -------------------------------
         
@@ -1117,8 +1117,8 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
                                                           wordWrap = FALSE))
         
         # Plot
-        myPlot <- plotSensiSobol(globalVariable$paraSelection, tableSensitivity)
-        output$plotlySensitivity <- renderPlotly(ggplotly(myPlot))
+        globalVariable$plotParameterSensitivity <<- plotSensiSobol(globalVariable$paraSelection, tableSensitivity)
+        output$plotlySensitivity <- renderPlotly(ggplotly(globalVariable$plotParameterSensitivity))
         
       } else if(globalVariable$paraSampling$samplingApproach == "Read_User_Parameter_File"){
         output$plotlySensitivity <- NULL
@@ -1130,6 +1130,59 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     }
   })  
   
+  
+  # ****************************************************************************  
+  # Save plot parameter sensitivity 
+  # ****************************************************************************
+  observe({
+    req(input$savePlotlySensitivity)
+    
+    showModal(
+      modalDialog(
+        textInput("savePlotlySensitivityFileName", "File name (must have .pdf)",
+                  placeholder = 'SWATshinyPlot.pdf'
+        ),
+        
+        numericInput("savePlotlySensitivityWidth", "Width in cm", 10, min = 1, max = 100),
+        
+        numericInput("savePlotlySensitivityHeight", "Height in cm", 10, min = 1, max = 100),
+        
+        span('Press OK to save plot as .pdf file in the working folder'),
+        
+        footer = tagList(
+          modalButton("Cancel"),
+          actionButton("savePlotlySensitivityok", "OK")
+        )
+      )
+    )
+ 
+  })
+  
+  #
+  observeEvent(input$savePlotlySensitivityok, {
+    
+    # Save plot
+    setwd(globalVariable$workingFolder)
+    
+    ggsave(input$savePlotlySensitivityFileName, 
+           plot = globalVariable$plotParameterSensitivity,
+           device = "pdf",
+           width = input$savePlotlySensitivityWidth,
+           height = input$savePlotlySensitivityHeight,
+           units = c("cm"))
+    
+    # print message
+    showModal(modalDialog(
+      title = " ",
+      "Plot was saved as .pdf file in the working folder",
+      easyClose = TRUE,
+      size = "l"
+    ))
+    
+
+    
+  })
+  #---------------------
   # 4.3. Optimization/Uncertainty
   
   # ****************************************************************************  
@@ -1181,9 +1234,9 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
       tempVar <- cbind(tempVar, globalVariable$observedData[[input$plotVarNumber]]$Value)
       
       colnames(tempVar) <- c("date", "lower", "median", "upper", "best", "observed")
+      globalVariable$PlotVariableNumber <<- plotSimulated(tempVar)
 
-
-      output$PlotVariableNumber <- renderPlotly(plotSimulated(tempVar)) 
+      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber)) 
       
       # Table
       columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'), 
@@ -1230,6 +1283,55 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     }    
     
   })
+  
+  # ****************************************************************************  
+  # Save plot simulated result 
+  # ****************************************************************************
+  observe({
+    req(input$savePlotVariableNumber)
+    
+    showModal(
+      modalDialog(
+        textInput("savePlotVariableNumberFileName", "File name (must have .pdf)",
+                  placeholder = 'SWATshinyPlot.pdf'
+        ),
+        
+        numericInput("savePlotVariableNumberWidth", "Width in cm", 10, min = 1, max = 100),
+        
+        numericInput("savePlotVariableNumberHeight", "Height in cm", 10, min = 1, max = 100),
+        
+        span('Press OK to save plot as .pdf file in the working folder'),
+        
+        footer = tagList(
+          modalButton("Cancel"),
+          actionButton("savePlotVariableNumberok", "OK")
+        )
+      )
+    )
+    
+  })
+  
+  observeEvent(input$savePlotVariableNumberok, {
+    
+    # Save plot
+    setwd(globalVariable$workingFolder)
+    
+    ggsave(input$savePlotVariableNumberFileName, 
+           plot = globalVariable$PlotVariableNumber,
+           device = "pdf",
+           width = input$savePlotVariableNumberWidth,
+           height = input$savePlotVariableNumberHeight,
+           units = c("cm"))
+    
+    # print message
+    showModal(modalDialog(
+      title = " ",
+      "Plot was saved as .pdf file in the working folder",
+      easyClose = TRUE,
+      size = "l"
+    ))
+  })
+    
   #-----------------------------------------------------------------------------
   # Tab 5. Visualization
   #-----------------------------------------------------------------------------  
@@ -1370,9 +1472,15 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     }
     
     fileHru <- trimws(paste(input$hruTxtInOutFolder, '/output.hru', sep=''))
-   
+  
     if(file.exists(fileHru)){
+     
       ouputHruHeader <- readOutputHruHeader(fileHru)
+
+      temp <- c('LULC', 'HRU', 'GIS', 'SUB', 'MGT', 'MO', 'DA', 'YR')
+
+      ouputHruHeader <- ouputHruHeader[-na.omit(match(temp,ouputHruHeader))]
+
       updateSelectizeInput(session, "hruSelectCol",
                            choices = ouputHruHeader,
                            selected = ouputHruHeader[1])
@@ -1380,7 +1488,6 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
       updateSelectizeInput(session, "hruSelectCol",
                            choices = NULL)      
     }
-    
     
   })
  
@@ -1395,7 +1502,10 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     
     if(file.exists(fileHru)){
       # Read HRU data
-      displayOutput$hruData <<- read.table(fileHru, header = TRUE, sep = "", skip = 8)
+      
+      temp <- read.table(fileHru, header = FALSE, sep = "", skip = 9)
+      colnames(temp) <- readOutputHruHeader(fileHru)
+      displayOutput$hruData <<- temp
     } else {
       displayOutput$hruData <<- NULL
     }
@@ -1409,7 +1519,7 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     req(input$hruTxtInOutFolder, 
         input$hruSelectCol,
         input$hruTempAgg)
-   
+  
     if (input$hruTempAgg == 'Daily'){
       displayOutput$hruInputDateRange <<- input$hruInputDateRange
       displayOutput$hruPlotDate <<- input$hruPlotDate       
@@ -1420,19 +1530,20 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
       displayOutput$hruInputDateRange <<- input$hruInputYearRange
       displayOutput$hruPlotDate <<- input$hruPlotYear 
     }
-      
+     
     if (!is.null(displayOutput$hruData)){
       hruPlotData <- subsetOutputHru(displayOutput$hruData, 
                                      displayOutput$hruInputDateRange[1], 
                                      displayOutput$hruInputDateRange[2], 
                                      input$hruSelectCol, 
                                      input$hruTempAgg)
+
       if(!is.null(displayOutput$hruRaster)){
 
         hruRaster <- hruRasterValue(displayOutput$hruRaster, 
                                     hruPlotData, 
                                     displayOutput$hruPlotDate)
-        
+       
         outputText <- as.character(displayOutput$hruPlotDate)
         if (input$hruTempAgg == "Monthly"){
           outputText <- substr(outputText,1,7)
@@ -1652,3 +1763,5 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
 }
 
 # globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 
+# globalVariable <- readRDS(file = 'C:/data/workingFolder/SWATShinyObject.rds') 
+# order(x, decreasing = TRUE)

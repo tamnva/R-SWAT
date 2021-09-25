@@ -38,7 +38,7 @@ generalSettingUI <- function(id) {
       column(width = 10,
              textInput("TxtInOutFolder",
                        "2. TxtInOut folder",
-                       "C:/data/TxtInOut",
+                       "C:/data/Scenarios/Default/TxtInOut",
                        width = "100%"
              ),
              

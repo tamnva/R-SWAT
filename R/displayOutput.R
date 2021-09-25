@@ -220,18 +220,18 @@ plotSimulated <- function(inputDataFrame){
     # Best simulation
     geom_line(aes(x = date, y = best, color = "Best simulation"), alpha = 0.6) +
     # Observed data
-    geom_line(aes(x = date, y = median, color = "Median"), alpha = 0.5) +
+    geom_line(aes(x = date, y = median, color = "Median"), alpha = 0.6) +
     # Observed data
     geom_line(aes(x = date, y = observed, color = "Observed"), alpha = 0.6) +
     scale_colour_manual(name= '', values=c("95PPU" = "red", 
                                            "Best simulation" = "red",
-                                           "Median" = "black",
+                                           "Median" = "green",
                                            "Observed" = "darkblue")) +
     # Axis name
-    labs(x ="Date", y = " ") +
+    labs(x ="  ", y = " ") +
     scale_x_date(date_labels = "%m-%Y") +
     theme_bw()
-  return(ggplotly(myplot))
+  return(myplot)
 }
 
 # ------------------------------------------------------------------------------
@@ -239,9 +239,15 @@ plotSimulated <- function(inputDataFrame){
 # ------------------------------------------------------------------------------
 plotSensitivity <- function(xval, yval, para){
   myData <- data.frame(x = xval, y = yval, Parameters = para)
+  
+  myData$Parameters <- factor(myData$Parameters, 
+                              levels = para[order(xval, decreasing = TRUE)])
+    
     #95 PPU
     myplot <- ggplot(data = myData, aes(x=x, y=y, colour = Parameters)) + 
       geom_point() +
+      scale_y_log10() + 
+      scale_x_log10() +
       theme_bw()
   return(myplot)
 }
