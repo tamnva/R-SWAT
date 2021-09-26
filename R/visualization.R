@@ -353,3 +353,26 @@ plotOutputSubSubset <- function(subsetOutputSub){
   
   return(ggplotly(myPlot))
 }
+
+# ------------------------------------------------------------------------------
+# Plot output.sub polygon subset
+# ------------------------------------------------------------------------------
+ggplotPolygon <- function(shp, Values){
+  shpDataFrame <- fortify(shp)
+  subbasin <- unique(shpDataFrame$id)
+  
+  out <- c()
+  for (i in 1:length(subbasin)){
+    count <- length(which(shpDataFrame$id== as.character(i-1)))
+    out <- c(out, rep(Values[i], count))
+  }
+  
+  shpDataFrame$Values <- out
+  
+  plt <- ggplot(shpDataFrame, aes(x = long, y = lat)) +
+    geom_polygon(aes(fill = Values, group = id)) +
+    labs(x ="  ", y = " ") +
+    theme_bw()
+  
+  return(plt)
+}
