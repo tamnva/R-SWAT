@@ -70,3 +70,87 @@ runifSobol <- function(min, max, nrows, ncols){
   
   return(output)
 }
+
+
+#-------------------------------------------------------------------------------	
+# General function for working with parameter sensitivity
+#-------------------------------------------------------------------------------	
+sensitivityCommand <- function(minCol, maxCol, textCommand){
+  
+  
+  myRCommand <-  morris(model = NULL, factors = 3, binf = c(1:3), bsup = c(2:4), r = 4, design = list(type = 'oat', levels = 5, grid.jump = 3))
+  # Where the generated parameter values is store 
+  # Must be in form of matrix with nrow = number of iteration, ncol = nparameter
+  
+  myRCommand$X
+  
+  # Command to evaluate parameter sensitivity
+  tell(myRCommand, SWATobj)
+  
+  # Where the result is stored (must be a data frame)
+  print(x)
+  
+}
+
+
+#-------------------------------------------------------------------------------	
+# Function to split input info to lines based on \n and remove comment
+#-------------------------------------------------------------------------------
+splitRemoveComment <- function(textCommand){
+
+  if((nchar(textCommand) == 0) | (is.null(textCommand))){
+     outText <- "No additional input for parameter sample was found"
+  } else {
+    textCommand <- gsub("minCol", "as.numeric(globalVariable$paraSelection$Min)", textCommand)  
+    textCommand <- gsub("maxCol", "as.numeric(globalVariable$paraSelection$Max)", textCommand)
+    textCommand <- gsub("nParam", "length(globalVariable$paraSelection$Max)", textCommand)
+    textCommand <- gsub("objFuncValue", "globalVariable$objValue", textCommand)
+    
+    textCommand <- strsplit(textCommand, split = "\n", fixed = TRUE)[[1]]
+    
+    outText <- NULL
+    count <- 1
+    
+    for (i in 1:length(textCommand)){
+      temp <- trimws(textCommand[i])
+      
+      if ((substr(temp, 1, 1) != "#" &
+           nchar(temp) != 0)) {
+        outText[count] <- temp
+        count <- count + 1
+      }
+    }
+    
+  }
+  return(outText)
+}
+
+#-------------------------------------------------------------------------------	
+# Function to split input info to lines based on \n and remove comment
+#-------------------------------------------------------------------------------
+evalTextCommand <- function(textCommand) {
+  out <- tryCatch(
+    {
+      eval(parse(text = textCommand)) 
+    },
+    error=function(cond) {
+      message("Error in eval")
+      message(cond)
+      return(NA)
+    },
+    warning=function(cond) {
+      message("Warning")
+      message(cond)
+      return(NA)
+    },
+    finally={
+    }
+  )    
+  return(out)
+}
+
+
+
+
+
+

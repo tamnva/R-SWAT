@@ -88,17 +88,35 @@ paramSamplingUI <- function(id) {
       #-------------------------------------------------------------------------
       column(width = 10,
              HTML("<b>",
-                        "2. Parameter sampling",
+                        "2. Parameter sampling ",
                         "</b>"),
       ),
- 
+
       column(width = 10,
-             excelOutput("tableParaSampling", 
-                         width = "100%", 
-                         height = "1px"),
+             selectInput("samplingApproach",
+                         width = "50%",
+                         label = "", 
+                         choices = c('Sensi_Cali_(uniform_Latin_Hpercube_Sampling)', 
+                                     'Sensi_(from_sensitivity_package)',
+                                     'Cali_(Dynamically_Dimensioned_Search)',
+                                     'Read_User_Parameter_File'),
+                         multiple = FALSE),
       ),
       
-    
+      column(width = 10,
+             
+             textAreaInput("InputInfo", " ", 
+                           " ", 
+                           width = "100%",
+                           height = "200px",
+                           resize = "vertical") %>%
+               shiny::tagAppendAttributes(style = 'width: 100%;'),
+             
+             checkboxInput("checkInputInfo", "Check this box"),
+             
+             verbatimTextOutput("displayInputInfo"),
+             ),
+      
       column(width = 1,
              tippy("Help?", tooltip = "<span style='font-size:16px;'>
                    'Sensi' and 'Cali' mean for sensitivity and calibration 
@@ -118,12 +136,6 @@ paramSamplingUI <- function(id) {
                    trigger = "click",
                    theme = "translucent"),
       ),
-      
-      column(width = 10,
-             verbatimTextOutput("printHelpInputinfo", placeholder = TRUE),
-             )
-
-      
     )
     
   )}
