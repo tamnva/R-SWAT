@@ -79,22 +79,36 @@ plotWatout <- function(watoutData = watoutData, watoutHeader = watoutHeader, var
 # Get variable number in watout.dat file type
 # ------------------------------------------------------------------------------
 readOutputHruHeader <- function(fileName){
+  # fileName <- "C:/data/workingFolder/TxtInOut_1/output.hru"
+  header <- readLines(fileName, 9)[9]
   
-  outputHruHeader <- readLines(fileName, 9)
+  header <- gsub("DA_STmmSURQ_GENmmSURQ_CNTmm", " DA_STmm SURQ_GENmm  SURQ_CNTmm ", header)
+  header <- gsub("TMP_MNdgCSOL_TMPdgCSOLARMJ/m2", "  TMP_MNdgC  SOL_TMPdgC  SOLARMJ/m2  ", header)
+  header <- gsub("USLEt/haN_APPkg/haP_APPkg/haNAUTOkg/haPAUTOkg/ha", " USLEt/ha  N_APPkg/ha   P_APPkg/ha   NAUTOkg/ha   PAUTOkg/ha  ", header)
+  header <- gsub("PGRZkg/haNCFRTkg/haPCFRTkg/haNRAINkg/ha", "  PGRZkg/ha  NCFRTkg/ha   PCFRTkg/ha   NRAINkg/ha  ", header)
+  header <- gsub("NO3Lkg/haNO3GWkg/ha", "  NO3Lkg/ha  NO3GWkg/ha  ", header)
+  header <- gsub("F-MPkg/haAO-LPkg/ha", "  F-MPkg/ha  AO-LPkg/ha  ", header)
+  header <- gsub("SEDPkg/haNSURQkg/haNLATQkg/ha", "  SEDPkg/ha  NSURQkg/ha  NLATQkg/ha  ", header)
+  header <- gsub("CMUPkg/haCMTOTkg/ha", "  CMUPkg/ha   CMTOTkg/ha  ", header)
 
-  outputHruHeader <- strsplit(outputHruHeader[9], "\\s+")[[1]]
-  outputHruHeader <- outputHruHeader[outputHruHeader != ""]
-  temp <- c('LULC', 'HRU', 'GIS', 'SUB', 'MGT', 'MO', 'DA', 'YR')
-  outputHruHeader <- outputHruHeader[-match(temp,outputHruHeader )]
+  header <- gsub("WTAB CLIm", "  WTABCLIm  ", header)
+  header <- gsub("WTAB SOLm", " WTABSOLm  ", header)
   
-  return(outputHruHeader)
+  header <- strsplit(header, "\\s+")[[1]]
+  header <- header[header != ""]
+
+  if(!('YR' %in% header)) {
+    header <- header[-match('MON',header )]
+  }
+  
+  return(header)
 }
 
 # ------------------------------------------------------------------------------
 # Subset of HRU based on column name and temporal aggregation
 # ------------------------------------------------------------------------------
 subsetOutputHru <- function(hruData, sDate, eDate, colNam, tempAgg){
-  
+
   # number of hrus
   nHrus <- max(hruData[,2])
   nTimeSteps <- nrow(hruData)/nHrus
@@ -185,11 +199,11 @@ readOutputRch <- function(outputRchFile){
 
   } else {
     header <- readLines(outputRchFile, 9)[9]
-    
     colnames(output) <- c("REACH", getOutputRchHeader(header))
+    output <- output[,-c(1)]
   }
   
-  output <- output[,-c(1)]
+
   return(output)
 }
 
@@ -260,7 +274,7 @@ plotOutputRchSubset <- function(subsetOutputRch, subsetObsRch){
 # ------------------------------------------------------------------------------
 # GetOutputSubHeader from output.sub file
 # ------------------------------------------------------------------------------
-# header <- readLines("C:/data/TxtInOut/output.sub", 9)[9]
+# header <- readLines("C:/data/workingFolder/TxtInOut_1/output.sub", 9)[9]
 
 getOutputSubHeader <- function(header){
   header <- gsub("[()]", "", header)
@@ -285,6 +299,10 @@ getOutputSubHeader <- function(header){
   header <- strsplit(header, "\\s+")[[1]]
   header <- header[header != ""]
   
+  if(!('YR' %in% header)) {
+    header <- header[-match('MON',header )]
+  }
+  
   return(header)
 }
 
@@ -292,7 +310,7 @@ getOutputSubHeader <- function(header){
 # ------------------------------------------------------------------------------
 # GetOutputSubHeader from output.rcg file
 # ------------------------------------------------------------------------------
-# header <- readLines("C:/data/TxtInOut/output.rch", 9)[9]
+# header <- readLines("C:/data/Scenarios/Default/TxtInOut/output.hru", 9)[9]
 
 getOutputRchHeader <- function(header){
   header <- gsub("TOT Pkg", " TOT_Pkg   ", header)
@@ -334,4 +352,30 @@ plotOutputSubSubset <- function(subsetOutputSub){
     theme_bw()
   
   return(ggplotly(myPlot))
+}
+
+# ------------------------------------------------------------------------------
+# Plot output.sub polygon subset
+# ------------------------------------------------------------------------------
+ggplotPolygon <- function(shp, Values){
+  shpDataFrame <- fortify(shp)
+  subbasin <- unique(shpDataFrame$id)
+  
+  out <- c()
+  for (i in 1:length(subbasin)){
+    count <- length(which(shpDataFrame$id== as.character(i-1)))
+    out <- c(out, rep(Values[i], count))
+  }
+  
+  shpDataFrame$Values <- out
+  
+  plt <- ggplot(shpDataFrame, aes(x = long, y = lat)) +
+    geom_polygon(aes(fill = Values, group = id)) +
+    labs(x ="  ", y = " ") +
+    coord_fixed() +
+    scale_fill_gradientn(colours = rev(terrain.colors(10))) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  
+  return(plt)
 }

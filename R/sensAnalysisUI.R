@@ -57,8 +57,8 @@ sensAnalysisUI <- function(id) {
     conditionalPanel(
       condition = "input.checkDisplayTableSensitivity == 1",
       column(width = 10,
-             plotlyOutput("plotlySensitivity"),
-             
+             actionButton("savePlotlySensitivity", "Click here to save plot"),
+             plotlyOutput("plotlySensitivity"), 
       ),
     ),
 

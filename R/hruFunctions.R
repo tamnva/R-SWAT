@@ -75,16 +75,6 @@ getOutputHru <- function(outputHRU){
   return(mylist)
 }
 
-
-#-------------------------------------------------------Get header of output.hru
-getHRUheader <- function(TxtInOut){
-  
-  HRUheader <- readLines(paste(TxtInOut, "/output.hru", sep = ""), 9)
-  HRUheader <- strsplit(HRUheader[9], "\\s+")[[1]]
-  
-  return(HRUheader)
-}
-
 #-------------------------------------------------------Get observed data from file to compare with watout
 getObsWatout <- function(obsWatoutFile){
   mydata <- read.table(obsWatoutFile , 
