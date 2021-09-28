@@ -117,24 +117,13 @@ hruUI <- function(id) {
     # Plot -----------------------------------------------------------              
     fluidRow(
       column(width = 12,
-             verbatimTextOutput("hruPlotTitle", placeholder = TRUE)),
+             verbatimTextOutput("hruPlotTitle")),
       
       column(width = 12,
              plotOutput("hruPlotHRU",
                         width = "100%", 
                         height = "650")
              ),
-              
-#      box(
-#        title = textOutput('hruPlotTitle'), 
-#        status = "success",
-#        height = "700" ,
-#        solidHeader = T,
-#        plotOutput("hruPlotHRU",
-#                   width = "100%", 
-#                   height = "650"), 
-#        width = 12
-#      )
     )
   )}
 

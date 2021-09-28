@@ -297,15 +297,3 @@ plotSensiSobol <- function(paraSelection, tableSensitivity){
   return(myPlot)
 }
 
-
-
-#-------
-#a <- raster("C:/data/w001001.adf")
-#rdf <- as_tibble(na.omit(as.data.frame(a, xy=TRUE)))
-#colnames(rdf) <- c('x', 'y', 'Values')
-#plt <- ggplot(rdf, aes(x, y)) +
-#  geom_raster(aes(fill = Values)) +
-#  labs(x ="Date", y = " ") +
-#  theme_bw()
-# ggplotly(plt)
-

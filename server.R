@@ -1695,70 +1695,164 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
 
   # 7.1. Visualize output.sub
   # ****************************************************************************  
-  # Read file.cio information
+  # Read subbasin shape file
   # ****************************************************************************
   observe({
-    req(input$subFileCio)
+    volumes <- getVolumes()
+    shinyFileChoose(input, "getSubShape", 
+                    roots = volumes, 
+                    filetypes=c('', 'shp'),
+                    session = session)
     
-    fileName <- input$subFileCio$datapath
-    if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".cio") {
-      displayOutput$subFileCioInfo <<- getFileCioInfo(input$subFileCio$datapath)  
-    } else {
-      displayOutput$subFileCioInfo <<- NULL
+    subShapeFile <- parseFilePaths(volumes, input$getSubShape)
+    
+    if(length(subShapeFile$datapath) == 1){
+      subShapeFile <- as.character(subShapeFile$datapath)
+      output$printSubShape <- renderText(subShapeFile)
+      
+      if (file.exists(subShapeFile)){
+        
+        displayOutput$subShape <<- readOGR(subShapeFile)
+      } else {
+        displayOutput$subShape <<- NULL
+      }
     }
   })
   
   # ****************************************************************************  
-  # Read output.sub  file
+  # Get TxtInOut directory 
   # ****************************************************************************
+  # Update select date range
   observe({
-    req(input$outputSubFile)
     
-    fileName <- input$outputSubFile$datapath
-    if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".sub") {
-      displayOutput$outputSubFile <<- readOutputRch(fileName)
+    req(input$subTxtInOutFolder)
+    
+    fileCio <- trimws(paste(input$subTxtInOutFolder, '/file.cio', sep=''))
+    
+    if (file.exists(fileCio)){
       
-      updateSelectizeInput(session, "subSelectedSub",
-                           choices = c(1:max(displayOutput$outputSubFile[,1])))
+      displayOutput$subFileCioInfo <<- getFileCioInfo(input$subTxtInOutFolder)
       
-      updateSelectizeInput(session, "subSelectedVariable",
-                           choices = colnames(displayOutput$outputSubFile))
-    } else {
-      displayOutput$outputSubFile <<- NULL
+      updateDateInput(session, "subPlotDate",
+                      min = displayOutput$subFileCioInfo$startEval,
+                      max = displayOutput$subFileCioInfo$endSim, 
+                      value = displayOutput$subFileCioInfo$startEval[1])  
+      
+      updateDateRangeInput(session, "subInputDateRange",
+                           start = displayOutput$subFileCioInfo$startEval,
+                           end = displayOutput$subFileCioInfo$endSim,
+                           min = displayOutput$subFileCioInfo$startEval,
+                           max = displayOutput$subFileCioInfo$endSim)
+      
+      
+      updateDateInput(session, "subPlotMonth",
+                      min = displayOutput$subFileCioInfo$startEval,
+                      max = displayOutput$subFileCioInfo$endSim, 
+                      value = displayOutput$subFileCioInfo$startEval[1])  
+      
+      updateDateRangeInput(session, "subInputMonthRange",
+                           start = displayOutput$subFileCioInfo$startEval,
+                           end = displayOutput$subFileCioInfo$endSim,
+                           min = displayOutput$subFileCioInfo$startEval,
+                           max = displayOutput$subFileCioInfo$endSim)
+      
+      updateDateInput(session, "subPlotYear",
+                      min = displayOutput$subFileCioInfo$startEval,
+                      max = displayOutput$subFileCioInfo$endSim, 
+                      value = displayOutput$subFileCioInfo$startEval[1])
+      
+      updateDateRangeInput(session, "subInputYearRange",
+                           start = displayOutput$subFileCioInfo$startEval,
+                           end = displayOutput$subFileCioInfo$endSim,
+                           min = displayOutput$subFileCioInfo$startEval,
+                           max = displayOutput$subFileCioInfo$endSim)
+      
     }
+    
+    # Get output.sub data and update select column
+    fileSub <- trimws(paste(input$subTxtInOutFolder, '/output.sub', sep=''))
+    
+    if(file.exists(fileSub)){
+        displayOutput$subData <<- readOutputRch(fileSub)
+
+        updateSelectizeInput(session, "subSelectCol",
+                             choices = colnames(displayOutput$subData)[-c(1)])
+    } else {
+      updateSelectizeInput(session, "subSelectCol",
+                           choices = NULL) 
+      displayOutput$subData <<- NULL
+    }
+    
   })
-
-
   
   # ****************************************************************************  
-  # Plot result
-  # **************************************************************************** 
+  # Plot sub
+  # ****************************************************************************
   observe({
     
-    req(input$subTempAgg)
-    req(input$subSelectedVariable)
-    req(input$subSelectedSub)
+    req(input$subTxtInOutFolder, 
+        input$subSelectCol,
+        input$subTempAgg)
+    
+    if (input$subTempAgg == 'Daily'){
+      displayOutput$subInputDateRange <<- input$subInputDateRange
+      displayOutput$subPlotDate <<- input$subPlotDate 
+    } else if (input$subTempAgg == 'Monthly'){
+      displayOutput$subInputDateRange <<- input$subInputMonthRange
+      displayOutput$subPlotDate <<- input$subPlotMonth  
+    } else {
+      displayOutput$subInputDateRange <<- input$subInputYearRange
+      displayOutput$subPlotDate <<- input$subPlotYear 
+    }
+    
+    if (!is.null(displayOutput$subData)){
+      subPlotData <- subsetOutputHru(displayOutput$subData, 
+                                     displayOutput$subInputDateRange[1], 
+                                     displayOutput$subInputDateRange[2], 
+                                     input$subSelectCol, 
+                                     input$subTempAgg)
+      
+      if(!is.null(displayOutput$subShape)){
+         rowNr <- match(displayOutput$subPlotDate, subPlotData[,1])
+         if (input$subTempAgg == 'Monthly'){
+           rowNr <- which(subPlotData[,1] == substr(displayOutput$subPlotDate, 1, 7))
+         } else if (input$subTempAgg == 'Yearly'){
+           rowNr <- which(subPlotData[,1] == substr(displayOutput$subPlotDate, 1, 4))
+         } else {
+           rowNr <- which(subPlotData[,1] == displayOutput$subPlotDate)
+         }
 
-    if (exists("outputSubFile", where = displayOutput)&
-        exists("subFileCioInfo", where = displayOutput)){
-      
-      outputSubSubset <- subsetOutputRch(displayOutput$outputSubFile,
-                                         input$subTempAgg, 
-                                         input$subSelectedVariable, 
-                                         c(displayOutput$subFileCioInfo$startEval, 
-                                           displayOutput$subFileCioInfo$endSim), 
-                                         input$subSelectedSub)
-      
-      plt <- plotOutputSubSubset(outputSubSubset)
-      
-      
-      output$subPlotSub <- renderPlotly(plt)
+        # display text
+        outputText <- as.character(displayOutput$subPlotDate)
+        if (input$subTempAgg == "Monthly"){
+          outputText <- substr(outputText,1,7)
+        } else if (input$subTempAgg == "Yearly"){
+          outputText <- substr(outputText,1,4)
+        }
+        outputText <- paste("You selected Variable: ", 
+                            input$subSelectCol, 
+                            ", Timestep: ",
+                            input$subTempAgg,
+                            ", Time: ",
+                            outputText,
+                            sep = "")
+        output$subPlotTitle <- renderText(outputText) 
+        output$subPlotSub <- renderPlot({
+          ggplotPolygon(displayOutput$subShape, as.numeric(subPlotData[rowNr, 2:ncol(subPlotData)]))
+        })
+        
+      } else {
+        output$subPlotSub <- NULL
+      }
       
     } else {
-      output$rchPlotRch <- NULL
-    }        
+      output$subPlotSub <- NULL
+    }
     
-  })  
+    
+  })
+  
+
   #-----------------------------------------------------------------------------  
 }
 

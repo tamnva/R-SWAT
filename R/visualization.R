@@ -199,11 +199,11 @@ readOutputRch <- function(outputRchFile){
 
   } else {
     header <- readLines(outputRchFile, 9)[9]
-    
     colnames(output) <- c("REACH", getOutputRchHeader(header))
+    output <- output[,-c(1)]
   }
   
-  output <- output[,-c(1)]
+
   return(output)
 }
 
@@ -274,7 +274,7 @@ plotOutputRchSubset <- function(subsetOutputRch, subsetObsRch){
 # ------------------------------------------------------------------------------
 # GetOutputSubHeader from output.sub file
 # ------------------------------------------------------------------------------
-# header <- readLines("C:/data/TxtInOut/output.sub", 9)[9]
+# header <- readLines("C:/data/workingFolder/TxtInOut_1/output.sub", 9)[9]
 
 getOutputSubHeader <- function(header){
   header <- gsub("[()]", "", header)
@@ -372,7 +372,10 @@ ggplotPolygon <- function(shp, Values){
   plt <- ggplot(shpDataFrame, aes(x = long, y = lat)) +
     geom_polygon(aes(fill = Values, group = id)) +
     labs(x ="  ", y = " ") +
-    theme_bw()
+    coord_fixed() +
+    scale_fill_gradientn(colours = rev(terrain.colors(10))) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
   
   return(plt)
 }
