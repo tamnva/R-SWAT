@@ -17,7 +17,7 @@ generalSettingUI <- function(id) {
       column(width = 10,
              textInput("workingFolder",
                        "1. Working folder",
-                       "C:/data/workingFolder",
+                       "C:/Tutorial/workingFolder",
                        width = "100%"
              ),
       ),
@@ -38,7 +38,7 @@ generalSettingUI <- function(id) {
       column(width = 10,
              textInput("TxtInOutFolder",
                        "2. TxtInOut folder",
-                       "C:/data/Scenarios/Default/TxtInOut",
+                       "C:/Tutorial/SWATshiny-master/data/TxtInOut",
                        width = "100%"
              ),
              
