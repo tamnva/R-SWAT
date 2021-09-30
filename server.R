@@ -530,7 +530,7 @@ print(tell(sensiObject, objFuncValue))
                                  globalVariable$userReadSwatOutput, 
                                  globalVariable$observedData, 
                                  globalVariable$workingFolder, 
-                                 globalVariable$objFunction$Index, 
+                                 globalVariable$objFunction, 
                                  globalVariable$dateRangeCali)
           
           newPar <- globalVariable$parameterValue
@@ -620,7 +620,7 @@ print(tell(sensiObject, objFuncValue))
                                    globalVariable$userReadSwatOutput, 
                                    globalVariable$observedData, 
                                    globalVariable$workingFolder, 
-                                   globalVariable$objFunction$Index, 
+                                   globalVariable$objFunction, 
                                    globalVariable$dateRangeCali)
             
             # Save iteration result
@@ -778,29 +778,12 @@ print(tell(sensiObject, objFuncValue))
   #-----------------------------------------------------------------------------
   # Tab 4. Evaluate output
   #-----------------------------------------------------------------------------  
-  # 4.1. Objective function
-  
   # ****************************************************************************  
-  # Objective function: Default setting
-  # ****************************************************************************
-  output$tableObjFunction <- renderExcel(excelTable(data = dataObjFunction, 
-                                                    columns = columnsObjFunction, 
-                                                    editable = TRUE,
-                                                    allowInsertRow = FALSE,
-                                                    allowInsertColumn = FALSE,
-                                                    allowDeleteColumn = FALSE,
-                                                    allowDeleteRow = FALSE, 
-                                                    rowDrag = FALSE,
-                                                    columnResize = TRUE,
-                                                    wordWrap = TRUE)) 
-
-  # ****************************************************************************  
-  # Get user input objective function
+  # 4.1. Get user input Objective function
   # ****************************************************************************    
   observe({
-    objFunction <- excel_to_R(input$tableObjFunction)
-    if(is.null(objFunction)) objFunction <- dataObjFunction
-    globalVariable$objFunction  <<- objFunction
+    req(input$objFunction)
+    globalVariable$objFunction  <<- input$objFunction
   })
   
   # ****************************************************************************  
@@ -863,7 +846,7 @@ print(tell(sensiObject, objFuncValue))
                              globalVariable$userReadSwatOutput, 
                              globalVariable$observedData, 
                              globalVariable$workingFolder, 
-                             globalVariable$objFunction$Index, 
+                             globalVariable$objFunction, 
                              globalVariable$dateRangeCali)
 
       globalVariable$objValue <<- temp$objValue
@@ -1092,7 +1075,7 @@ print(tell(sensiObject, objFuncValue))
                                                                globalVariable$parameterValue,
                                                                input$behThreshold,
                                                                input$plotVarNumber,
-                                                               globalVariable$objFunction$Index[1],
+                                                               globalVariable$objFunction,
                                                                globalVariable$observedData)
       
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData

@@ -1,13 +1,4 @@
-# ------------------------------------------------------------------------------
-# Default objective function
-# ------------------------------------------------------------------------------
-dataObjFunction <- data.frame(Index = c('NSE'))
 
-columnsObjFunction <- data.frame(title = colnames(dataObjFunction),
-                                width = c(900),
-                                source = I(list(c('NSE', 'KGE', 'R2', 'RMSE', 'PBIAS', 'userObjFunction'))),
-                                type = c('dropdown')
-                                )
 
 # ------------------------------------------------------------------------------
 # Default parameter change values

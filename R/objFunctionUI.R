@@ -15,9 +15,17 @@ objFunctionUI <- function(id) {
       #-------------------------------------------------------------------------
       # 1. Objective function
       #-------------------------------------------------------------------------  
+
       column(width = 10,
-             HTML("<b>","1. Objective function","</b>"),
+             selectInput("objFunction",
+                         width = "20%",
+                         label = "1. Select objective function", 
+                         choices = c('NSE', 'KGE', 'R2', 'RMSE', 'PBIAS', 
+                                     'userObjFunction'),
+                         multiple = FALSE),
+             #verbatimTextOutput("printObjFunction"),
       ),
+      
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Please select the objective function: NSE = Nash–Sutcliffe 
@@ -25,19 +33,12 @@ objFunctionUI <- function(id) {
                    RMSE = Root-mean-square error, PBIAS =  Percent bias = 
                    100 * (sumObserved - sumSimulated)/sumObserved. The objective 
                    function currently just the average selected (e.g., NSE) for all 
-                   variables with equal weights. Future options will let the user to write
-                   their own objective function here
+                   variables with equal weights. TODO...
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
                    theme = "translucent"),
       ),  
-      
-      column(width = 10,
-             excelOutput("tableObjFunction", 
-                         width = "30%", 
-                         height = "1px"),
-      ),
       
       #-------------------------------------------------------------------------
       # 2. Get observed data files
@@ -67,7 +68,7 @@ objFunctionUI <- function(id) {
                               multiple = TRUE,
                               buttonType = "default", 
                               class = NULL),
-             verbatimTextOutput("printObservedDataFile", placeholder = TRUE),
+             verbatimTextOutput("printObservedDataFile"),
       ),
       
       column(width = 10,
@@ -108,7 +109,6 @@ objFunctionUI <- function(id) {
 
       column(width = 10,
              actionButton("calObjFunction", "Click here to calculate objection"),
-             verbatimTextOutput('printObjFunction'),
       ),
 
       column(width = 10, 
@@ -118,19 +118,18 @@ objFunctionUI <- function(id) {
       
       conditionalPanel(
         condition = "input.checkDisplayObjFunctionPlot == 1",
-        column(width = 10, height = 200,
-               plotlyOutput("plotObjFunction",height = 'auto'),
+        column(width = 10, 
+               plotlyOutput("plotObjFunction", height = 'auto'),
+        ),
+        
+        column(width = 10, 
+               checkboxInput('checkDisplayObjFunction', 'Check here to display result', 
+                             value = FALSE, width = NULL),
         ),
       ), 
       
-      column(width = 10, 
-             checkboxInput('checkDisplayObjFunction', 'Check here to display result', 
-                           value = FALSE, width = NULL),
-      ),
-      
       conditionalPanel(
         condition = "input.checkDisplayObjFunction == 1",
-        verbatimTextOutput('printMessageObjectiveFunction'),
         column(width = 10,
                excelOutput("tableCalObjFunction", 
                            width = "100%", 
