@@ -19,7 +19,7 @@ objFunctionUI <- function(id) {
              HTML("<b>","1. Objective function","</b>"),
       ),
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Please select the objective function: NSE = Nash–Sutcliffe 
                    efficiency, KGE = Kling-Gupta efficiency, R2 = R squared, 
                    RMSE = Root-mean-square error, PBIAS =  Percent bias = 
@@ -35,7 +35,7 @@ objFunctionUI <- function(id) {
       
       column(width = 10,
              excelOutput("tableObjFunction", 
-                         width = "100%", 
+                         width = "30%", 
                          height = "1px"),
       ),
       
@@ -48,7 +48,7 @@ objFunctionUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Load observed data, single file for each variable. 
                    Files should be in ASCII format with two columns and header,
                    the first column is the date (format dd/mm/yyyy) and 
@@ -76,7 +76,7 @@ objFunctionUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Show all observed variable here, each observed values have 
                    2 columns, the first 2 columns are for 1st variable in the file
                    obs_var_1.txt, the next 2 columns are for the 2nd variable in the

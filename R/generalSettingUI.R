@@ -23,7 +23,7 @@ generalSettingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    1. Working folder: All files created by this tool are saved 
                    in this folder
                    <span>", 
@@ -45,7 +45,7 @@ generalSettingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
              2. TxtInOut folder: The TxtInOut folder which contains all SWAT 
              input files
                    <span>", 
@@ -60,7 +60,7 @@ generalSettingUI <- function(id) {
       ),
 
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    If this is a TxtInOut folder, a table with a list of HRUs 
                    and their properties (landuse, soil, slope,..) will appear 
                    if you tick the checkbox
@@ -88,7 +88,7 @@ generalSettingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    3. Select executable SWAT file: Select an executable swat 
                    file, for example, swat_32debug.exe
                    <span>", 
@@ -120,7 +120,7 @@ generalSettingUI <- function(id) {
       ),
 
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                             4. Files with list of all SWAT parameters: 
                             The file name must be 'swatParam.txt'
                             ASCII file format. If there are  parameter that you 

@@ -5,31 +5,9 @@ dataObjFunction <- data.frame(Index = c('NSE'))
 
 columnsObjFunction <- data.frame(title = colnames(dataObjFunction),
                                 width = c(900),
-                                source = I(list(c('NSE', 'KGE', 'R2', 'RMSE', 'PBIAS'))),
+                                source = I(list(c('NSE', 'KGE', 'R2', 'RMSE', 'PBIAS', 'userObjFunction'))),
                                 type = c('dropdown')
                                 )
-
-# ------------------------------------------------------------------------------
-# Default calibration/sensitivity approach
-# ------------------------------------------------------------------------------
-dataParaSampling <- data.frame(samplingApproach = c("Sensi_Cali_(LHS)"),
-                              InputInfo = c(10))
-
-ColumnsParaSampling <- data.frame(title = colnames(dataParaSampling),
-                                 width = c(900,
-                                           900),
-                                 source = I(list(c('Sensi_Cali_(LHS)', 
-                                                   'Sensi_(Morris)', 
-                                                   'Sensi_(Sobol)',
-                                                   'Cali_(DDS)',
-                                                   'Read_User_Parameter_File',
-                                                   'Cali_(DREAM)_Under_Development_DO_NOT_TRY',
-                                                   'Cali_(MCMC)_Under_Development_DO_NOT_TRY'), 
-                                                 NA)),
-                                 type = c('dropdown',
-                                          'text')
-                                 )
-
 
 # ------------------------------------------------------------------------------
 # Default parameter change values
