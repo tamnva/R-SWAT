@@ -18,7 +18,7 @@ runSwatUI <- function(id) {
              HTML("<b>","1. Define model outputs for extraction","</b>"),
       ),
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    You can read from multiple 'watout.dat' file type with different 
                    names, add more rows if you do so. The column specifies which 
                    columns from that file you want to extract (e.g., column 4 and 
@@ -69,7 +69,7 @@ runSwatUI <- function(id) {
              
       ),
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Select the time range for sensitivity analysis/calibration. 
                    The min and maximum dates is automatically detect by this 
                    program by reading the 'file.cio'. Feel free to select any 
@@ -94,7 +94,7 @@ runSwatUI <- function(id) {
              ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:15px;'>
+             tippy("Help", tooltip = "<span style='font-size:15px;'>
                    The maximum number of parallel runs is the number of 
                    logical processors in this computer. Please check how much CPU 
                    or Memory you need for each simulation. Then you can select the
@@ -118,7 +118,7 @@ runSwatUI <- function(id) {
       ),
 
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:15px;'>
+             tippy("Help", tooltip = "<span style='font-size:15px;'>
                    When you click this button, all settings are saved to the file 
                    'SWATShinyObject.rds' in the working directory folder. The parameter
                    sets are generated and SWAT are run in parallel. Running can
@@ -149,7 +149,7 @@ runSwatUI <- function(id) {
       ),
 
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:15px;'>
+             tippy("Help", tooltip = "<span style='font-size:15px;'>
                    You can only open this files when all SWAT simulations are 
                    finished. If SWAT is running on background, you can manually 
                    go to the working folder .\\Output\\CurrentSimulationReport.log
@@ -200,7 +200,7 @@ runSwatUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    6. Load previous results: This option can be used in the case 
                    that you have finised step 5, close your project and want to open
                    the project again without starting from the first step. It only 

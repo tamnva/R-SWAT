@@ -5,7 +5,7 @@ ui <- dashboardPage(
   
   # ----------------------------------------------------------------------Header
   dashboardHeader(
-    title = "SWATshiny"
+    title = "RSWAT"
   ),
   
   # ---------------------------------------------------------------------Sidebar
@@ -68,6 +68,14 @@ ui <- dashboardPage(
 
   # ------------------------------------------------------------------------Body
   dashboardBody(
+    
+    # Change menu background color when selected
+    tags$head(tags$style(HTML('/* active selected tab in the sidebarmenu */
+                            .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
+                            background-color: #E0E0E0;
+                            color: #666666;
+                            }
+                            '))), 
     
     # Tab item for General Setting
     tabItems(

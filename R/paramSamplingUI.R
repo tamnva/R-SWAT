@@ -27,7 +27,7 @@ paramSamplingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    If you are not sure about the parameter name, subbasin, 
                    land use, soil type, slope, check this box
                    <span>", 
@@ -50,15 +50,15 @@ paramSamplingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;text-align: left;'>
                    Parameters defined at the hru level (in files .hru, .gw, .mgt,
                    .chm, .sdr, .sep, .sol files) you should fill in all fields 
-                   of this table. Parameter defined at the subbasin level (in 
-                   files .sub, .rte, .wq, .pnd .res files), the land use, soil, slope 
+                   of this table. <br> Parameter defined at the subbasin level 
+                   (.sub, .rte, .wq, .pnd .res files), the land use, soil, slope 
                    can be left empty. Basin parameters (.wwq, .bsn files), the 
                    subbasin, landuse, soil, slope cells can be left emtpy. If 
                    you select all subbasins/landuse/soil or slope, just type 
-                   'All'. Note: 'relative' change means 
+                   'All'. Note: 'relative' change means
                    x_new = x_old*(1 + appliedValue). 'absolute' change means
                    x_new = x_old + appliedValue. 'replace' means
                    x_new = appliedValue
@@ -84,41 +84,41 @@ paramSamplingUI <- function(id) {
       ),
 
       #-------------------------------------------------------------------------
-      # 2. Parameter sampling
+      # 2. Select sensitivity or calibration approach
       #-------------------------------------------------------------------------
-      column(width = 10,
-             HTML("<b>",
-                        "2. Parameter sampling ",
-                        "</b>"),
-      ),
-
       column(width = 10,
              selectInput("samplingApproach",
                          width = "50%",
-                         label = "", 
+                         label = "2. Select sensitivity or calibration approach", 
                          choices = c('Sensi_Cali_(uniform_Latin_Hpercube_Sampling)', 
                                      'Sensi_(from_sensitivity_package)',
                                      'Cali_(Dynamically_Dimensioned_Search)',
                                      'Read_User_Parameter_File'),
                          multiple = FALSE),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 3. Additional information for sensitivity/calibration
+      #-------------------------------------------------------------------------      
       column(width = 10,
              
-             textAreaInput("InputInfo", " ", 
+             textAreaInput("InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                            " ", 
                            width = "100%",
                            height = "200px",
                            resize = "vertical") %>%
                shiny::tagAppendAttributes(style = 'width: 100%;'),
              
-             checkboxInput("checkInputInfo", "Check this box"),
+             actionButton("executeRCommandText", "Click here to execute the command in the input box (IMPORTANT)",
+                          buttonType = "default",
+                          style="background-color: #87CEFA; 
+                              border-color: #2e6da4"),
              
              verbatimTextOutput("displayInputInfo"),
              ),
       
       column(width = 1,
-             tippy("Help?", tooltip = "<span style='font-size:16px;'>
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
                    'Sensi' and 'Cali' mean for sensitivity and calibration 
                    simulations. 'Sensi_Cali_(LHS)' means 
                    you can perform both sensitivity and calibration (SUIF2-like

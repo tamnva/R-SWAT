@@ -210,19 +210,19 @@ server <- function(input, output, session) {
     req(input$samplingApproach)
     globalVariable$samplingApproach <<- input$samplingApproach
     if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
-      updateTextAreaInput(session, "InputInfo", "", 
+      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delete all text here and type the number of iterations (number of parameter sets), for example, 
                                                        10
 This approach similar to the SUFI-2 approach")
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
-      updateTextAreaInput(session, "InputInfo", "", 
+      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delte all text here and type the number of iterations and parallel approach, seperated by comma, for example,
                                                       10, 1
 10 means the number of interation
 1 means the parallel approach (DDS run independently in each core)
 2 means intermediate best parameter from all cores is selected and assigned as inital parameter set for next run in all cores")      
     } else if (input$samplingApproach == 'Read_User_Parameter_File'){
-      updateTextAreaInput(session, "InputInfo", "", 
+      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delte all text here and type the link to the file, for example,
                                                  C:/data/myParameterFile.txt
 The format (free format, different fields are seperated by space) of this file MUST be as follows (see in the example file myParameterSet.txt)
@@ -235,7 +235,7 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
 70.1          0.2       0.22         0.12         0.65       3.5         3.5          5.5
                                               ")      
     } else {
-      updateTextAreaInput(session, "InputInfo", "", 
+      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh", 
                           "Delte all text here and type the R command from the 'sensitivity' package' as suggest below:
 NOTE: This option only works with sensitivity functions designed for 'decoupling' simulations from the 'sensitivity' package
           When typing functions from the 'sensitivity' package, you might need to access the min, max of your selected parameters 
@@ -281,42 +281,60 @@ print(tell(sensiObject, objFuncValue))
         }            
       }    
       output$displayInputInfo <- renderText(outputTex)
-      
-      # Should check input info first
-      if (input$checkInputInfo){
-        
-        globalVariable$sensiObject <<- eval(parse(text = globalVariable$SensCaliCommand[1]))
-        
-        parameterValue <- eval(parse(text = globalVariable$SensCaliCommand[2]))
-        
-        parameterValue <- cbind(c(1:nrow(parameterValue)), parameterValue)
-        parameterValue <- as.matrix(parameterValue)
-        rownames(parameterValue) <- NULL
-        colnames(parameterValue) <- NULL
-        globalVariable$parameterValue <<- parameterValue
-        
-      }      
-    } else if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
-      if (input$checkInputInfo){
-        globalVariable$parameterValue <<- lhsRange(as.numeric(input$InputInfo),
-                                                   getParamRange(globalVariable$paraSelection))
-      }
+    } else {
+      output$displayInputInfo <- NULL
+    }
+    })
+
+  # ****************************************************************************  
+  # Parameter sampling: executing input R command in the input text box
+  # ****************************************************************************
+  observe({
+    #--------------------------------------------------
+    req(input$InputInfo, 
+        input$executeRCommandText)  
     
+    if (input$samplingApproach == 'Sensi_(from_sensitivity_package)'){
+      
+      globalVariable$sensiObject <<- eval(parse(text = globalVariable$SensCaliCommand[1]))
+      
+      parameterValue <- eval(parse(text = globalVariable$SensCaliCommand[2]))
+      
+      parameterValue <- cbind(c(1:nrow(parameterValue)), parameterValue)
+      parameterValue <- as.matrix(parameterValue)
+      rownames(parameterValue) <- NULL
+      colnames(parameterValue) <- NULL
+      globalVariable$parameterValue <<- parameterValue
+      
+      
+    } else if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
+      
+      globalVariable$parameterValue <<- lhsRange(as.numeric(input$InputInfo),
+                                                 getParamRange(globalVariable$paraSelection))
+      
+      
     } else if (globalVariable$samplingApproach == "Read_User_Parameter_File"){
-      if (input$checkInputInfo){
-        
-        parameterValue <- as.matrix(read.table(file = trimws(globalVariable$InputInfo),
-                                               header = TRUE, sep =""))
-        parameterValue <- cbind(c(1:nrow(parameterValue)),parameterValue)
-        colnames(parameterValue) <- NULL
-        rownames(parameterValue) <- NULL
-        
-        globalVariable$parameterValue <<- parameterValue
-      }
+      
+      
+      parameterValue <- as.matrix(read.table(file = trimws(globalVariable$InputInfo),
+                                             header = TRUE, sep =""))
+      parameterValue <- cbind(c(1:nrow(parameterValue)),parameterValue)
+      colnames(parameterValue) <- NULL
+      rownames(parameterValue) <- NULL
+      
+      globalVariable$parameterValue <<- parameterValue
+      
     } else {
       globalVariable$parameterValue <<- NULL
     }
   
+    # Message show all input was saved
+    showModal(modalDialog(
+      title = "Execute input R command",
+      HTML("The input R command was sucessfully executed"),
+      easyClose = TRUE,
+      size = "l"
+    ))
     #-------------------------------------------------
   }) 
   
@@ -512,7 +530,7 @@ print(tell(sensiObject, objFuncValue))
                                  globalVariable$userReadSwatOutput, 
                                  globalVariable$observedData, 
                                  globalVariable$workingFolder, 
-                                 globalVariable$objFunction$Index, 
+                                 globalVariable$objFunction, 
                                  globalVariable$dateRangeCali)
           
           newPar <- globalVariable$parameterValue
@@ -602,7 +620,7 @@ print(tell(sensiObject, objFuncValue))
                                    globalVariable$userReadSwatOutput, 
                                    globalVariable$observedData, 
                                    globalVariable$workingFolder, 
-                                   globalVariable$objFunction$Index, 
+                                   globalVariable$objFunction, 
                                    globalVariable$dateRangeCali)
             
             # Save iteration result
@@ -760,29 +778,12 @@ print(tell(sensiObject, objFuncValue))
   #-----------------------------------------------------------------------------
   # Tab 4. Evaluate output
   #-----------------------------------------------------------------------------  
-  # 4.1. Objective function
-  
   # ****************************************************************************  
-  # Objective function: Default setting
-  # ****************************************************************************
-  output$tableObjFunction <- renderExcel(excelTable(data = dataObjFunction, 
-                                                    columns = columnsObjFunction, 
-                                                    editable = TRUE,
-                                                    allowInsertRow = FALSE,
-                                                    allowInsertColumn = FALSE,
-                                                    allowDeleteColumn = FALSE,
-                                                    allowDeleteRow = FALSE, 
-                                                    rowDrag = FALSE,
-                                                    columnResize = TRUE,
-                                                    wordWrap = TRUE)) 
-
-  # ****************************************************************************  
-  # Get user input objective function
+  # 4.1. Get user input Objective function
   # ****************************************************************************    
   observe({
-    objFunction <- excel_to_R(input$tableObjFunction)
-    if(is.null(objFunction)) objFunction <- dataObjFunction
-    globalVariable$objFunction  <<- objFunction
+    req(input$objFunction)
+    globalVariable$objFunction  <<- input$objFunction
   })
   
   # ****************************************************************************  
@@ -845,7 +846,7 @@ print(tell(sensiObject, objFuncValue))
                              globalVariable$userReadSwatOutput, 
                              globalVariable$observedData, 
                              globalVariable$workingFolder, 
-                             globalVariable$objFunction$Index, 
+                             globalVariable$objFunction, 
                              globalVariable$dateRangeCali)
 
       globalVariable$objValue <<- temp$objValue
@@ -1074,7 +1075,7 @@ print(tell(sensiObject, objFuncValue))
                                                                globalVariable$parameterValue,
                                                                input$behThreshold,
                                                                input$plotVarNumber,
-                                                               globalVariable$objFunction$Index[1],
+                                                               globalVariable$objFunction,
                                                                globalVariable$observedData)
       
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData

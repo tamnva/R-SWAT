@@ -219,7 +219,7 @@ calObjFunction <- function(parameterValue, ncores,
                                                              simData[[j]][[counter[j]]])
         
         if((i == 1) & (j == 1)) {
-          perIndex <- match(index[1], 
+          perIndex <- match(index, 
                             colnames(output$perCriteria[[j]][[counter[j]]]))
         }
         output$objValue[counter[j]] <- output$objValue[counter[j]] + 
