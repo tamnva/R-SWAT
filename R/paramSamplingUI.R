@@ -92,6 +92,7 @@ paramSamplingUI <- function(id) {
                          label = "2. Select sensitivity or calibration approach", 
                          choices = c('Sensi_Cali_(uniform_Latin_Hpercube_Sampling)', 
                                      'Sensi_(from_sensitivity_package)',
+                                     'Cali_(from_optimization_package)', 
                                      'Cali_(Dynamically_Dimensioned_Search)',
                                      'Read_User_Parameter_File'),
                          multiple = FALSE),

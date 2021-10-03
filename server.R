@@ -11,7 +11,57 @@ server <- function(input, output, session) {
   globalVariable <- list()
   displayOutput <- list()
   globalVariable$checkSimComplete <- FALSE
+
+  #-----------------------------------------------------------------------------
+  # Global function for running SWAT
+  #-----------------------------------------------------------------------------
+  swat <- function(parameterValue){
     
+    parameterValue <- matrix(c(1,parameterValue), nrow = 1)
+    globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
+    ncores <- min(globalVariable$ncores, nrow(parameterValue))
+    
+    runSWATpar(globalVariable$workingFolder, 
+               globalVariable$TxtInOutFolder, 
+               globalVariable$outputExtraction, 
+               globalVariable$ncores, 
+               globalVariable$SWATexeFile, 
+               parameterValue,
+               globalVariable$caliParam,
+               globalVariable$copyUnchangeFiles,
+               globalVariable$fileCioInfo,
+               globalVariable$dateRangeCali,
+               globalVariable$firstRun)
+   
+    # Objective function with initial parameter set
+    temp <- calObjFunction(parameterValue,
+                           ncores, 
+                           globalVariable$nOutputVar,
+                           globalVariable$userReadSwatOutput, 
+                           globalVariable$observedData, 
+                           globalVariable$workingFolder, 
+                           globalVariable$objFunction, 
+                           globalVariable$dateRangeCali)
+   
+   if (is.null(globalVariable$simData)){
+     globalVariable$simData <<-temp$simData
+     globalVariable$objValue <<- temp$objValue
+   } else {
+     globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
+     globalVariable$objValue <<- c(globalVariable$objValue, temp$objValue)
+   }
+   
+   # Set first run is false
+   globalVariable$copyUnchangeFiles <<- FALSE
+   globalVariable$firstRun <<- FALSE
+   
+   # Ouput is to minize the objective function value
+   output <- temp$objValue
+   print(output)
+   
+   return(-output)
+  }  
+
   #-----------------------------------------------------------------------------
   # Tab 1. General Setting
   #-----------------------------------------------------------------------------
@@ -214,6 +264,12 @@ server <- function(input, output, session) {
                           "Delete all text here and type the number of iterations (number of parameter sets), for example, 
                                                        10
 This approach similar to the SUFI-2 approach")
+      
+    } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
+      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "optim_sa(fun = swat, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))"
+      )
+      
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
       updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delte all text here and type the number of iterations and parallel approach, seperated by comma, for example,
@@ -270,7 +326,8 @@ print(tell(sensiObject, objFuncValue))
     #--------------------------------------------------
     req(input$InputInfo)
     
-    if (input$samplingApproach == 'Sensi_(from_sensitivity_package)'){
+    if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
+        input$samplingApproach == 'Cali_(from_optimization_package)'){
       globalVariable$SensCaliCommand <<- input$InputInfo
       globalVariable$SensCaliCommand <<- splitRemoveComment(globalVariable$SensCaliCommand)
       
@@ -325,6 +382,7 @@ print(tell(sensiObject, objFuncValue))
       globalVariable$parameterValue <<- parameterValue
       
     } else {
+      print("nothing is execuate , this will be execute when running SWAT")
       globalVariable$parameterValue <<- NULL
     }
   
@@ -682,8 +740,20 @@ print(tell(sensiObject, objFuncValue))
         }
         
       } else {
-        print("Unknown calibration approach")
-      }
+        # There is no simulated data and obj function values when the model has not been run
+        globalVariable$simData <<- NULL
+        globalVariable$objValue <<- NULL
+        
+        # First run is true
+        globalVariable$copyUnchangeFiles <<- TRUE
+        globalVariable$firstRun <<- TRUE
+        
+        globalVariable$optimObject <<- eval(parse(text = globalVariable$SensCaliCommand[1]))
+
+        # Print output to screen
+        print(globalVariable$optimObject)
+        print(globalVariable$objValue)
+     }
       
       # End run SWAT for all iterations ----------------------------------------
       globalVariable$checkSimComplete <<- TRUE
