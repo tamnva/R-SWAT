@@ -2,15 +2,19 @@
 # Find behavioral simulation/parameters
 # ------------------------------------------------------------------------------
 behaSimulation <- function(objValue, simData, parameterValue, behThreshold, 
-                           varNumber, statIndex, observedData){
+                           varNumber, statIndex, observedData, minOrmax){
   
   # find index of simulation which are behavioral simulations
   if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
     behaIndex <- which (objValue >= behThreshold)
-  } else if(statIndex == "PBIAS") {
-    behaIndex <- which (abs(objValue) <= abs(behThreshold))
+  } else if(statIndex == "aBIAS" | statIndex == "RMSE") {
+    behaIndex <- which (objValue <= abs(behThreshold))
   } else {
-    behaIndex <- which (objValue <- behThreshold)
+    if (minOrmax == "Maximize"){
+      behaIndex <- which (objValue >= behThreshold)
+    } else {
+      behaIndex <- which (objValue <= behThreshold)
+    }
   }
   
   # find 2.5% and 97.5 percentile
@@ -30,8 +34,18 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
                                                 c(0.025, 0.5, 0.975))) 
   }
   
-  ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))]]
-  
+  # find best simulation
+  if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
+    ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))]]
+  } else if(statIndex == "aBIAS" | statIndex == "RMSE") {
+    ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))]]
+  } else {
+    if (minOrmax == "Maximize"){
+      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))]]
+    } else {
+      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))]]
+    }
+  }  
   
   ppuSimData <- as.data.frame(ppuSimData)
   ppuSimData <- cbind(observedData[[varNumber]]$Date, ppuSimData)
@@ -106,33 +120,39 @@ prFactor <- function(obs, low, up){
 
     missingValue <- which(is.na(obs))
     
-    if (length(missingValue) > 0){
-      obs <- obs[-missingValue]
-      sim <- sim[-missingValue]      
+    if (length(missingValue) == length(obs)){
+      NSE <- 0
+      R2 <- 0
+      aBIAS <- 0
+      KGE <- 0
+      RMSE <- 0      
+    } else {
+      if (length(missingValue) > 0){
+        obs <- obs[-missingValue]
+        sim <- sim[-missingValue]      
+      }
+      
+      mObs <- mean(obs)
+      mSim <- mean(sim)
+      obs_mObs <- obs - mObs
+      sim_mSim <- sim - mSim
+      sim_obs <-  sim - obs
+      sumSim <- sum(sim)
+      sumObs <- sum(obs)
+      correlation <- cor(obs, sim)
+      sdObs <- sd(obs)
+      sdSim <- sd(sim)
+      
+      
+      NSE <- 1 - sum(sim_obs**2)/sum(obs_mObs**2)
+      R2 <- correlation ** 2
+      aBIAS <- abs((sumObs - sumSim)/sumObs)
+      KGE <- 1 - sqrt((correlation - 1)**2  + (sdSim/sdObs - 1)**2 + (mSim/mObs - 1)**2)
+      RMSE <- sqrt(mean(sim_obs**2))      
     }
-    
-    mObs <- mean(obs)
-    mSim <- mean(sim)
-    obs_mObs <- obs - mObs
-    sim_mSim <- sim - mSim
-    sim_obs <-  sim - obs
-    sumSim <- sum(sim)
-    sumObs <- sum(obs)
-    correlation <- cor(obs, sim)
-    sdObs <- sd(obs)
-    sdSim <- sd(sim)
-    
-    
-    objNSE <- 1 - sum(sim_obs**2)/sum(obs_mObs**2)
-    objR2 <- correlation ** 2
-    objPBIAS <- 100 * (sumObs - sumSim)/sumObs
-    obsKGE <- 1 - sqrt((correlation - 1)**2  + (sdSim/sdObs - 1)**2 + 
-                         (mSim/mObs - 1)**2)
-    
-    rmse <- sqrt(mean(sim_obs**2))
 
-    result <- matrix(c(objNSE, obsKGE, objR2, rmse, objPBIAS), nrow = 1)
-    colnames(result) <- c('NSE', 'KGE', 'R2', 'RMSE', 'PBIAS')
+    result <- matrix(c(NSE, KGE, R2, RMSE, aBIAS), nrow = 1)
+    colnames(result) <- c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS')
     
     return(result)
   }
@@ -171,9 +191,9 @@ prFactor <- function(obs, low, up){
 # Calculate objective function
 # ------------------------------------------------------------------------------
 calObjFunction <- function(parameterValue, ncores, 
-                           nOutputVar,userReadSwatOutput, 
+                           nOutputVar, userReadSwatOutput, 
                            observedData, workingFolder, 
-                           index, dateRangeCali){
+                           index){
   
   output <- list()
   
@@ -191,12 +211,9 @@ calObjFunction <- function(parameterValue, ncores,
     #loop over number of variables
     for (j in 1:nOutputVar){
       
-      if (userReadSwatOutput[j]){
-        ntimestep <- nrow(observedData[[j]]) + 1
-      } else {
-        ntimestep <- as.numeric(dateRangeCali[2]- dateRangeCali[1]) + 2
-      }
-      
+      # Number of time step + 1 (header of each simulation)
+      ntimestep <- nrow(observedData[[j]]) + 1
+
       if ((i == 1)) {
         simData[[j]] <- list()
         output$perCriteria[[j]] <- list()
@@ -215,15 +232,27 @@ calObjFunction <- function(parameterValue, ncores,
         simData[[j]][[counter[j]]] <- tempSimData[(sIndex + 1):eIndex, 1]
         output$simData[[j]][[counter[j]]] <- simData[[j]][[counter[j]]]
         
-        output$perCriteria[[j]][[counter[j]]] <- perCriteria(observedData[[j]][,2],
-                                                             simData[[j]][[counter[j]]])
-        
-        if((i == 1) & (j == 1)) {
-          perIndex <- match(index, 
-                            colnames(output$perCriteria[[j]][[counter[j]]]))
+        if (index == 'userObjFunction'){
+          # user userObjFunction in this case
+          output$perCriteria[[j]][[counter[j]]] <- userObjFunction(observedData[[j]][,2],
+                                                               simData[[j]][[counter[j]]])
+          
+          output$objValue[counter[j]] <- output$objValue[counter[j]] + 
+            as.numeric(output$perCriteria[[j]][[counter[j]]])  
+          
+        } else {
+          # use objective function of RSWAT
+          output$perCriteria[[j]][[counter[j]]] <- perCriteria(observedData[[j]][,2],
+                                                               simData[[j]][[counter[j]]])
+          
+          if((i == 1) & (j == 1)) {
+            perIndex <- match(index, 
+                              colnames(output$perCriteria[[j]][[counter[j]]]))
+          }   
+          output$objValue[counter[j]] <- output$objValue[counter[j]] + 
+            output$perCriteria[[j]][[counter[j]]][perIndex]  
         }
-        output$objValue[counter[j]] <- output$objValue[counter[j]] + 
-          output$perCriteria[[j]][[counter[j]]][perIndex]         
+
       }
     }
     

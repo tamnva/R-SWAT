@@ -51,8 +51,7 @@ server <- function(input, output, session) {
                            globalVariable$userReadSwatOutput, 
                            globalVariable$observedData, 
                            globalVariable$workingFolder, 
-                           globalVariable$objFunction, 
-                           globalVariable$dateRangeCali)
+                           globalVariable$objFunction)
    
    if (is.null(globalVariable$simData)){
      globalVariable$simData <<-temp$simData
@@ -66,8 +65,12 @@ server <- function(input, output, session) {
    globalVariable$copyUnchangeFiles <<- FALSE
    globalVariable$firstRun <<- FALSE
    
-   # Ouput is to minize the objective function value
-   output <- temp$objValue
+   # Minimize or maximize objective function value
+   if (globalVariable$minOrmax == "Minimize"){
+     output <- temp$objValue
+   } else {
+     output <- - temp$objValue
+   }
    
    return(output)
   }  
@@ -277,7 +280,7 @@ This approach similar to the SUFI-2 approach")
       
     } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
       updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "optim_sa(fun = swat, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))"
+                          "optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))"
       )
       
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
@@ -595,8 +598,7 @@ print(tell(sensiObject, objFuncValue))
                                  globalVariable$userReadSwatOutput, 
                                  globalVariable$observedData, 
                                  globalVariable$workingFolder, 
-                                 globalVariable$objFunction, 
-                                 globalVariable$dateRangeCali)
+                                 globalVariable$objFunction)
           
           newPar <- globalVariable$parameterValue
           
@@ -685,8 +687,7 @@ print(tell(sensiObject, objFuncValue))
                                    globalVariable$userReadSwatOutput, 
                                    globalVariable$observedData, 
                                    globalVariable$workingFolder, 
-                                   globalVariable$objFunction, 
-                                   globalVariable$dateRangeCali)
+                                   globalVariable$objFunction)
             
             # Save iteration result
             saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,
@@ -880,6 +881,30 @@ print(tell(sensiObject, objFuncValue))
   observe({
     req(input$objFunction)
     globalVariable$objFunction  <<- input$objFunction
+    
+    if (input$objFunction == 'NSE' | input$objFunction == 'KGE' |
+        input$objFunction == 'R2'){
+      updateSelectInput(session, 'minOrmax', 
+                        label = 'Minimize or maximize the objective function?',
+                        selected = 'Maximize')      
+    } else if (input$objFunction == 'aBIAS' | input$objFunction == 'RMSE'){
+      updateSelectInput(session, 'minOrmax', 
+                        label = 'Minimize or maximize the objective function?',
+                        selected = 'Minimize')
+    } else {
+      updateSelectInput(session, 'minOrmax', 
+                        label = 'Minimize or maximize the objective function?',
+                        selected = ' ')
+   }
+
+  })
+
+  # ****************************************************************************  
+  # Target min or max of the objective function
+  # ****************************************************************************    
+  observe({
+    req(input$minOrmax)
+    globalVariable$minOrmax  <<- input$minOrmax
   })
   
   # ****************************************************************************  
@@ -942,8 +967,7 @@ print(tell(sensiObject, objFuncValue))
                              globalVariable$userReadSwatOutput, 
                              globalVariable$observedData, 
                              globalVariable$workingFolder, 
-                             globalVariable$objFunction, 
-                             globalVariable$dateRangeCali)
+                             globalVariable$objFunction)
 
       globalVariable$objValue <<- temp$objValue
       globalVariable$perCriteria <<- temp$perCriteria
@@ -1172,7 +1196,8 @@ print(tell(sensiObject, objFuncValue))
                                                                input$behThreshold,
                                                                input$plotVarNumber,
                                                                globalVariable$objFunction,
-                                                               globalVariable$observedData)
+                                                               globalVariable$observedData,
+                                                               globalVariable$minOrmax)
       
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData
       tempVar <- cbind(tempVar, globalVariable$observedData[[input$plotVarNumber]]$Value)
