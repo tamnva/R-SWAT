@@ -15,9 +15,20 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
   #-----------------------------------------------------------------------------
-  swat <- function(parameterValue){
+  SWAT <- function(parameterValue){
     
-    parameterValue <- matrix(c(1,parameterValue), nrow = 1)
+    if (is.matrix(parameterValue) |
+        is.data.frame(parameterValue)){
+      parameterValue <- cbind(c(1:nrow), parameterValue)
+    } else {
+      parameterValue <- matrix(c(1,parameterValue), nrow = 1)      
+    }
+    
+    #Remove row and column names
+    rownames(parameterValue) <- NULL
+    colnames(parameterValue) <- NULL
+    
+    # Save 
     globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
     ncores <- min(globalVariable$ncores, nrow(parameterValue))
     
@@ -57,9 +68,8 @@ server <- function(input, output, session) {
    
    # Ouput is to minize the objective function value
    output <- temp$objValue
-   print(output)
    
-   return(-output)
+   return(output)
   }  
 
   #-----------------------------------------------------------------------------
@@ -312,9 +322,7 @@ sensiObject$X
 
 # Last R command line tells this tool where the resulted sensitivity table are stored
 print(tell(sensiObject, objFuncValue))
-
-
-                                                    ")      
+                          ")      
     }
 
   })
@@ -382,7 +390,6 @@ print(tell(sensiObject, objFuncValue))
       globalVariable$parameterValue <<- parameterValue
       
     } else {
-      print("nothing is execuate , this will be execute when running SWAT")
       globalVariable$parameterValue <<- NULL
     }
   
@@ -739,20 +746,39 @@ print(tell(sensiObject, objFuncValue))
                             step = 1)          
         }
         
-      } else {
-        # There is no simulated data and obj function values when the model has not been run
-        globalVariable$simData <<- NULL
-        globalVariable$objValue <<- NULL
+      } else if (globalVariable$samplingApproach == 'Cali_(from_optimization_package)') {
         
-        # First run is true
-        globalVariable$copyUnchangeFiles <<- TRUE
-        globalVariable$firstRun <<- TRUE
-        
-        globalVariable$optimObject <<- eval(parse(text = globalVariable$SensCaliCommand[1]))
+        if(is.null(globalVariable$observedData)){
+          showModal(modalDialog(
+            title = "Not enough information to perform SWAT run",
+            HTML("You selected 'Cali_(from_optimization_package)', please defined objective function and load observed data (Step 4.1) before running SWAT"),
+            easyClose = TRUE,
+            size = "l"
+          ))
+          
+        } else {
+          # There is no simulated data and obj function values when the model has not been run
+          globalVariable$simData <<- NULL
+          globalVariable$objValue <<- NULL
+          
+          # First run is true
+          globalVariable$copyUnchangeFiles <<- TRUE
+          globalVariable$firstRun <<- TRUE
+          
+          globalVariable$optimObject <<- eval(parse(text = globalVariable$SensCaliCommand[1]))
+          
+          # Print output to screen
+          print(globalVariable$optimObject)
+          print(globalVariable$objValue)          
+        }
 
-        # Print output to screen
-        print(globalVariable$optimObject)
-        print(globalVariable$objValue)
+      } else {
+        showModal(modalDialog(
+          title = "Not enough information to perform SWAT run",
+          HTML("Unkown method"),
+          easyClose = TRUE,
+          size = "l"
+        ))       
      }
       
       # End run SWAT for all iterations ----------------------------------------
