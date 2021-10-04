@@ -47,7 +47,7 @@ runSwatUI <- function(id) {
 
       column(width = 5,
              checkboxInput('checkOutputExtractionDisplayOnly', 
-                           'Display your selected outputs', 
+                           'Display corresponding observed file names', 
                            value = FALSE, width = NULL),
       ),
       

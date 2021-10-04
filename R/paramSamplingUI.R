@@ -92,8 +92,10 @@ paramSamplingUI <- function(id) {
                          label = "2. Select sensitivity or calibration approach", 
                          choices = c('Sensi_Cali_(uniform_Latin_Hpercube_Sampling)', 
                                      'Sensi_(from_sensitivity_package)',
+                                     'Sensi_(from_userDefined_package)',
                                      'Cali_(from_optimization_package)', 
                                      'Cali_(Dynamically_Dimensioned_Search)',
+                                     'Cali_(from_userDefined_package)',
                                      'Read_User_Parameter_File'),
                          multiple = FALSE),
       ),
@@ -109,11 +111,6 @@ paramSamplingUI <- function(id) {
                            height = "200px",
                            resize = "vertical") %>%
                shiny::tagAppendAttributes(style = 'width: 100%;'),
-             
-             actionButton("executeRCommandText", "Click here to execute the command in the input box (IMPORTANT)",
-                          buttonType = "default",
-                          style="background-color: #87CEFA; 
-                              border-color: #2e6da4"),
              
              verbatimTextOutput("displayInputInfo"),
              ),

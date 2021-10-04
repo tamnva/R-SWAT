@@ -11,38 +11,54 @@ paraOptUncerUI <- function(id) {
   tagList(
     
     fluidRow(
+      
       #-------------------------------------------------------------------------
-      # 1. Input behavioral threshold
+      # 1. Update min max objective fucntion values
       #------------------------------------------------------------------------- 
       column(width = 10,
-             numericInput("behThreshold", 
-                          "1. Input behavioral threshold",
-                          value = 0.5,
-                          step = 0.05,
-                          min = 0,
-                          max = 1),
-             ),
-      
+             HTML("<b>","1. Update the user interface for step 4.3","</b>"),
+      ),
       column(width = 10,
-             verbatimTextOutput("printMaxBehThreshold", placeholder = TRUE),
+             actionButton("updateUI", "Click here to update"),
+      ),
+      
+      #-------------------------------------------------------------------------
+      # 2. Input behavioral threshold
+      #-------------------------------------------------------------------------
+      div( style = "margin-top: 5em",  
+           column(width = 10,
+                  numericInput("behThreshold", 
+                               "2. Input behavioral threshold",
+                               value = 0.5,
+                               step = 0.05,
+                               min = 0,
+                               max = 1,
+                               width = "25%"),
+           ),
+           
+           column(width = 10,
+                  verbatimTextOutput("printMaxBehThreshold"),
+           ),
       ),
 
+
       #-------------------------------------------------------------------------
-      # 2. Input variable number to plot
+      # 4. Input variable number to plot
       #-------------------------------------------------------------------------       
       column(width = 10,
              sliderInput("plotVarNumber", 
-                         "2. Input variable number to plot", 
+                         "3. Input variable number to plot", 
                          value = 1, 
                          min = 1, 
                          max = 2,
                          step = 1,
-                         round = TRUE),
+                         round = TRUE,
+                         width = "25%"),
              ),
       
       column(width = 10,
              checkboxInput("checkPlotVariableNumber", 
-                           "Display plot (this will also save all results to the file 'SWATShinyObject.rds')",
+                           "Display plot",
                            width = '100%'),
              ),
 
@@ -93,7 +109,19 @@ paraOptUncerUI <- function(id) {
                verbatimTextOutput("printPandRFactor", placeholder = TRUE),
         ),
       ),
-      
+
+      #-------------------------------------------------------------------------
+      # 4. Save result
+      #-------------------------------------------------------------------------
+      div( style = "margin-top: 5em",  
+           column(width = 10,
+                  HTML("<b>","4. Save all results","</b>"),
+           ),
+           column(width = 10,
+                  actionButton("saveAllResults", "Click here save"),
+           ),   
+           
+      ),      
       #--------------------------------------------------------------------------- 
     ),
     
