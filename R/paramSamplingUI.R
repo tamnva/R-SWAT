@@ -90,7 +90,7 @@ paramSamplingUI <- function(id) {
              selectInput("samplingApproach",
                          width = "50%",
                          label = "2. Select sensitivity or calibration approach", 
-                         choices = c('Sensi_Cali_(uniform_Latin_Hpercube_Sampling)', 
+                         choices = c('Sensi_Cali_(uniform_Latin_Hypercube_Sampling)', 
                                      'Sensi_(from_sensitivity_package)',
                                      'Sensi_(from_userDefined_package)',
                                      'Cali_(from_optimization_package)', 
@@ -105,7 +105,7 @@ paramSamplingUI <- function(id) {
       #-------------------------------------------------------------------------      
       column(width = 10,
              
-             textAreaInput("InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+             textAreaInput("inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                            " ", 
                            width = "100%",
                            height = "200px",

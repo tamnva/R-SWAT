@@ -1,7 +1,6 @@
 
 # maximum upload file 500 MB
 options(shiny.maxRequestSize = 500*1024^2)
-
 # Creating server
 server <- function(input, output, session) {
  
@@ -273,27 +272,27 @@ server <- function(input, output, session) {
   observe({
     req(input$samplingApproach)
     globalVariable$samplingApproach <<- input$samplingApproach
-    if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+    if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delete all text here and type the number of iterations (number of parameter sets), for example, 
                                                        10
 This approach similar to the SUFI-2 approach")
       
     } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))"
       )
       
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "Delte all text here and type the number of iterations and parallel approach, seperated by comma, for example,
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Delete all text here and type the number of iterations and parallel approach, seperated by comma, for example,
                                                       10, 1
 10 means the number of interation
 1 means the parallel approach (DDS run independently in each core)
 2 means intermediate best parameter from all cores is selected and assigned as inital parameter set for next run in all cores")      
     } else if (input$samplingApproach == 'Read_User_Parameter_File'){
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "Delte all text here and type the link to the file, for example,
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Delete all text here and type the link to the file, for example,
                                                  C:/data/myParameterFile.txt
 The format (free format, different fields are seperated by space) of this file MUST be as follows (see in the example file myParameterSet.txt)
   - 1st line is the header, next lines is your parameterset values
@@ -303,10 +302,20 @@ Example (NOTE: In this case, the parameter ranges (min, max) in the table above 
 GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.rte    SURLAG.bsn
 60.1          0.1       0.12         0.2          0.55       2.5         1.5          4.5
 70.1          0.2       0.22         0.12         0.65       3.5         3.5          5.5
-                                              ")      
+                                              ")  
+    } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Please add the name of your package to the file ./R/loadPackages.R 
+Input code to this box should follow the same guidlines with the approach 'Cali_(from_optimization_package)'
+                                              ") 
+    } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Please add the name of your package to the file ./R/loadPackages.R 
+Input code to this box should follow the same guidlines with the approach 'Cali_(from_optimization_package)'
+                                              ") 
     } else {
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh", 
-                          "Delte all text here and type the R command from the 'sensitivity' package' as suggest below:
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh", 
+                          "Delete all text here and type the R command from the 'sensitivity' package' as suggest below:
           When typing functions from the 'sensitivity' package, you might need to run the model, access the min, max of your selected parameters 
           from the above table, the number of selected parameters. You can ACCESS to the model and THESE VARIABLES using the following KEYWORDS
           'SWAT' is the SWAT model/function with inputs are parameters (and all user settings from RSWAT, these were hard coded in the SWAT function) and outputs are vector of objective function values
@@ -332,13 +341,13 @@ print(sensCaliObject)[]
   # ****************************************************************************
   observe({
     #--------------------------------------------------
-    req(input$InputInfo)
+    req(input$inputInfo)
     
     if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
         input$samplingApproach == 'Cali_(from_optimization_package)' |
         input$samplingApproach == 'Sensi_(from_userDefined_package)' |
         input$samplingApproach == 'Cali_(from_userDefined_package)' ){
-      globalVariable$sensCaliCommand <<- input$InputInfo
+      globalVariable$sensCaliCommand <<- input$inputInfo
       globalVariable$sensCaliCommand <<- splitRemoveComment(globalVariable$sensCaliCommand)
       
       outputTex <- NULL
@@ -470,8 +479,8 @@ print(sensCaliObject)[]
         title = "Save current input",
         HTML("All current inputs were saved to the file 'SWATShinyObject.rds' in the working folder.<br> 
       SWAT is running, close this message. You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
-      in the working folder to see the current simulation. Future option (not yet implemented): enable option .<br>
-      to restart from the last simulations if your simulation is interupted"),
+      in the working folder to see the current simulation. Future option: restart from the last simulations .<br>
+      if your simulation is interupted"),
         easyClose = TRUE,
         size = "l"
       ))
@@ -481,15 +490,15 @@ print(sensCaliObject)[]
       firstRun <- TRUE
 
       # Run SWAT for all iteration ---------------------------------------------  
-      if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)') |
+      if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)') |
         (globalVariable$samplingApproach == 'Read_User_Parameter_File')){
 
         # Generate parameter values
-        if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
-          globalVariable$parameterValue <<- lhsRange(as.numeric(input$InputInfo),
+        if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
+          globalVariable$parameterValue <<- lhsRange(as.numeric(input$inputInfo),
                                                      getParamRange(globalVariable$paraSelection))          
         } else if (globalVariable$samplingApproach == "Read_User_Parameter_File"){
-          parameterValue <- as.matrix(read.table(file = trimws(globalVariable$InputInfo),
+          parameterValue <- as.matrix(read.table(file = trimws(input$inputInfo),
                                                  header = TRUE, sep =""))
           parameterValue <- cbind(c(1:nrow(parameterValue)),parameterValue)
           colnames(parameterValue) <- NULL
@@ -548,12 +557,12 @@ print(sensCaliObject)[]
           firstRun = FALSE
           
           # Run SWAT with first initial parameter set
-          nIters <- as.numeric(strsplit(globalVariable$InputInfo, 
+          nIters <- as.numeric(strsplit(input$inputInfo, 
                                         split = ",", 
                                         fixed = TRUE)[[1]][1])
           
           # Get parallel mode
-          parallelMode <- as.numeric(strsplit(globalVariable$InputInfo, 
+          parallelMode <- as.numeric(strsplit(input$inputInfo, 
                                               split = ",", 
                                               fixed = TRUE)[[1]][2])
           
@@ -922,7 +931,7 @@ print(sensCaliObject)[]
           size = "l"
         ))
         
-      } else if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'|
+      } else if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'|
                  globalVariable$samplingApproach == 'Read_User_Parameter_File'){
 
         # Caculate objective function
@@ -1055,18 +1064,18 @@ print(sensCaliObject)[]
     
     if (globalVariable$checkSimComplete & !is.null(globalVariable$objValue)){
 
-      # Message show all input was saved
-      showModal(modalDialog(
-        title = "Sensitivity analysis",
-        HTML("Performing sensitivity analysis"),
-        easyClose = TRUE,
-        size = "l"
-      ))
-      
       #-------------------------------------      
-      if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
+      if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
+        
+        # Message show all input was saved
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("Performing sensitivity analysis"),
+          easyClose = TRUE,
+          size = "l"
+        ))
 
-        # Table with parameter and objective funtion values
+        # Table with parameter and objective function values
         tableSensitivity <- globalVariable$parameterValue 
         tableSensitivity[,1] <- globalVariable$objValue 
        
@@ -1074,7 +1083,7 @@ print(sensCaliObject)[]
         colnames(tableSensitivity) <- c("objFunction", globalVariable$paraSelection[,1])
         tableSensitivity <- as.data.frame(tableSensitivity)
         
-        # parameter sensitivity using multivariable regression analysi
+        # parameter sensitivity using multivariate regression analysis
         tableSensitivity <- summary(lm(formula = objFunction ~ ., tableSensitivity))[4]$coefficients[,3:4]
         
         # remove the first row because it is the intercept
@@ -1093,8 +1102,15 @@ print(sensCaliObject)[]
 
       } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)'|
                  globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)'){
-print("ok")
-print(globalVariable$sensCaliObject)
+        
+        # Message show all input was saved
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("Performing sensitivity analysis"),
+          easyClose = TRUE,
+          size = "l"
+        ))
+
         sensCaliObject <- globalVariable$sensCaliObject
         sensiReport <- eval(parse(text = globalVariable$sensCaliCommand[2])) 
         
@@ -1109,9 +1125,21 @@ print(globalVariable$sensCaliObject)
         
       } else if(globalVariable$samplingApproach == "Read_User_Parameter_File"){
         output$tableSensitivity <- NULL
-        output$displaySensitivityReport <- renderText("You read parameter sets from external file \n Please use external program for sensitivity analysis in this case ")
+        # Message show all input was saved
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("You have input parameter set from extermal file, not sensitivity analysis is performed. Please use external program"),
+          easyClose = TRUE,
+          size = "l"
+        ))
       } else {
-        
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("You have select parameter optimization, not sensitivity analysis is performed"),
+          easyClose = TRUE,
+          size = "l"
+        ))  
+        output$tableSensitivity <- NULL
       }
       
     } else {

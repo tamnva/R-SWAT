@@ -25,7 +25,6 @@ sensAnalysisUI <- function(id) {
 
     column(width = 10,
            dataTableOutput('tableSensitivity'),
-           verbatimTextOutput("displaySensitivityReport")
     ),
 
     
