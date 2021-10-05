@@ -213,6 +213,7 @@ printVariableNameObservedFiles <- function(outputExtraction){
 # ------------------------------------------------------------------------------
 plotSimulated <- function(inputDataFrame){
   inputDataFrame$date <- as.Date(inputDataFrame$date, "%Y-%m-%d")
+  
   myplot <- ggplot(inputDataFrame) + 
     #95 PPU
     geom_ribbon(aes(x = date, ymin = lower, ymax = upper, color = "95PPU"), 

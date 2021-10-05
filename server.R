@@ -280,7 +280,11 @@ This approach similar to the SUFI-2 approach")
       
     } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))"
+                          "# Example with Simulated Annealing
+optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))
+
+# Example with Particle Swarm Optimization
+# hydroPSO(fn = SWAT, lower=minCol, upper=maxCol, control=list(write2disk=FALSE))                       "
       )
       
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
@@ -306,9 +310,9 @@ GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.r
     } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Please add the name of your package to the file ./R/loadPackages.R 
-Input code to this box should follow the same guidlines with the approach 'Cali_(from_optimization_package)'
+Input code to this box should follow the same guidlines with the approach 'Cali_(from_sensitivity_package)'
                                               ") 
-    } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
+    } else if (input$samplingApproach == 'Cali_(from_userDefined_package)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Please add the name of your package to the file ./R/loadPackages.R 
 Input code to this box should follow the same guidlines with the approach 'Cali_(from_optimization_package)'
@@ -743,6 +747,28 @@ print(sensCaliObject)[]
       # End run SWAT for all iterations ----------------------------------------
       globalVariable$checkSimComplete <<- TRUE
       
+      # Update numeric input (threshold objective function)
+
+      minObjValue <- min(globalVariable$objValue)
+      maxObjValue <- max(globalVariable$objValue)
+
+      updateNumericInput(session = session, "behThreshold", 
+                         label = "1. Input behavioral threshold", 
+                         value = minObjValue,
+                         min = minObjValue, 
+                         max = maxObjValue, 
+                         step = (maxObjValue - minObjValue)/20)
+      
+      # Update select variable number
+      updateSliderInput(session = session,
+                        "plotVarNumber", 
+                        "2. Input variable number to plot", 
+                        value = 1, 
+                        min = 1, 
+                        max = globalVariable$nOutputVar,
+                        step = 1)
+      
+    
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                            'SWATShinyObject.rds',
                                            sep ='')) 
@@ -947,6 +973,27 @@ print(sensCaliObject)[]
         globalVariable$perCriteria <<- temp$perCriteria
         globalVariable$simData <<- temp$simData
         
+        # Update numeric input (threshold objective function)
+        
+        minObjValue <- min(globalVariable$objValue)
+        maxObjValue <- max(globalVariable$objValue)
+        
+        updateNumericInput(session = session, "behThreshold", 
+                           label = "1. Input behavioral threshold", 
+                           value = minObjValue,
+                           min = minObjValue, 
+                           max = maxObjValue, 
+                           step = (maxObjValue - minObjValue)/20)
+        
+        # Update select variable number
+        updateSliderInput(session = session,
+                          "plotVarNumber", 
+                          "2. Input variable number to plot", 
+                          value = 1, 
+                          min = 1, 
+                          max = globalVariable$nOutputVar,
+                          step = 1)
+        
       } else {
         showModal(modalDialog(
           title = "Important message",
@@ -983,34 +1030,6 @@ print(sensCaliObject)[]
       output$plotObjFunction <- renderPlotly(plotObjFuncParaValue(globalVariable))
     } else {
       output$plotObjFunction <- NULL
-    }
-  })
-
-  # ****************************************************************************  
-  # Update the user interface
-  # ****************************************************************************
-  observe({
-    req(input$updateUI)
-    if (!is.null(globalVariable$objValue)){
-      # Update numeric input (threshold objective function)
-      minObjValue <- min(globalVariable$objValue)
-      maxObjValue <- max(globalVariable$objValue)
-      
-      updateNumericInput(session = session, "behThreshold", 
-                         label = "2. Input behavioral threshold", 
-                         value = minObjValue,
-                         min = minObjValue, 
-                         max = maxObjValue, 
-                         step = (maxObjValue - minObjValue)/20)
-      
-      # Update select variable number
-      updateSliderInput(session = session,
-                        "plotVarNumber", 
-                        "3. Input variable number to plot", 
-                        value = 1, 
-                        min = 1, 
-                        max = globalVariable$nOutputVar,
-                        step = 1)
     }
   })
 
@@ -1202,7 +1221,8 @@ print(sensCaliObject)[]
       colnames(tempVar) <- c("date", "lower", "median", "upper", "best", "observed")
       globalVariable$PlotVariableNumber <<- plotSimulated(tempVar)
 
-      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber)) 
+
+      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber + theme(text = element_text(size=20)))) 
       
       # Table
       columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'), 
