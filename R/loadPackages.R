@@ -1,7 +1,9 @@
-# Dependency packages
-dependencyPackages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
-                        'shinyFiles', 'tippy', 'excelR', 'shiny', 'doParallel',
-                        'sensitivity', 'ggplot2', 'boot','rgdal', 'raster')
+# Dependency packages (add more if necessary)
+dependencyPackages <- c('foreach', 'parallel', 'doParallel',                        # Parallelization
+                        'lhs', 'plotly', 'ggplot2', 'rgdal', 'raster',              # Visualization
+                        'shiny', 'shinydashboard', 'shinyFiles', 'tippy', 'excelR', # User interface
+                        'sensitivity',  'boot',                                     # Sensitivity
+                        'optimization','hydroPSO')                                  # Optimization
 
 # Check and install only missing packages
 install.packages(setdiff(dependencyPackages,rownames(installed.packages())), 

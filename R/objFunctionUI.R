@@ -18,12 +18,23 @@ objFunctionUI <- function(id) {
 
       column(width = 10,
              selectInput("objFunction",
-                         width = "20%",
+                         width = "40%",
                          label = "1. Select objective function", 
-                         choices = c('NSE', 'KGE', 'R2', 'RMSE', 'PBIAS', 
+                         choices = c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS', 
                                      'userObjFunction'),
                          multiple = FALSE),
-             #verbatimTextOutput("printObjFunction"),
+      ),
+
+      conditionalPanel(
+        
+        condition = "input.objFunction == 'userObjFunction'",
+        column(width = 10,
+               selectInput("minOrmax",
+                           width = "40%",
+                           label = "Minimize or maximize the objective function?", 
+                           choices = c('Minimize', 'Maximize'),
+                           multiple = FALSE),
+        ),
       ),
       
       column(width = 1,

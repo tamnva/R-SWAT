@@ -1,7 +1,6 @@
 
 # maximum upload file 500 MB
 options(shiny.maxRequestSize = 500*1024^2)
-
 # Creating server
 server <- function(input, output, session) {
  
@@ -11,7 +10,71 @@ server <- function(input, output, session) {
   globalVariable <- list()
   displayOutput <- list()
   globalVariable$checkSimComplete <- FALSE
+
+  #-----------------------------------------------------------------------------
+  # Global function for running SWAT
+  #-----------------------------------------------------------------------------
+  SWAT <- function(parameterValue){
+    if (is.matrix(parameterValue) |
+        is.data.frame(parameterValue)){
+      nrow <- nrow(parameterValue)
+      parameterValue <- cbind(c(1:nrow), parameterValue)
+
+    } else {
+      parameterValue <- matrix(c(1,parameterValue), nrow = 1)   
+
+    }
+    #Remove row and column names
+    rownames(parameterValue) <- NULL
+    colnames(parameterValue) <- NULL
+
+    # Save 
+    globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
+    ncores <- min(globalVariable$ncores, nrow(parameterValue))
     
+    runSWATpar(globalVariable$workingFolder, 
+               globalVariable$TxtInOutFolder, 
+               globalVariable$outputExtraction, 
+               globalVariable$ncores, 
+               globalVariable$SWATexeFile, 
+               parameterValue,
+               globalVariable$caliParam,
+               globalVariable$copyUnchangeFiles,
+               globalVariable$fileCioInfo,
+               globalVariable$dateRangeCali,
+               globalVariable$firstRun)
+   
+    # Objective function with initial parameter set
+    temp <- calObjFunction(parameterValue,
+                           ncores, 
+                           globalVariable$nOutputVar,
+                           globalVariable$userReadSwatOutput, 
+                           globalVariable$observedData, 
+                           globalVariable$workingFolder, 
+                           globalVariable$objFunction)
+   
+   if (is.null(globalVariable$simData)){
+     globalVariable$simData <<-temp$simData
+     globalVariable$objValue <<- temp$objValue
+   } else {
+     globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
+     globalVariable$objValue <<- c(globalVariable$objValue, temp$objValue)
+   }
+   
+   # Set first run is false
+   globalVariable$copyUnchangeFiles <<- FALSE
+   globalVariable$firstRun <<- FALSE
+   
+   # Minimize or maximize objective function value
+   if (globalVariable$minOrmax == "Minimize"){
+     output <- temp$objValue
+   } else {
+     output <- - temp$objValue
+   }
+   
+   return(output)
+  }  
+
   #-----------------------------------------------------------------------------
   # Tab 1. General Setting
   #-----------------------------------------------------------------------------
@@ -209,21 +272,27 @@ server <- function(input, output, session) {
   observe({
     req(input$samplingApproach)
     globalVariable$samplingApproach <<- input$samplingApproach
-    if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+    if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delete all text here and type the number of iterations (number of parameter sets), for example, 
                                                        10
 This approach similar to the SUFI-2 approach")
+      
+    } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))"
+      )
+      
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "Delte all text here and type the number of iterations and parallel approach, seperated by comma, for example,
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Delete all text here and type the number of iterations and parallel approach, seperated by comma, for example,
                                                       10, 1
 10 means the number of interation
 1 means the parallel approach (DDS run independently in each core)
 2 means intermediate best parameter from all cores is selected and assigned as inital parameter set for next run in all cores")      
     } else if (input$samplingApproach == 'Read_User_Parameter_File'){
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "Delte all text here and type the link to the file, for example,
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Delete all text here and type the link to the file, for example,
                                                  C:/data/myParameterFile.txt
 The format (free format, different fields are seperated by space) of this file MUST be as follows (see in the example file myParameterSet.txt)
   - 1st line is the header, next lines is your parameterset values
@@ -233,32 +302,36 @@ Example (NOTE: In this case, the parameter ranges (min, max) in the table above 
 GW_DELAY.gw   CN2.mgt   SOL_K.sol   ALPHA_BF.GW   ESCO.hru   SURLAG.hru  CH_K2.rte    SURLAG.bsn
 60.1          0.1       0.12         0.2          0.55       2.5         1.5          4.5
 70.1          0.2       0.22         0.12         0.65       3.5         3.5          5.5
-                                              ")      
+                                              ")  
+    } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Please add the name of your package to the file ./R/loadPackages.R 
+Input code to this box should follow the same guidlines with the approach 'Cali_(from_optimization_package)'
+                                              ") 
+    } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Please add the name of your package to the file ./R/loadPackages.R 
+Input code to this box should follow the same guidlines with the approach 'Cali_(from_optimization_package)'
+                                              ") 
     } else {
-      updateTextAreaInput(session, "InputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh", 
-                          "Delte all text here and type the R command from the 'sensitivity' package' as suggest below:
-NOTE: This option only works with sensitivity functions designed for 'decoupling' simulations from the 'sensitivity' package
-          When typing functions from the 'sensitivity' package, you might need to access the min, max of your selected parameters 
-          from the above table, the number of selected parameters. You can ACCESS to THESE VARIABLES using the following KEYWORDS
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh", 
+                          "Delete all text here and type the R command from the 'sensitivity' package' as suggest below:
+          When typing functions from the 'sensitivity' package, you might need to run the model, access the min, max of your selected parameters 
+          from the above table, the number of selected parameters. You can ACCESS to the model and THESE VARIABLES using the following KEYWORDS
+          'SWAT' is the SWAT model/function with inputs are parameters (and all user settings from RSWAT, these were hard coded in the SWAT function) and outputs are vector of objective function values
           'minCol' is a vector of the Min column from the above table
           'maxCol' is a vector of the Max column from the above table
           'nParam' is the number of your selected parameters from the above table
-          'objFuncValue' is a vector of objective function values after running SWAT with given parameter sets
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------  
 For sensitivity analysis, you should type only 3 lines of R code (no line break, blank and comment lines are not counted), e.g., with Morris approach
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 # First R command line creates a 'sensitivity object', the variable name MUST be 'sensiObject', for example
-sensiObject <-  morris(model = NULL, factors = nParam, binf = minCol, bsup = maxCol, r = 4, design = list(type = 'oat', levels = 5, grid.jump = 3))
+sensCaliObject <-  morris(model = SWAT, factors = nParam, binf = minCol, bsup = maxCol, r = 4, design = list(type = 'oat', levels = 5, grid.jump = 3))
 
-# Second R command line tells this tool where the generated parameter sets are stored, e.g.,
-sensiObject$X
-
-# Last R command line tells this tool where the resulted sensitivity table are stored
-print(tell(sensiObject, objFuncValue))
-
-
-                                                    ")      
+# Second R command line tells this tool where the resulted sensitivity table are stored
+print(sensCaliObject)[]
+                          ")      
     }
 
   })
@@ -268,16 +341,19 @@ print(tell(sensiObject, objFuncValue))
   # ****************************************************************************
   observe({
     #--------------------------------------------------
-    req(input$InputInfo)
+    req(input$inputInfo)
     
-    if (input$samplingApproach == 'Sensi_(from_sensitivity_package)'){
-      globalVariable$SensCaliCommand <<- input$InputInfo
-      globalVariable$SensCaliCommand <<- splitRemoveComment(globalVariable$SensCaliCommand)
+    if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
+        input$samplingApproach == 'Cali_(from_optimization_package)' |
+        input$samplingApproach == 'Sensi_(from_userDefined_package)' |
+        input$samplingApproach == 'Cali_(from_userDefined_package)' ){
+      globalVariable$sensCaliCommand <<- input$inputInfo
+      globalVariable$sensCaliCommand <<- splitRemoveComment(globalVariable$sensCaliCommand)
       
       outputTex <- NULL
-      if (!is.null(globalVariable$SensCaliCommand)){
-        for (i in 1:length(globalVariable$SensCaliCommand)){
-          outputTex <- paste(outputTex, globalVariable$SensCaliCommand[i], "\n", sep ="")
+      if (!is.null(globalVariable$sensCaliCommand)){
+        for (i in 1:length(globalVariable$sensCaliCommand)){
+          outputTex <- paste(outputTex, globalVariable$sensCaliCommand[i], "\n", sep ="")
         }            
       }    
       output$displayInputInfo <- renderText(outputTex)
@@ -285,59 +361,6 @@ print(tell(sensiObject, objFuncValue))
       output$displayInputInfo <- NULL
     }
     })
-
-  # ****************************************************************************  
-  # Parameter sampling: executing input R command in the input text box
-  # ****************************************************************************
-  observe({
-    #--------------------------------------------------
-    req(input$InputInfo, 
-        input$executeRCommandText)  
-    
-    if (input$samplingApproach == 'Sensi_(from_sensitivity_package)'){
-      
-      globalVariable$sensiObject <<- eval(parse(text = globalVariable$SensCaliCommand[1]))
-      
-      parameterValue <- eval(parse(text = globalVariable$SensCaliCommand[2]))
-      
-      parameterValue <- cbind(c(1:nrow(parameterValue)), parameterValue)
-      parameterValue <- as.matrix(parameterValue)
-      rownames(parameterValue) <- NULL
-      colnames(parameterValue) <- NULL
-      globalVariable$parameterValue <<- parameterValue
-      
-      
-    } else if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
-      
-      globalVariable$parameterValue <<- lhsRange(as.numeric(input$InputInfo),
-                                                 getParamRange(globalVariable$paraSelection))
-      
-      
-    } else if (globalVariable$samplingApproach == "Read_User_Parameter_File"){
-      
-      
-      parameterValue <- as.matrix(read.table(file = trimws(globalVariable$InputInfo),
-                                             header = TRUE, sep =""))
-      parameterValue <- cbind(c(1:nrow(parameterValue)),parameterValue)
-      colnames(parameterValue) <- NULL
-      rownames(parameterValue) <- NULL
-      
-      globalVariable$parameterValue <<- parameterValue
-      
-    } else {
-      globalVariable$parameterValue <<- NULL
-    }
-  
-    # Message show all input was saved
-    showModal(modalDialog(
-      title = "Execute input R command",
-      HTML("The input R command was sucessfully executed"),
-      easyClose = TRUE,
-      size = "l"
-    ))
-    #-------------------------------------------------
-  }) 
-  
 
   #-----------------------------------------------------------------------------
   # Tab 3. Run SWAT
@@ -412,6 +435,10 @@ print(tell(sensiObject, objFuncValue))
   observeEvent(input$runSWAT, {
     
     # Performe check list otherwise SWATshiny will be turn off when click this
+
+    # ****************************************************************************  
+    # Parameter sampling: executing input R command in the input text box
+    # ****************************************************************************
     
     checkList <- TRUE
     checkList <- checkList & !is.null(globalVariable$workingFolder)
@@ -452,8 +479,8 @@ print(tell(sensiObject, objFuncValue))
         title = "Save current input",
         HTML("All current inputs were saved to the file 'SWATShinyObject.rds' in the working folder.<br> 
       SWAT is running, close this message. You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
-      in the working folder to see the current simulation. Future option (not yet implemented): enable option .<br>
-      to restart from the last simulations if your simulation is interupted"),
+      in the working folder to see the current simulation. Future option: restart from the last simulations .<br>
+      if your simulation is interupted"),
         easyClose = TRUE,
         size = "l"
       ))
@@ -463,10 +490,26 @@ print(tell(sensiObject, objFuncValue))
       firstRun <- TRUE
 
       # Run SWAT for all iteration ---------------------------------------------  
-      if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)') |
-        (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)') |
+      if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)') |
         (globalVariable$samplingApproach == 'Read_User_Parameter_File')){
 
+        # Generate parameter values
+        if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
+          globalVariable$parameterValue <<- lhsRange(as.numeric(input$inputInfo),
+                                                     getParamRange(globalVariable$paraSelection))          
+        } else if (globalVariable$samplingApproach == "Read_User_Parameter_File"){
+          parameterValue <- as.matrix(read.table(file = trimws(input$inputInfo),
+                                                 header = TRUE, sep =""))
+          parameterValue <- cbind(c(1:nrow(parameterValue)),parameterValue)
+          colnames(parameterValue) <- NULL
+          rownames(parameterValue) <- NULL
+          
+          globalVariable$parameterValue <<- parameterValue
+        } else {
+          globalVariable$parameterValue <<- NULL
+        }
+
+        
         # Check max number of cores
         globalVariable$ncores <<- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
 
@@ -514,12 +557,12 @@ print(tell(sensiObject, objFuncValue))
           firstRun = FALSE
           
           # Run SWAT with first initial parameter set
-          nIters <- as.numeric(strsplit(globalVariable$InputInfo, 
+          nIters <- as.numeric(strsplit(input$inputInfo, 
                                         split = ",", 
                                         fixed = TRUE)[[1]][1])
           
           # Get parallel mode
-          parallelMode <- as.numeric(strsplit(globalVariable$InputInfo, 
+          parallelMode <- as.numeric(strsplit(input$inputInfo, 
                                               split = ",", 
                                               fixed = TRUE)[[1]][2])
           
@@ -530,8 +573,7 @@ print(tell(sensiObject, objFuncValue))
                                  globalVariable$userReadSwatOutput, 
                                  globalVariable$observedData, 
                                  globalVariable$workingFolder, 
-                                 globalVariable$objFunction, 
-                                 globalVariable$dateRangeCali)
+                                 globalVariable$objFunction)
           
           newPar <- globalVariable$parameterValue
           
@@ -620,8 +662,7 @@ print(tell(sensiObject, objFuncValue))
                                    globalVariable$userReadSwatOutput, 
                                    globalVariable$observedData, 
                                    globalVariable$workingFolder, 
-                                   globalVariable$objFunction, 
-                                   globalVariable$dateRangeCali)
+                                   globalVariable$objFunction)
             
             # Save iteration result
             saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,
@@ -659,31 +700,45 @@ print(tell(sensiObject, objFuncValue))
           globalVariable$perCriteria <<- saveIterationResult$perCriteria
           globalVariable$simData <<- saveIterationResult$simData
           globalVariable$parameterValue[,1] <<- c(1:nrow(globalVariable$parameterValue))
-          
-          # Update numeric input (threshold objective function)
-          minObjValue <- min(globalVariable$objValue)
-          maxObjValue <- max(globalVariable$objValue)
-          
-          updateNumericInput(session = session, "behThreshold", 
-                             label = "1. Input behavioral threshold", 
-                             value = minObjValue,
-                             min = minObjValue, 
-                             max = maxObjValue, 
-                             step = (maxObjValue - minObjValue)/20)
-          
-          # Update select variable number
-          updateSliderInput(session = session,
-                            "plotVarNumber", 
-                            "2. Input variable number to plot", 
-                            value = 1, 
-                            min = 1, 
-                            max = globalVariable$nOutputVar,
-                            step = 1)          
         }
         
+      } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
+                 globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' |
+                 globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
+                 globalVariable$samplingApproach == 'Cali_(from_userDefined_package)') {
+        
+        if(is.null(globalVariable$observedData)){
+          showModal(modalDialog(
+            title = "Not enough information to perform SWAT run",
+            HTML("Please defined objective function and load observed data (Step 4.1) before running SWAT"),
+            easyClose = TRUE,
+            size = "l"
+          ))
+          
+        } else {
+          # There is no simulated data and obj function values when the model has not been run
+          globalVariable$simData <<- NULL
+          globalVariable$objValue <<- NULL
+          
+          # First run is true
+          globalVariable$copyUnchangeFiles <<- TRUE
+          globalVariable$firstRun <<- TRUE
+          
+          globalVariable$sensCaliObject <<- eval(parse(text = globalVariable$sensCaliCommand[1]))
+          
+          # Print output to screen
+          # print(globalVariable$sensCaliObject)
+          # print(globalVariable$objValue)          
+        }
+
       } else {
-        print("Unknown calibration approach")
-      }
+        showModal(modalDialog(
+          title = "Not enough information to perform SWAT run",
+          HTML("Unkown method"),
+          easyClose = TRUE,
+          size = "l"
+        ))       
+     }
       
       # End run SWAT for all iterations ----------------------------------------
       globalVariable$checkSimComplete <<- TRUE
@@ -784,6 +839,30 @@ print(tell(sensiObject, objFuncValue))
   observe({
     req(input$objFunction)
     globalVariable$objFunction  <<- input$objFunction
+    
+    if (input$objFunction == 'NSE' | input$objFunction == 'KGE' |
+        input$objFunction == 'R2'){
+      updateSelectInput(session, 'minOrmax', 
+                        label = 'Minimize or maximize the objective function?',
+                        selected = 'Maximize')      
+    } else if (input$objFunction == 'aBIAS' | input$objFunction == 'RMSE'){
+      updateSelectInput(session, 'minOrmax', 
+                        label = 'Minimize or maximize the objective function?',
+                        selected = 'Minimize')
+    } else {
+      updateSelectInput(session, 'minOrmax', 
+                        label = 'Minimize or maximize the objective function?',
+                        selected = ' ')
+   }
+
+  })
+
+  # ****************************************************************************  
+  # Target min or max of the objective function
+  # ****************************************************************************    
+  observe({
+    req(input$minOrmax)
+    globalVariable$minOrmax  <<- input$minOrmax
   })
   
   # ****************************************************************************  
@@ -839,56 +918,52 @@ print(tell(sensiObject, objFuncValue))
         size = "l"
       ))
       
-      # Caculate objective function
-      temp <- calObjFunction(globalVariable$parameterValue,
-                             globalVariable$ncores, 
-                             globalVariable$nOutputVar,
-                             globalVariable$userReadSwatOutput, 
-                             globalVariable$observedData, 
-                             globalVariable$workingFolder, 
-                             globalVariable$objFunction, 
-                             globalVariable$dateRangeCali)
+      if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)' |
+          globalVariable$samplingApproach == 'Cali_(from_userDefined_package)'  |
+          globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
+          globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
+          globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' ){
+        
+        showModal(modalDialog(
+          title = "Important message",
+          "The objective function was/will be calculated after each model run (Step 3)",
+          easyClose = TRUE,
+          size = "l"
+        ))
+        
+      } else if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'|
+                 globalVariable$samplingApproach == 'Read_User_Parameter_File'){
 
-      globalVariable$objValue <<- temp$objValue
-      globalVariable$perCriteria <<- temp$perCriteria
-      globalVariable$simData <<- temp$simData
+        # Caculate objective function
+        temp <- calObjFunction(globalVariable$parameterValue,
+                               globalVariable$ncores, 
+                               globalVariable$nOutputVar,
+                               globalVariable$userReadSwatOutput, 
+                               globalVariable$observedData, 
+                               globalVariable$workingFolder, 
+                               globalVariable$objFunction)
+        
+        globalVariable$objValue <<- temp$objValue
+        globalVariable$perCriteria <<- temp$perCriteria
+        globalVariable$simData <<- temp$simData
+        
+      } else {
+        showModal(modalDialog(
+          title = "Important message",
+          "Unknown sensitivity or optimization approach",
+          easyClose = TRUE,
+          size = "l"
+        ))
+      }
       
-      # Update numeric input (threshold objective function)
-      minObjValue <- min(globalVariable$objValue)
-      maxObjValue <- max(globalVariable$objValue)
-      
-      updateNumericInput(session = session, "behThreshold", 
-                         label = "1. Input behavioral threshold", 
-                         value = minObjValue,
-                         min = minObjValue, 
-                         max = maxObjValue, 
-                         step = (maxObjValue - minObjValue)/20)
-      
-      # Update select variable number
-      updateSliderInput(session = session,
-                        "plotVarNumber", 
-                        "2. Input variable number to plot", 
-                        value = 1, 
-                        min = 1, 
-                        max = globalVariable$nOutputVar,
-                        step = 1)
-      
-    } else if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)') {
-      showModal(modalDialog(
-        title = "Important message",
-        "You selected 'Cali_(Dynamically_Dimensioned_Search)' - The objective function is calculated after each model run (Step 3.4)",
-        easyClose = TRUE,
-        size = "l"
-      ))
-      
-    } else {
-      showModal(modalDialog(
-        title = "Important message",
-        "Not all simulations were finised ...",
-        easyClose = TRUE,
-        size = "l"
-      ))
-    }
+      } else {
+        showModal(modalDialog(
+          title = "Important message",
+          "Not all simulations were finised ...",
+          easyClose = TRUE,
+          size = "l"
+        ))       
+      }
     
     #Save SWATShinyObject
     saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
@@ -910,8 +985,34 @@ print(tell(sensiObject, objFuncValue))
       output$plotObjFunction <- NULL
     }
   })
-  
-  
+
+  # ****************************************************************************  
+  # Update the user interface
+  # ****************************************************************************
+  observe({
+    req(input$updateUI)
+    if (!is.null(globalVariable$objValue)){
+      # Update numeric input (threshold objective function)
+      minObjValue <- min(globalVariable$objValue)
+      maxObjValue <- max(globalVariable$objValue)
+      
+      updateNumericInput(session = session, "behThreshold", 
+                         label = "2. Input behavioral threshold", 
+                         value = minObjValue,
+                         min = minObjValue, 
+                         max = maxObjValue, 
+                         step = (maxObjValue - minObjValue)/20)
+      
+      # Update select variable number
+      updateSliderInput(session = session,
+                        "plotVarNumber", 
+                        "3. Input variable number to plot", 
+                        value = 1, 
+                        min = 1, 
+                        max = globalVariable$nOutputVar,
+                        step = 1)
+    }
+  })
 
   # ****************************************************************************  
   # Calculate objective function: Display objective function values
@@ -963,18 +1064,18 @@ print(tell(sensiObject, objFuncValue))
     
     if (globalVariable$checkSimComplete & !is.null(globalVariable$objValue)){
 
-      # Message show all input was saved
-      showModal(modalDialog(
-        title = "Sensitivity analysis",
-        HTML("Performing sensitivity analysis"),
-        easyClose = TRUE,
-        size = "l"
-      ))
-      
       #-------------------------------------      
-      if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hpercube_Sampling)'){
+      if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
+        
+        # Message show all input was saved
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("Performing sensitivity analysis"),
+          easyClose = TRUE,
+          size = "l"
+        ))
 
-        # Table with parameter and objective funtion values
+        # Table with parameter and objective function values
         tableSensitivity <- globalVariable$parameterValue 
         tableSensitivity[,1] <- globalVariable$objValue 
        
@@ -982,7 +1083,7 @@ print(tell(sensiObject, objFuncValue))
         colnames(tableSensitivity) <- c("objFunction", globalVariable$paraSelection[,1])
         tableSensitivity <- as.data.frame(tableSensitivity)
         
-        # parameter sensitivity using multivariable regression analysi
+        # parameter sensitivity using multivariate regression analysis
         tableSensitivity <- summary(lm(formula = objFunction ~ ., tableSensitivity))[4]$coefficients[,3:4]
         
         # remove the first row because it is the intercept
@@ -999,11 +1100,21 @@ print(tell(sensiObject, objFuncValue))
         
         output$tableSensitivity <- renderDataTable(globalVariable$tableSensitivity)
 
-      } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)'){
+      } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)'|
+                 globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)'){
         
-        sensiObject <- globalVariable$sensiObject
-        sensiReport <- eval(parse(text = globalVariable$SensCaliCommand[3])) 
-        sensiReport <- print(sensiReport)
+        # Message show all input was saved
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("Performing sensitivity analysis"),
+          easyClose = TRUE,
+          size = "l"
+        ))
+
+        sensCaliObject <- globalVariable$sensCaliObject
+        sensiReport <- eval(parse(text = globalVariable$sensCaliCommand[2])) 
+        
+        print(sensiReport)[]
         
         if ("X1" %in% rownames(sensiReport)) {
           sensiReport <- cbind(parameters = globalVariable$paraSelection[,1],sensiReport)
@@ -1014,9 +1125,21 @@ print(tell(sensiObject, objFuncValue))
         
       } else if(globalVariable$samplingApproach == "Read_User_Parameter_File"){
         output$tableSensitivity <- NULL
-        output$displaySensitivityReport <- renderText("You read parameter sets from external file \n Please use external program for sensitivity analysis in this case ")
+        # Message show all input was saved
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("You have input parameter set from extermal file, not sensitivity analysis is performed. Please use external program"),
+          easyClose = TRUE,
+          size = "l"
+        ))
       } else {
-        
+        showModal(modalDialog(
+          title = "Sensitivity analysis",
+          HTML("You have select parameter optimization, not sensitivity analysis is performed"),
+          easyClose = TRUE,
+          size = "l"
+        ))  
+        output$tableSensitivity <- NULL
       }
       
     } else {
@@ -1064,19 +1187,14 @@ print(tell(sensiObject, objFuncValue))
     req(input$checkPlotVariableNumber)
     if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
       
-      # Save observed data to globalVariables
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')) 
-      
-
       globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue,
                                                                globalVariable$simData,
                                                                globalVariable$parameterValue,
                                                                input$behThreshold,
                                                                input$plotVarNumber,
                                                                globalVariable$objFunction,
-                                                               globalVariable$observedData)
+                                                               globalVariable$observedData,
+                                                               globalVariable$minOrmax)
       
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData
       tempVar <- cbind(tempVar, globalVariable$observedData[[input$plotVarNumber]]$Value)
@@ -1125,9 +1243,6 @@ print(tell(sensiObject, objFuncValue))
         paste("p-factor = ", globalVariable$dataPlotVariableNumber$prFactor[1],
               " r-factor = ", globalVariable$dataPlotVariableNumber$prFactor[2],
               sep =""))
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
-                                           sep ='')) 
     }    
     
   })
@@ -1179,7 +1294,23 @@ print(tell(sensiObject, objFuncValue))
       size = "l"
     ))
   })
-    
+  
+  # ****************************************************************************  
+  # Save all results
+  # ****************************************************************************
+  observe({
+    req(input$saveAllResults)
+    # Save observed data to globalVariables
+    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+                                         'SWATShinyObject.rds',
+                                         sep ='')) 
+    showModal(modalDialog(
+      title = "Save results",
+      HTML("All results was saved as 'SWATShinyObject.rds' in the working folder"),
+      easyClose = TRUE,
+      size = "l"
+    ))
+  })
   #-----------------------------------------------------------------------------
   # Tab 5. Visualization
   #-----------------------------------------------------------------------------  
