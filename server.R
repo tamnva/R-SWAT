@@ -748,9 +748,10 @@ print(sensCaliObject)[]
       globalVariable$checkSimComplete <<- TRUE
       
       # Update numeric input (threshold objective function)
+
       minObjValue <- min(globalVariable$objValue)
       maxObjValue <- max(globalVariable$objValue)
-      
+
       updateNumericInput(session = session, "behThreshold", 
                          label = "1. Input behavioral threshold", 
                          value = minObjValue,
@@ -767,7 +768,7 @@ print(sensCaliObject)[]
                         max = globalVariable$nOutputVar,
                         step = 1)
       
-      
+    
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                            'SWATShinyObject.rds',
                                            sep ='')) 
@@ -971,6 +972,27 @@ print(sensCaliObject)[]
         globalVariable$objValue <<- temp$objValue
         globalVariable$perCriteria <<- temp$perCriteria
         globalVariable$simData <<- temp$simData
+        
+        # Update numeric input (threshold objective function)
+        
+        minObjValue <- min(globalVariable$objValue)
+        maxObjValue <- max(globalVariable$objValue)
+        
+        updateNumericInput(session = session, "behThreshold", 
+                           label = "1. Input behavioral threshold", 
+                           value = minObjValue,
+                           min = minObjValue, 
+                           max = maxObjValue, 
+                           step = (maxObjValue - minObjValue)/20)
+        
+        # Update select variable number
+        updateSliderInput(session = session,
+                          "plotVarNumber", 
+                          "2. Input variable number to plot", 
+                          value = 1, 
+                          min = 1, 
+                          max = globalVariable$nOutputVar,
+                          step = 1)
         
       } else {
         showModal(modalDialog(
