@@ -1,13 +1,13 @@
- .rte file Subbasin: 4 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
-         9.494    | CHW2 : Main channel width [m]
-         0.492    | CHD : Main channel depth [m]
-       0.03452    | CH_S2 : Main channel slope [m/m]
-        14.104    | CH_L2 : Main channel length [km]
-         0.045    | CH_N2 : Manning's nvalue for main channel
+ .rte file Subbasin: 4 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
+        12.826    | CHW2 : Main channel width [m]
+         0.601    | CHD : Main channel depth [m]
+       0.01594    | CH_S2 : Main channel slope [m/m]
+         7.216    | CH_L2 : Main channel length [km]
+         0.014    | CH_N2 : Manning's nvalue for main channel
          0.000    | CH_K2 : Effective hydraulic conductivity [mm/hr]
          0.000    | CH_COV1: Channel erodibility factor
          0.000    | CH_COV2 : Channel cover factor
-        19.302    | CH_WDR : Channel width:depth ratio [m/m]
+        21.338    | CH_WDR : Channel width:depth ratio [m/m]
          0.000    | ALPHA_BNK : Baseflow alpha factor for bank storage [days]
           0.00    | ICANAL : Code for irrigation canal
           0.00    | CH_ONCO : Organic nitrogen concentration in the channel [ppm]
@@ -23,3 +23,8 @@
           0.00    | CH_BED_TC : Critical shear stress of channel bed (N/m2)
   0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
              0    | CH_EQN : Sediment routing methods
+          1.00    | PRF :  Peak rate adjustment factor for sediment routing in the main channel
+        0.0001    | SPCON :  Linear parameter for calculating the maximum amount of sediment that can be reentrained during channel sediment routing
+          1.00    | SPEXP :  Exponent parameter for calculating sediment reentrained in channel sediment routing.
+  1.00  1.00  1.00  1.00  1.00  1.00  1.00  1.00  1.00  1.00  1.00  1.00| HRU_SALT :  Monthly adjustment factors for HRU salt loadings.
+         1.000    |SALT_DEL :  Salt delivery ratio in reach

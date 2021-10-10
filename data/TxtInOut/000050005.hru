@@ -1,12 +1,12 @@
- .hru file Watershed HRU:67 Subbasin:5 HRU:5 Luse:FRSE Soil: B59H8301 Slope: 5-9999 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
-       0.6188996    | HRU_FR : Fraction of subbasin area contained in HRU
-           9.146    | SLSUBBSN : Average slope length [m]
-           0.357    | HRU_SLP : Average slope stepness [m/m]
-           0.100    | OV_N : Manning's "n" value for overland flow
+ .hru file Watershed HRU:23 Subbasin:5 HRU:5 Luse:WATR Soil: Fr333ab4494 Slope: 5-9999 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
+       0.0071455    | HRU_FR : Fraction of subbasin area contained in HRU
+          18.293    | SLSUBBSN : Average slope length [m]
+           0.192    | HRU_SLP : Average slope stepness [m/m]
+           0.010    | OV_N : Manning's "n" value for overland flow
            0.000    | LAT_TTIME : Lateral flow travel time [days]
            0.000    | LAT_SED : Sediment concentration in lateral flow and groundwater flow [mg/l]
            0.000    | SLSOIL : Slope length for lateral subsurface flow [m]
-           2.500    | CANMX : Maximum canopy storage [mm]
+           0.000    | CANMX : Maximum canopy storage [mm]
            0.950    | ESCO : Soil evaporation compensation factor
            1.000    | EPCO : Plant uptake compensation factor
            0.000    | RSDIN : Initial residue cover [kg/ha]
@@ -41,5 +41,5 @@ Special HRU: Pothole
              0.3    | N_LAG: Lag coefficient for calculating nitrate concentration in subsurface drains
              2.0    | N_LN: Power function exponent for calculating nitrate concentration in subsurface drains
              2.0    | N_LNCO: Coefficient for power function for calculating nitrate concentration in subsurface drains
-             0.1    | SURLAG: Surface runoff lag time in the HRU (days)
+             2.0    | SURLAG: Surface runoff lag time in the HRU (days)
              1.0    | R2ADJ: Curve number retention parameter adjustment factor to adjust surface runoff for flat slopes

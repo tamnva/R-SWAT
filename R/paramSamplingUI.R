@@ -95,6 +95,7 @@ paramSamplingUI <- function(id) {
                                      'Sensi_(from_userDefined_package)',
                                      'Cali_(from_optimization_package)', 
                                      'Cali_(Dynamically_Dimensioned_Search)',
+                                     'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
                                      'Cali_(from_userDefined_package)',
                                      'Read_User_Parameter_File'),
                          multiple = FALSE),

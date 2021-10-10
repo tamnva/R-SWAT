@@ -1,4 +1,4 @@
- .sdr file Watershed HRU:47 Subbasin:4 HRU:4 Luse:PAST Soil: B59H8301 Slope 5-9999 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
+ .sdr file Watershed HRU:17 Subbasin:4 HRU:4 Luse:AGRL Soil: Fr333ab4494 Slope 0-5 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
      50.00    | RE: Effective radius of drains (mm)
   15000.00    | SDRAIN: Distance bwtween two drain tubes or tiles (mm)
      10.00    | DRAIN_CO: Drainage coefficient (mm/day)
