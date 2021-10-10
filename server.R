@@ -277,7 +277,6 @@ server <- function(input, output, session) {
                           "Delete all text here and type the number of iterations (number of parameter sets), for example, 
                                                        10
 This approach similar to the SUFI-2 approach")
-      
     } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "# Example with Simulated Annealing
@@ -293,7 +292,13 @@ optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower
                                                       10, 1
 10 means the number of interation
 1 means the parallel approach (DDS run independently in each core)
-2 means intermediate best parameter from all cores is selected and assigned as inital parameter set for next run in all cores")      
+2 means intermediate best parameter from all cores is selected and assigned as inital parameter set for next run in all cores") 
+    } else if (input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "Delete all text here and type the number of iterations (number of parameter sets), for example, 
+                                                       100
+In this approach, parameter sets are sampled using uniform distribution, likelihood measures are the objective function
+(must be monotopically increase with higher values indicate better model performance, threshold for behavioral must be positive")
     } else if (input$samplingApproach == 'Read_User_Parameter_File'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delete all text here and type the link to the file, for example,
@@ -495,12 +500,19 @@ print(sensCaliObject)[]
 
       # Run SWAT for all iteration ---------------------------------------------  
       if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)') |
+          (globalVariable$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)') |
         (globalVariable$samplingApproach == 'Read_User_Parameter_File')){
 
         # Generate parameter values
         if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
           globalVariable$parameterValue <<- lhsRange(as.numeric(input$inputInfo),
-                                                     getParamRange(globalVariable$paraSelection))          
+                                                     getParamRange(globalVariable$paraSelection)) 
+          
+        } else if(input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
+          globalVariable$parameterValue <<- runifSampling(as.numeric(input$inputInfo),
+                                                          as.numeric(globalVariable$paraSelection$Min), 
+                                                          as.numeric(globalVariable$paraSelection$Max))
+            
         } else if (globalVariable$samplingApproach == "Read_User_Parameter_File"){
           parameterValue <- as.matrix(read.table(file = trimws(input$inputInfo),
                                                  header = TRUE, sep =""))
@@ -958,6 +970,7 @@ print(sensCaliObject)[]
         ))
         
       } else if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'|
+                 globalVariable$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'|
                  globalVariable$samplingApproach == 'Read_User_Parameter_File'){
 
         # Caculate objective function
@@ -1154,7 +1167,7 @@ print(sensCaliObject)[]
       } else {
         showModal(modalDialog(
           title = "Sensitivity analysis",
-          HTML("You have select parameter optimization, not sensitivity analysis is performed"),
+          HTML("The approach you selected in step 2 is not for parameter sensitivity analysis - skip this step"),
           easyClose = TRUE,
           size = "l"
         ))  
@@ -1205,7 +1218,7 @@ print(sensCaliObject)[]
   observe({
     req(input$checkPlotVariableNumber)
     if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
-      
+
       globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue,
                                                                globalVariable$simData,
                                                                globalVariable$parameterValue,
@@ -1213,7 +1226,8 @@ print(sensCaliObject)[]
                                                                input$plotVarNumber,
                                                                globalVariable$objFunction,
                                                                globalVariable$observedData,
-                                                               globalVariable$minOrmax)
+                                                               globalVariable$minOrmax,
+                                                               globalVariable$samplingApproach)
       
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData
       tempVar <- cbind(tempVar, globalVariable$observedData[[input$plotVarNumber]]$Value)

@@ -2,7 +2,8 @@
 # Find behavioral simulation/parameters
 # ------------------------------------------------------------------------------
 behaSimulation <- function(objValue, simData, parameterValue, behThreshold, 
-                           varNumber, statIndex, observedData, minOrmax){
+                           varNumber, statIndex, observedData, minOrmax,
+                           samplingApproach){
   
   # find index of simulation which are behavioral simulations
   if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
@@ -29,11 +30,25 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   }
   
   ppuSimData <- matrix(rep(NA, 4*nrow), ncol = 4)
-  for (i in 1:nrow){
-    ppuSimData[i,c(1:3)] <- as.numeric(quantile(behaSimData[i,], 
-                                                c(0.025, 0.5, 0.975))) 
+
+  if (samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
+    # If GLUE then use different approach
+    # Normalized the likelikhood
+    normalizedLik <- which(objValue >= behThreshold)
+    normalizedLik <- normalizedLik/sum(normalizedLik)
+    for (i in 1:nrow){
+      ppuSimData[i,c(1:3)] <- ecdf.pred(c(0.025, 0.5, 0.975),
+                                   behaSimData[i,],
+                                   normalizedLik)
+    }
+    
+  } else {
+    for (i in 1:nrow){
+      ppuSimData[i,c(1:3)] <- as.numeric(quantile(behaSimData[i,], 
+                                                  c(0.025, 0.5, 0.975))) 
+    }   
   }
-  
+
   # find best simulation
   if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
     ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))]]
