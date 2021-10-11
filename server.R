@@ -30,7 +30,7 @@ server <- function(input, output, session) {
 
     # Save 
     globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
-    ncores <- min(globalVariable$ncores, nrow(parameterValue))
+    globalVariable$ncores <- min(globalVariable$ncores, nrow(parameterValue))
     
     runSWATpar(globalVariable$workingFolder, 
                globalVariable$TxtInOutFolder, 
@@ -46,7 +46,7 @@ server <- function(input, output, session) {
    
     # Objective function with initial parameter set
     temp <- calObjFunction(parameterValue,
-                           ncores, 
+                           globalVariable$ncores, 
                            globalVariable$nOutputVar,
                            globalVariable$userReadSwatOutput, 
                            globalVariable$observedData, 
@@ -72,6 +72,8 @@ server <- function(input, output, session) {
      output <- - temp$objValue
    }
    
+   print(parameterValue)
+   print(output)
    return(output)
   }  
 
@@ -279,13 +281,19 @@ server <- function(input, output, session) {
 This approach similar to the SUFI-2 approach")
     } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "# Example with Simulated Annealing
-optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))
-
-# Example with Particle Swarm Optimization
-# hydroPSO(fn = SWAT, lower=minCol, upper=maxCol, control=list(write2disk=FALSE))                       "
+                          "# Delete all text here and type command from the optimization package, e.g., with simulated annealing appraoch
+optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))")
+    } else if (input$samplingApproach == 'Cali_(from_hydroPSO_package)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "# Delete all text here and type command from the hydroPSO package, e.g., with the Particle Swarm Optimization approach
+hydroPSO(fn = SWAT, lower=minCol, upper=maxCol, control=list(write2disk=FALSE)
+                          )"
       )
-      
+    } else if (input$samplingApproach == 'Cali_(from_nloptr_package)'){
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+                          "# Delete all text here and type command from the nloptr package, e.g., with Bound Optimization by Quadratic Approximation approach
+bobyqa(runif(nParam, min = minCol, max = maxCol), SWAT, lower = minCol, upper = maxCol, control = list(maxeval = 100))
+                          ")
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delete all text here and type the number of iterations and parallel approach, seperated by comma, for example,
@@ -354,6 +362,8 @@ print(sensCaliObject)[]
     
     if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
         input$samplingApproach == 'Cali_(from_optimization_package)' |
+        input$samplingApproach == 'Cali_(from_hydroPSO_package)' |
+        input$samplingApproach == 'Cali_(from_nloptr_package)' |
         input$samplingApproach == 'Sensi_(from_userDefined_package)' |
         input$samplingApproach == 'Cali_(from_userDefined_package)' ){
       globalVariable$sensCaliCommand <<- input$inputInfo
@@ -721,6 +731,8 @@ print(sensCaliObject)[]
       } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
                  globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' |
                  globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
+                 globalVariable$samplingApproach == 'Cali_(from_hydroPSO_package)' |
+                 globalVariable$samplingApproach == 'Cali_(from_nloptr_package)' |
                  globalVariable$samplingApproach == 'Cali_(from_userDefined_package)') {
         
         if(is.null(globalVariable$observedData)){
@@ -743,8 +755,8 @@ print(sensCaliObject)[]
           globalVariable$sensCaliObject <<- eval(parse(text = globalVariable$sensCaliCommand[1]))
           
           # Print output to screen
-          # print(globalVariable$sensCaliObject)
-          # print(globalVariable$objValue)          
+           print(globalVariable$sensCaliObject)
+           print(globalVariable$objValue)          
         }
 
       } else {
@@ -959,6 +971,8 @@ print(sensCaliObject)[]
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)' |
           globalVariable$samplingApproach == 'Cali_(from_userDefined_package)'  |
           globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
+          globalVariable$samplingApproach == 'Cali_(from_hydroPSO_package)' |
+          globalVariable$samplingApproach == 'Cali_(from_nloptr_package)' |
           globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
           globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' ){
         
