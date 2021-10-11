@@ -270,7 +270,9 @@ plotObjFuncParaValue <- function(globalVariable){
   
   temp <- data.frame(Objective_function, Parameter_Value, Parameter) 
   myPlot <- ggplot(temp, aes(x = Parameter_Value, y = Objective_function, color = Parameter)) + 
-    geom_point()+ facet_wrap(vars(Parameter), scales = "free") 
+    geom_point(size = 1)+ facet_wrap(vars(Parameter), ncol = 3, scales = "free_x") +
+    xlab(" ") + ylab(" ")
+  ggplotly(myPlot)
   
   myPlot <- ggplotly(myPlot)
   

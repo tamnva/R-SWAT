@@ -1236,7 +1236,7 @@ print(sensCaliObject)[]
       globalVariable$PlotVariableNumber <<- plotSimulated(tempVar)
 
 
-      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber + theme(text = element_text(size=20)))) 
+      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber + theme(text = element_text(size=10)))) 
       
       # Table
       columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'), 
