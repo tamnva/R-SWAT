@@ -1,5 +1,5 @@
 # This is an example of how to extract SWAT output data that are not available
-# in the given options in SWATshiny. SWATshiny will use this function to get 
+# in the given options in RSWAT. RSWAT will use this function to get 
 # SWAT outputs (from the respective core) after each model run and save it in 
 # combination  with other outputs
 

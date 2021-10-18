@@ -1,4 +1,4 @@
- .sep file Watershed HRU:48 Subbasin:4 HRU:5 Luse:FRSE Soil: B07H8301 Slope 5-9999 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
+ .sep file Watershed HRU:18 Subbasin:4 HRU:5 Luse:WATR Soil: Fr333ab4494 Slope 5-9999 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
 
             1    | ISEP_TYP : The type of septic system
             0    | ISEP_IYR :  Year the septic system began operation

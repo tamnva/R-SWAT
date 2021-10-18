@@ -1,14 +1,14 @@
- .sub file Subbasin: 3 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
-        1.379294    | SUB_KM : Subbasin area [km2]
+ .sub file Subbasin: 3 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
+        0.766233    | SUB_KM : Subbasin area [km2]
 
 Climate in subbasin
-       51.697514    | LATITUDE : Latitude of subbasin [degrees]
-          477.38    | ELEV : Elevation of subbasin [m]
-               2    | IRGAGE: precip gage data used in subbasin
-               2    | ITGAGE: temp gage data used in subbasin
-               2    | ISGAGE: solar radiation gage data used in subbasin
-               2    | IHGAGE: relative humidity gage data used in subbasin
-               2    | IWGAGE: wind speed gage data used in subbasin
+       12.043247    | LATITUDE : Latitude of subbasin [degrees]
+          634.86    | ELEV : Elevation of subbasin [m]
+               1    | IRGAGE: precip gage data used in subbasin
+               1    | ITGAGE: temp gage data used in subbasin
+               1    | ISGAGE: solar radiation gage data used in subbasin
+               1    | IHGAGE: relative humidity gage data used in subbasin
+               1    | IWGAGE: wind speed gage data used in subbasin
 000030000.wgn       | WGNFILE: name of weather generator data file
                1    | FCST_REG: Region number used to assign forecast data to the subbasin
 Elevation Bands
@@ -22,9 +22,9 @@ Elevation Bands
            0.000    | TLAPS : Temperature lapse rate [°C/km]
            0.000    | SNO_SUB : Initial snow water content [mm]
 Tributary Channels
-           0.916    | CH_L1 : Longest tributary channel length [km]
-           0.012    | CH_S1 : Average slope of tributary channel [m/m]
-           1.565    | CH_W1 : Average width of tributary channel [m]
+           1.658    | CH_L1 : Longest tributary channel length [km]
+           0.069    | CH_S1 : Average slope of tributary channel [m/m]
+           1.100    | CH_W1 : Average width of tributary channel [m]
            0.000    | CH_K1 : Effective hydraulic conductivity in tributary channel [mm/hr]
            0.014    | CH_N1 : Manning's "n" value for the tributary channels
 Impoundments
@@ -50,7 +50,7 @@ Climate Change
 | HUMINC: Climate change monthly humidity adjustment (July - December)
    0.000   0.000   0.000   0.000   0.000   0.000
 | HRU data
-               7    | HRUTOT : Total number of HRUs modeled in subbasin
+               4    | HRUTOT : Total number of HRUs modeled in subbasin
 
 HRU: Depressional Storage/Pothole
 
@@ -63,6 +63,3 @@ HRU: General
 000030002.hru000030002.mgt000030002.sol000030002.chm 000030002.gw             000030002.sep
 000030003.hru000030003.mgt000030003.sol000030003.chm 000030003.gw             000030003.sep
 000030004.hru000030004.mgt000030004.sol000030004.chm 000030004.gw             000030004.sep
-000030005.hru000030005.mgt000030005.sol000030005.chm 000030005.gw             000030005.sep
-000030006.hru000030006.mgt000030006.sol000030006.chm 000030006.gw             000030006.sep
-000030007.hru000030007.mgt000030007.sol000030007.chm 000030007.gw             000030007.sep

@@ -1,4 +1,4 @@
-Basin data           .bsn file 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
+Basin data           .bsn file 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
 Modeling Options: Land Area
 Water Balance:
            1.000    | SFTMP : Snowfall temperature [ºC]
@@ -55,7 +55,7 @@ Bacteria:
            0.000    | WGLPF: less persistent bacteria growth factor on foliage
                0    | ISED_DET: 
 Modeling Options: Reaches
-               1    | IRTE: water routing method 0=variable travel-time 1=Muskingum
+               0    | IRTE: water routing method 0=variable travel-time 1=Muskingum
            0.750    | MSK_CO1 : Calibration coefficient used to control impact of the storage time constant (Km) for normal flow 
            0.250    | MSK_CO2 : Calibration coefficient used to control impact of the storage time constant (Km) for low flow 
            0.200    | MSK_X : Weighting factor controlling relative importance of inflow rate and outflow rate in determining water storage in reach segment
@@ -129,3 +129,7 @@ Subdaily Erosion:
                0    | SSTMAXD_BSN: basinwide retention parm adjustment factor
                0    | ISMAX: max depressional storage code
                0    | IROUTUNIT:
+           0.000    | CO2_X2: Quadratic coefficient for incrementinig  future CO2 concentrations using a quadratic equation.
+           0.000    | CO2_X: Linear coefficient for incrementinig  future CO2 concentrations using a quadratic equation.
+               0    | SFSEDMEAN: Mean sediment concentration coming out of sand filter.
+               0    | SFSEDSTDEV: Standard deviation of sediment concentration coming out of sand filter.

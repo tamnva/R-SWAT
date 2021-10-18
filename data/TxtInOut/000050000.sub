@@ -1,9 +1,9 @@
- .sub file Subbasin: 5 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
-       15.140012    | SUB_KM : Subbasin area [km2]
+ .sub file Subbasin: 5 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
+       10.377414    | SUB_KM : Subbasin area [km2]
 
 Climate in subbasin
-       51.729546    | LATITUDE : Latitude of subbasin [degrees]
-          603.56    | ELEV : Elevation of subbasin [m]
+       12.031814    | LATITUDE : Latitude of subbasin [degrees]
+          647.15    | ELEV : Elevation of subbasin [m]
                1    | IRGAGE: precip gage data used in subbasin
                1    | ITGAGE: temp gage data used in subbasin
                1    | ISGAGE: solar radiation gage data used in subbasin
@@ -22,9 +22,9 @@ Elevation Bands
            0.000    | TLAPS : Temperature lapse rate [°C/km]
            0.000    | SNO_SUB : Initial snow water content [mm]
 Tributary Channels
-           5.855    | CH_L1 : Longest tributary channel length [km]
-           0.034    | CH_S1 : Average slope of tributary channel [m/m]
-           6.587    | CH_W1 : Average width of tributary channel [m]
+           7.360    | CH_L1 : Longest tributary channel length [km]
+           0.023    | CH_S1 : Average slope of tributary channel [m/m]
+           5.251    | CH_W1 : Average width of tributary channel [m]
            0.000    | CH_K1 : Effective hydraulic conductivity in tributary channel [mm/hr]
            0.014    | CH_N1 : Manning's "n" value for the tributary channels
 Impoundments
@@ -50,7 +50,7 @@ Climate Change
 | HUMINC: Climate change monthly humidity adjustment (July - December)
    0.000   0.000   0.000   0.000   0.000   0.000
 | HRU data
-              14    | HRUTOT : Total number of HRUs modeled in subbasin
+               6    | HRUTOT : Total number of HRUs modeled in subbasin
 
 HRU: Depressional Storage/Pothole
 
@@ -65,11 +65,3 @@ HRU: General
 000050004.hru000050004.mgt000050004.sol000050004.chm 000050004.gw             000050004.sep
 000050005.hru000050005.mgt000050005.sol000050005.chm 000050005.gw             000050005.sep
 000050006.hru000050006.mgt000050006.sol000050006.chm 000050006.gw             000050006.sep
-000050007.hru000050007.mgt000050007.sol000050007.chm 000050007.gw             000050007.sep
-000050008.hru000050008.mgt000050008.sol000050008.chm 000050008.gw             000050008.sep
-000050009.hru000050009.mgt000050009.sol000050009.chm 000050009.gw             000050009.sep
-000050010.hru000050010.mgt000050010.sol000050010.chm 000050010.gw             000050010.sep
-000050011.hru000050011.mgt000050011.sol000050011.chm 000050011.gw             000050011.sep
-000050012.hru000050012.mgt000050012.sol000050012.chm 000050012.gw             000050012.sep
-000050013.hru000050013.mgt000050013.sol000050013.chm 000050013.gw             000050013.sep
-000050014.hru000050014.mgt000050014.sol000050014.chm 000050014.gw             000050014.sep

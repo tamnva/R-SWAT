@@ -130,7 +130,7 @@ objFunctionUI <- function(id) {
       conditionalPanel(
         condition = "input.checkDisplayObjFunctionPlot == 1",
         column(width = 10, 
-               plotlyOutput("plotObjFunction", height = 'auto'),
+               plotlyOutput("plotObjFunction", height = "500px"),
         ),
         
         column(width = 10, 

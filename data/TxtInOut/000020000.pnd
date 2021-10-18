@@ -1,4 +1,4 @@
- .Pnd file Subbasin: 2 1/17/2019 12:00:00 AM ArcSWAT 2012.10_2.19
+ .Pnd file Subbasin: 2 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
 Pond inputs:
            0.000    | PND_FR : Fraction of subbasin area that drains into ponds. The value for PND_FR should be between 0.0 and 1.0. If PND_FR = 1.0, the pond is at the outlet of the subbasin on the main channel
            5.000    | PND_PSA: Surface area of ponds when filled to principal spillway [ha]
@@ -55,3 +55,5 @@ RETENTION-IRRIGATION BASIN FILE:
 
 SEDIMENTATION-FILTRATION BASIN:
 
+LOW IMPACT DEVELOPMENT FILE:
+000020000.lid

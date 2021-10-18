@@ -1,0 +1,59 @@
+ .Pnd file Subbasin: 6 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
+Pond inputs:
+           0.000    | PND_FR : Fraction of subbasin area that drains into ponds. The value for PND_FR should be between 0.0 and 1.0. If PND_FR = 1.0, the pond is at the outlet of the subbasin on the main channel
+           5.000    | PND_PSA: Surface area of ponds when filled to principal spillway [ha]
+          25.000    | PND_PVOL: Volume of water stored in ponds when filled to the principal spillway [104 m3]
+           8.000    | PND_ESA: Surface area of ponds when filled to emergency spillway [ha]
+          40.000    | PND_EVOL: Volume of water stored in ponds when filled to the emergency spillway [104 m3]
+           0.000    | PND_VOL: Initial volume of water in ponds [104 m3]
+           0.000    | PND_SED: Initial sediment concentration in pond water [mg/l]
+           0.000    | PND_NSED: Normal sediment concentration in pond water [mg/l]
+           0.000    | PND_K: Hydraulic conductivity through bottom of ponds [mm/hr].
+               0    | IFLOD1: Beginning month of non-flood season
+               0    | IFLOD2: Ending month of non-flood season
+           0.000    | NDTARG: Number of days needed to reach target storage from current pond storage
+          10.000    | PSETLP1: Phosphorus settling rate in pond for months IPND1 through IPND2 [m/year]
+          10.000    | PSETLP2: Phosphorus settling rate in pond for months other than IPND1-IPND2 [m/year]
+           5.500    | NSETLP1: Initial dissolved oxygen concentration in the reach [mg O2/l]
+           5.500    | NSETLP2: Initial dissolved oxygen concentration in the reach [mg O2/l]
+           1.000    | CHLAP: Chlorophyll a production coefficient for ponds [ ] 
+           1.000    | SECCIP: Water clarity coefficient for ponds [m]
+           0.000    | PND_NO3: Initial concentration of NO3-N in pond [mg N/l]
+           0.000    | PND_SOLP: Initial concentration of soluble P in pond [mg P/L]
+           0.000    | PND_ORGN: Initial concentration of organic N in pond [mg N/l]
+           0.000    | PND_ORGP: Initial concentration of organic P in pond [mg P/l]
+           0.000    | PND_D50: Median particle diameter of sediment [um]
+               1    | IPND1: Beginning month of mid-year nutrient settling "season"
+               1    | IPND2: Ending month of mid-year nutrient settling "season"
+Wetland inputs:
+           0.000    | WET_FR : Fraction of subbasin area that drains into wetlands
+           0.000    | WET_NSA: Surface area of wetlands at normal water level [ha]
+           0.000    | WET_NVOL: Volume of water stored in wetlands when filled to normal water level [104 m3] 
+           0.000    | WET_MXSA: Surface area of wetlands at maximum water level [ha]
+           0.000    | WET_MXVOL: Volume of water stored in wetlands when filled to maximum water level [104 m3]
+           0.000    | WET_VOL: Initial volume of water in wetlands [104 m3]
+           0.000    | WET_SED: Initial sediment concentration in wetland water [mg/l]
+           0.000    | WET_NSED: Normal sediment concentration in wetland water [mg/l]
+           0.000    | WET_K: Hydraulic conductivity of bottom of wetlands [mm/hr]
+           0.000    | PSETLW1: Phosphorus settling rate in wetland for months IPND1 through IPND2 [m/year]
+           0.000    | PSETLW2: Phosphorus settling rate in wetlands for months other than IPND1-IPND2 [m/year]
+           0.000    | NSETLW1: Nitrogen settling rate in wetlands for months IPND1 through IPND2 [m/year]
+           0.000    | NSETLW2: Nitrogen settling rate in wetlands for months other than IPND1-IPND2 [m/year]
+           0.000    | CHLAW: Chlorophyll a production coefficient for wetlands [ ]
+           0.000    | SECCIW: Water clarity coefficient for wetlands [m]
+           0.000    | WET_NO3: Initial concentration of NO3-N in wetland [mg N/l]
+           0.000    | WET_SOLP: Initial concentration of soluble P in wetland [mg P/l]
+           0.000    | WET_ORGN: Initial concentration of organic N in wetland [mg N/l]
+           0.000    | WET_ORGP: Initial concentration of organic P in wetland [mg P/l]
+           0.000    | PNDEVCOEFF: Actual pond evaporation is equal to the potential evaporation times the pond evaporation coefficient
+           0.000    | WETEVCOEFF: Actual wetland evaporation is equal to the potential evaporation times the wetland evaporation coefficient.
+DETENTION POND FILE:
+
+WET POND FILE:
+
+RETENTION-IRRIGATION BASIN FILE:
+
+SEDIMENTATION-FILTRATION BASIN:
+
+LOW IMPACT DEVELOPMENT FILE:
+000060000.lid

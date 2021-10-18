@@ -24,8 +24,7 @@ generalSettingUI <- function(id) {
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   1. Working folder: All files created by this tool are saved 
-                   in this folder
+                   All files created by this tool are saved in this folder
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -46,8 +45,7 @@ generalSettingUI <- function(id) {
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
-             2. TxtInOut folder: The TxtInOut folder which contains all SWAT 
-             input files
+             Link to the TxtInOut directory which contains all SWAT input files
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -59,17 +57,6 @@ generalSettingUI <- function(id) {
                            folder', value = FALSE, width = NULL),
       ),
 
-      column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   If this is a TxtInOut folder, a table with a list of HRUs 
-                   and their properties (landuse, soil, slope,..) will appear 
-                   if you tick the checkbox
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
-      ),
-      
       conditionalPanel(
         condition = "input.checkTxtInOutFolder == 1",
         column(width = 10,
@@ -89,8 +76,7 @@ generalSettingUI <- function(id) {
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   3. Select executable SWAT file: Select an executable swat 
-                   file, for example, swat_32debug.exe
+                  Select the executable SWAT file, for example, swat_32debug.exe
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -120,16 +106,15 @@ generalSettingUI <- function(id) {
       ),
 
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                            4. Files with list of all SWAT parameters: 
-                            The file name must be 'swatParam.txt'
-                            ASCII file format. If there are  parameter that you 
-                            want to calibrate but are missing in this file, 
+             tippy("Help", tooltip = "<span style ='font-size:16px'>
+                            Select the file 'swatParam.txt' with list of all SWAT parameters. 
+                            If there are  parameters that you want to calibrate 
+                            but are missing in this file, 
                             simply open this file manually and add to the file. 
-                            The theoretical min and max values are used to 
-                            restrict the parameters that you are going to modified
-                            will not out of this range. I would suggest checking 
-                            the theoretical min and max values of your selected 
+                            The theoretical min and max are used to 
+                            restrict the parameters that you are going to modify
+                            will not out of this range. Please check again 
+                            the theoretical min and max of your selected 
                             parameters.
                    <span>", 
                    allowHTML = TRUE, 

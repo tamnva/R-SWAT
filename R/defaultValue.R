@@ -45,10 +45,19 @@ columnsParaSelection <- data.frame(title= colnames(dataParaSelection),
 # ------------------------------------------------------------------------------
 # Default output variables
 # ------------------------------------------------------------------------------
-dataOutputExtraction <- data.frame(FileType = c('watout.dat'),
-                                  FileName = c('watout.dat'),
-                                  Column = c("4"),
-                                  Reach = c(NA))
+dataOutputExtraction <- data.frame(FileType = c('watout.dat', 
+                                                'output.rch',
+                                                'output.sub',
+                                                'output.hru',
+                                                'userReadSwatOutput'),
+                                  FileName = c('watout.dat', 
+                                               'output.rch',
+                                               'output.sub',
+                                               'output.hru',
+                                               NA),
+                                  Column = c("4", "7, 8 ", "8, 9", "3", "2"),
+                                  Reach = c(NA, "1, 2 * 1, 2, 3", "1 * 5, 6", "20", NA)
+                                  )
                                
 
 columnsOutputExtraction <- data.frame(title= colnames(dataOutputExtraction),

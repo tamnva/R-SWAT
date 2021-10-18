@@ -1,7 +1,7 @@
 Master Watershed File: file.cio
 Project Description:
 General Input/Output section (file.cio):
-1/17/2019 12:00:00 AM ARCGIS-SWAT interface AV
+9/21/2021 12:00:00 AM ARCGIS-SWAT interface AV
 
 General Information/Watershed Configuration:
 fig.fig
@@ -16,18 +16,18 @@ Climate:
                0    | IDIST : rainfall distribution code: 0 skewed, 1 exponential
            1.300    | REXP : Exponent for IDIST=1
                1    | NRGAGE: number of pcp files used in simulation
-               5    | NRTOT: number of precip gage records used in simulation
-               5    | NRGFIL: number of gage records in each pcp file
+               1    | NRTOT: number of precip gage records used in simulation
+               1    | NRGFIL: number of gage records in each pcp file
                1    | TMPSIM: temperature simulation code: 1=measured, 2=simulated
                1    | NTGAGE: number of tmp files used in simulation
-               5    | NTTOT: number of temp gage records used in simulation
-               5    | NTGFIL: number of gage records in each tmp file
+               1    | NTTOT: number of temp gage records used in simulation
+               1    | NTGFIL: number of gage records in each tmp file
                1    | SLRSIM : Solar radiation simulation Code: 1=measured, 2=simulated
-               5    | NSTOT: number of solar radiation records in slr file
+               1    | NSTOT: number of solar radiation records in slr file
                1    | RHSIM : relative humidity simulation code: 1=measured, 2=simulated
-               5    | NHTOT: number of relative humidity records in hmd file
+               1    | NHTOT: number of relative humidity records in hmd file
                1    | WINDSIM : Windspeed simulation code: 1=measured, 2=simulated
-               5    | NWTOT: number of wind speed records in wnd file
+               1    | NWTOT: number of wind speed records in wnd file
                0    | FCSTYR: beginning year of forecast period
                0    | FCSTDAY: beginning julian date of forecast period
                0    | FCSTCYCLES: number of time to simulate forecast period
@@ -66,7 +66,7 @@ Reach output variables:
 Subbasin output variables:
    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
 HRU output variables:
-   6  12   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
 HRU data to be printed:
    0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
 ATMOSPERIC DEPOSITION
@@ -82,4 +82,4 @@ septwq.dat
                0    | ISNOW: 0=do not print snowband.out; 1=print output.snw
                0    | IMGT: 0=do not print output.mtg; 1=print output.mgt
                0    | IWTR: Code for printing output.pot and output.wtr files
-               1    | ICALEN: Code for printing out calendar or julian dates to .rch, .sub and .hru files
+               0    | ICALEN: Code for printing out calendar or julian dates to .rch, .sub and .hru files

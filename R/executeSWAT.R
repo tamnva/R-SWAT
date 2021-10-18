@@ -116,8 +116,8 @@
                         fromToDate,
                         firstRun)      
     } else {
-      cl <- parallel::makeCluster(ncores)
-      doParallel::registerDoParallel(cl)
+      cl <- makeCluster(ncores)
+      registerDoParallel(cl)
       foreach(i = 1:ncores, .combine = 'c', .export=c("runSWATSequential",
                                                       "getParameterValue", 
                                                       "updateMultiFile",
@@ -137,7 +137,7 @@
                                                                           firstRun)
                                                         
                                                       }
-      parallel::stopCluster(cl)      
+      stopCluster(cl)      
     }
      
   }
