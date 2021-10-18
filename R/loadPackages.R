@@ -1,5 +1,5 @@
 # Dependency packages (add more if necessary)
-dependencyPackages <- c('foreach', 'parallel', 'doParallel',                        # Parallelization
+dependencyPackages <- c('foreach', 'doParallel',                                    # Parallelization
                         'lhs', 'plotly', 'ggplot2', 'rgdal', 'raster',              # Visualization
                         'shiny', 'shinydashboard', 'shinyFiles', 'tippy', 'excelR', # User interface
                         'sensitivity',  'boot',                                     # Sensitivity

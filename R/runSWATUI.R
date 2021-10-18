@@ -120,7 +120,7 @@ runSwatUI <- function(id) {
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:15px;'>
                    When you click this button, all settings are saved to the file 
-                   'SWATShinyObject.rds' in the working directory folder. The parameter
+                   'RSWATObject.rds' in the working directory folder. The parameter
                    sets are generated and SWAT are run in parallel. Running can
                    can take time, R is busy while calling SWAT on the background
                    therefore, it might not response to any anything. Don't turn of R.
@@ -218,14 +218,14 @@ runSwatUI <- function(id) {
       ),
       
       column(width = 10,
-             shinyFilesButton("getSWATShinyObject", "Click here to select SWATShinyObject.rds file from previous run" ,
-                              title = "Please select 'SWATShinyObject.rds' file",
+             shinyFilesButton("getRSWATObject", "Click here to select RSWATObject.rds file from previous run" ,
+                              title = "Please select 'RSWATObject.rds' file",
                               multiple = FALSE,
                               buttonType = "default",
                               style="background-color: #87CEFA; 
                               border-color: #2e6da4",
                               class = NULL),
-             verbatimTextOutput("printSWATShinyObject", placeholder = TRUE),
+             verbatimTextOutput("printRSWATObject", placeholder = TRUE),
       ),
       #-------------------------------------------------------------------------
       

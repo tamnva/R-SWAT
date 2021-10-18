@@ -453,7 +453,7 @@ print(sensCaliObject)[]
   # ****************************************************************************
   observeEvent(input$runSWAT, {
     
-    # Performe check list otherwise SWATshiny will be turn off when click this
+    # Performe check list otherwise RSWAT will be turn off when click this
 
     # ****************************************************************************  
     # Parameter sampling: executing input R command in the input text box
@@ -489,14 +489,14 @@ print(sensCaliObject)[]
 
       # Save global variables
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
+                                           'RSWATObject.rds',
                                            sep =''))
       
       
       # Message show all input was saved
       showModal(modalDialog(
         title = "Save current input",
-        HTML("All current inputs were saved to the file 'SWATShinyObject.rds' in the working folder.<br> 
+        HTML("All current inputs were saved to the file 'RSWATObject.rds' in the working folder.<br> 
       SWAT is running, close this message. You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
       in the working folder to see the current simulation. Future option: restart from the last simulations .<br>
       if your simulation is interupted"),
@@ -728,6 +728,27 @@ print(sensCaliObject)[]
           globalVariable$parameterValue[,1] <<- c(1:nrow(globalVariable$parameterValue))
         }
         
+        # Update numeric input (threshold objective function)
+        
+        minObjValue <- min(globalVariable$objValue)
+        maxObjValue <- max(globalVariable$objValue)
+        
+        updateNumericInput(session = session, "behThreshold", 
+                           label = "1. Input behavioral threshold", 
+                           value = minObjValue,
+                           min = minObjValue, 
+                           max = maxObjValue, 
+                           step = (maxObjValue - minObjValue)/20)
+        
+        # Update select variable number
+        updateSliderInput(session = session,
+                          "plotVarNumber", 
+                          "2. Input variable number to plot", 
+                          value = 1, 
+                          min = 1, 
+                          max = globalVariable$nOutputVar,
+                          step = 1)
+        
       } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
                  globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' |
                  globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
@@ -756,7 +777,28 @@ print(sensCaliObject)[]
           
           # Print output to screen
            print(globalVariable$sensCaliObject)
-           print(globalVariable$objValue)          
+           print(globalVariable$objValue)
+           
+           # Update numeric input (threshold objective function)
+           
+           minObjValue <- min(globalVariable$objValue)
+           maxObjValue <- max(globalVariable$objValue)
+           
+           updateNumericInput(session = session, "behThreshold", 
+                              label = "1. Input behavioral threshold", 
+                              value = minObjValue,
+                              min = minObjValue, 
+                              max = maxObjValue, 
+                              step = (maxObjValue - minObjValue)/20)
+           
+           # Update select variable number
+           updateSliderInput(session = session,
+                             "plotVarNumber", 
+                             "2. Input variable number to plot", 
+                             value = 1, 
+                             min = 1, 
+                             max = globalVariable$nOutputVar,
+                             step = 1)
         }
 
       } else {
@@ -771,30 +813,8 @@ print(sensCaliObject)[]
       # End run SWAT for all iterations ----------------------------------------
       globalVariable$checkSimComplete <<- TRUE
       
-      # Update numeric input (threshold objective function)
-
-      minObjValue <- min(globalVariable$objValue)
-      maxObjValue <- max(globalVariable$objValue)
-
-      updateNumericInput(session = session, "behThreshold", 
-                         label = "1. Input behavioral threshold", 
-                         value = minObjValue,
-                         min = minObjValue, 
-                         max = maxObjValue, 
-                         step = (maxObjValue - minObjValue)/20)
-      
-      # Update select variable number
-      updateSliderInput(session = session,
-                        "plotVarNumber", 
-                        "2. Input variable number to plot", 
-                        value = 1, 
-                        min = 1, 
-                        max = globalVariable$nOutputVar,
-                        step = 1)
-      
-    
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
+                                           'RSWATObject.rds',
                                            sep ='')) 
       
     } else {
@@ -862,20 +882,20 @@ print(sensCaliObject)[]
   })
 
   # ****************************************************************************  
-  # 6. Get SWATShinyObject.rds file
+  # 6. Get RSWATObject.rds file
   # ****************************************************************************  
   observe({
     volumes <- getVolumes()
-    shinyFileChoose(input, "getSWATShinyObject", 
+    shinyFileChoose(input, "getRSWATObject", 
                     roots = volumes, 
                     filetypes=c('', 'rds'),
                     session = session)
     
-    SWATShinyObjectFile <- parseFilePaths(volumes, input$getSWATShinyObject)
+    RSWATObjectFile <- parseFilePaths(volumes, input$getRSWATObject)
     
-    if(length(SWATShinyObjectFile$datapath) == 1){
-      output$printSWATShinyObject <- renderText(SWATShinyObjectFile$datapath)
-      globalVariable <<- readRDS(SWATShinyObjectFile$datapath)
+    if(length(RSWATObjectFile$datapath) == 1){
+      output$printRSWATObject <- renderText(RSWATObjectFile$datapath)
+      globalVariable <<- readRDS(RSWATObjectFile$datapath)
     }
   })
   
@@ -939,7 +959,7 @@ print(sensCaliObject)[]
       
       # Save observed data to globalVariables
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'SWATShinyObject.rds',
+                                           'RSWATObject.rds',
                                            sep ='')) 
     }
   })
@@ -1039,9 +1059,9 @@ print(sensCaliObject)[]
         ))       
       }
     
-    #Save SWATShinyObject
+    #Save RSWATObject
     saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                         'SWATShinyObject.rds',
+                                         'RSWATObject.rds',
                                          sep ='')) 
 
   })
@@ -1304,7 +1324,7 @@ print(sensCaliObject)[]
     showModal(
       modalDialog(
         textInput("savePlotVariableNumberFileName", "File name (must have .pdf)",
-                  placeholder = 'SWATshinyPlot.pdf'
+                  placeholder = 'RSWATPlot.pdf'
         ),
         
         numericInput("savePlotVariableNumberWidth", "Width in cm", 10, min = 1, max = 100),
@@ -1350,11 +1370,11 @@ print(sensCaliObject)[]
     req(input$saveAllResults)
     # Save observed data to globalVariables
     saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                         'SWATShinyObject.rds',
+                                         'RSWATObject.rds',
                                          sep ='')) 
     showModal(modalDialog(
       title = "Save results",
-      HTML("All results was saved as 'SWATShinyObject.rds' in the working folder"),
+      HTML("All results was saved as 'RSWATObject.rds' in the working folder"),
       easyClose = TRUE,
       size = "l"
     ))
@@ -1883,6 +1903,6 @@ print(sensCaliObject)[]
   #-----------------------------------------------------------------------------  
 }
 
-# globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoSWATshiny/SWATShinyObject.rds') 
-# globalVariable <- readRDS(file = 'C:/data/workingFolder/SWATShinyObject.rds') 
+# globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoRSWAT/RSWATObject.rds') 
+# globalVariable <- readRDS(file = 'C:/data/workingFolder/RSWATObject.rds') 
 # order(x, decreasing = TRUE)
