@@ -8,17 +8,18 @@
 
 ## Getting Started!
 
-This app is designed for R beginner to advance users, you can use this app even you don't know anything about R. Just install the **<u>latest</u>** version of R that you can find [here](https://cran.r-project.org/bin/windows/base/). I would also suggest installing [RStudio](https://www.rstudio.com/).  After installing R, open R (or RStudio) and use the following code to download the app to your local machine:
+This app is designed for R beginner to advance users, you can use this app even you don't know anything about R. 
 
-    #-----------------------------------------------------------------------------------------------------------
-    # 1. If you run SWATshiny for the first time, lease open the file ./R/loadPackages.R and install all packages 
-    #    listed in this file before runing this app
-    #-----------------------------------------------------------------------------------------------------------
-    
-    #-----------------------------------------------------------------------------------------------------------
-    # 2. Then run the following commands (next time you use SWATshiny, just run these commands)
-    #-----------------------------------------------------------------------------------------------------------
-    # Call shiny package
+To run this app, install latest **[R version 4.1.1](https://cran.r-project.org/bin/windows/base/)** or newer version (If you use old version of R this **might NOT** work). Then **[install R studio](https://www.rstudio.com/)**. Then do the following steps:
+
+- **Step 1**: [Click here](https://github.com/tamnva/SWATshiny/archive/refs/heads/master.zip) to download the whole code of this app.
+- **Step 2**: Extract the downloaded file => Click to the file *SWATshiny.Rproj* to open the project.
+- **Step 3**: Go to the folder *./R/loadPackages.R* and install all packages list in this file (take 5-10 minutes)
+- **Step 4**: Click to open the file server.R or ui.R => then click the green button named *Run App*
+
+**Next time** when you use this app just **step 4** is needed or you can download the latest app and run it using the following commands
+
+    # Load shiny package
     library(shiny)
     
     # Automatically download this SWATshiny app (code + data) to your local machine and run it
@@ -27,7 +28,7 @@ This app is designed for R beginner to advance users, you can use this app even 
     # If you already manually downloaded it from the github, you can run the app using this command
     # runApp("SWATshiny_folder")
 
-If the app is successfully downloaded to your local machine. If it doesn't work, please see this [documentation](https://groups.google.com/g/swatshiny/c/4geoDwlV5Ok). The following interface (attached screenshot on the end of this document) will appear and you can start using this app. Start with Tab '1. General setting' => '2. Parameter sampling' => and so on. On each tab there are subitems (e.g., in the first figure, start with '1. Working folder' => '2. TxtInOut folder' => and so on)
+The following interface (attached screenshot on the end of this document) will appear and you can start using this app. Start with Tab '1. General setting' => '2. Parameter sampling' => and so on. On each tab there are subitems (e.g., in the first figure, start with '1. Working folder' => '2. TxtInOut folder' => and so on)
 
 If you don't know which input is required, simply clicking to "Help?" at the right side of each respective input field. A sample of data for running this app can be downloaded from my [GitHub repository](https://github.com/tamnva/SWATshiny/tree/master/data), including:
 
@@ -40,7 +41,3 @@ If you don't know which input is required, simply clicking to "Help?" at the rig
 <p align="center">
   <img src="data/figures/SWATshiny.gif" width=100% title="hover text">
 </p>
-
-
-#### 
-
