@@ -11,3 +11,4 @@ install.packages(setdiff(dependencyPackages,rownames(installed.packages())),
   
 # Load dependency packages
 invisible(lapply(dependencyPackages, library, character.only = TRUE))
+

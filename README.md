@@ -4,24 +4,16 @@
 - The latest version of this app is always in the "master" branch.
 - If you would like to contribute to the code, have any suggestions, want to report errors, and have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/swatshiny) specially designed for this app. Tutorial videos can be found in [SWATshiny youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - This is the first version, the app will be continued to be developed to serve the SWAT community. If you would like to contribute to the development of this app, please let me know. **Together we can make this app much better as my time and R knowledge for this app are very limited.
+- This work has not been published in any journal. If you use this program for your publication, please contact me.
 
 ## Getting Started!
 
 This app is designed for R beginner to advance users, you can use this app even you don't know anything about R. Just install the **<u>latest</u>** version of R that you can find [here](https://cran.r-project.org/bin/windows/base/). I would also suggest installing [RStudio](https://www.rstudio.com/).  After installing R, open R (or RStudio) and use the following code to download the app to your local machine:
 
     #-----------------------------------------------------------------------------------------------------------
-    # 1. If you run SWATshiny for the first time, install the following packages
+    # 1. If you run SWATshiny for the first time, lease open the file ./R/loadPackages.R and install all packages 
+    #    listed in this file before runing this app
     #-----------------------------------------------------------------------------------------------------------
-    # Denpendency packages
-    dependencyPackages <- c('foreach', 'parallel', 'lhs', 'plotly', 'shinydashboard', 
-                            'shinyFiles', 'tippy', 'excelR', 'shiny', 'doParallel',
-                            'sensitivity', 'ggplot2', 'boot','rgdal', 'raster')
-    
-    # Check and install only missing packages
-    install.packages(setdiff(dependencyPackages,rownames(installed.packages())), dependencies = TRUE) 
-      
-    # Load dependency packages
-    invisible(lapply(dependencyPackages, library, character.only = TRUE))
     
     #-----------------------------------------------------------------------------------------------------------
     # 2. Then run the following commands (next time you use SWATshiny, just run these commands)
