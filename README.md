@@ -14,8 +14,8 @@ To run this app, install latest **[R version 4.1.1](https://cran.r-project.org/b
 
 - **Step 1**: [Click here](https://github.com/tamnva/SWATshiny/archive/refs/heads/master.zip) to download the whole code of this app.
 - **Step 2**: Extract the downloaded file => Click to the file *SWATshiny.Rproj* to open the project.
-- **Step 3**: Go to the folder *./R/loadPackages.R* and install all packages list in this file (take 5-10 minutes)
-- **Step 4**: Click to open the file server.R or ui.R => then click the green button named *Run App*
+- **Step 3**: Open the file *./R/loadPackages.R* with R studio and install all packages list in this file (take 5-10 minutes)
+- **Step 4**: Open the file server.R or ui.R in R studio => then click the green button named *Run App*
 
 **Next time** when you use this app just **step 4** is needed or you can download the latest app and run it using the following commands
 
