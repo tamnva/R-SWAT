@@ -152,7 +152,7 @@ subsetOutputHru <- function(hruData, sDate, eDate, colNam, tempAgg){
 # ------------------------------------------------------------------------------
 # Subset of HRU based on column name and temporal aggregation
 # ------------------------------------------------------------------------------
-hruRasterValue <- function(hruRaster, hruAggregate, selectedDate){
+hruShpValue <- function(hruAggregate, selectedDate){
 
   temp <- hruAggregate[1,1]
   
@@ -168,20 +168,9 @@ hruRasterValue <- function(hruRaster, hruAggregate, selectedDate){
 
   rowNr <- match(selectedDate, hruAggregate[,1])
   output <- as.numeric(hruAggregate[rowNr, 2:ncol(hruAggregate)])
-  
-  val <- values(hruRaster)
 
- 
-  for(i in 1:length(val)){
-    if(!is.na(val[i])){
-      val[i] <- output[val[i]]      
-    }
-  }
   
-  
-  values(hruRaster) <- val
-  
-  return(hruRaster)
+  return(output)
   
 }
 
@@ -373,9 +362,29 @@ ggplotPolygon <- function(shp, Values){
     geom_polygon(aes(fill = Values, group = id)) +
     labs(x ="  ", y = " ") +
     coord_fixed() +
-    scale_fill_gradientn(colours = rev(terrain.colors(10))) +
+    scale_fill_gradientn(colours = rev(terrain.colors(1000))) +
     theme_bw() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+ 
+  return(plt)
+}
+
+# ------------------------------------------------------------------------------
+# Plot output.hru polygon subset
+# ------------------------------------------------------------------------------
+#shp <- readOGR("C:/data/Watershed/Shapes/hru1.shp")
+
+ggplotHruPolygon <- function(shp, Values){
+
+  # adding Values to shp data frame
+  shp@data$Values <- Values
+  plt <- spplot(shp, "Values", col.regions = rev(terrain.colors(1000)), col = "transparent",
+                par.settings = list(axis.line = list(col = "transparent")))
   
   return(plt)
 }
+
+
+
+
+
