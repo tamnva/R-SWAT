@@ -111,6 +111,10 @@ subUI <- function(id) {
              ),
              
       ),
+      column(width = 10,
+             sliderInput("subPlotRange", "7. Set value range for plot",
+                         min = 0, max = 100, value = c(10, 90), step = 1)
+      )
       
     ),
     

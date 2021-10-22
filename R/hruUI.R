@@ -14,14 +14,14 @@ hruUI <- function(id) {
       # Input UI
       
       column(width = 4,
-             shinyFilesButton("getHruRaster", "1. Click here to select HRU raster file" ,
+             shinyFilesButton("getHruShp", "1. Click here to select HRU shape file" ,
                               title = "Please select the Hru raster file:",
                               multiple = FALSE,
                               buttonType = "default",
                               style="font-weight: bold",
                               # border-color: #2e6da4",
                               class = NULL),
-             verbatimTextOutput("printHruRaster", placeholder = TRUE),
+             verbatimTextOutput("printHruShp", placeholder = TRUE),
       ),
       
       
@@ -111,6 +111,11 @@ hruUI <- function(id) {
              ),
              
       ),
+      
+      column(width = 10,
+             sliderInput("hruPlotRange", "7. Set value range for plot",
+                         min = 0, max = 100, value = c(10, 90), step = 1)
+             )
     
     ),
     

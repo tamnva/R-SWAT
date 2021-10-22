@@ -9,6 +9,8 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   globalVariable <- list()
   displayOutput <- list()
+  displayOutput$plotHru <- FALSE
+  displayOutput$plotSub <- FALSE
   globalVariable$checkSimComplete <- FALSE
 
   #-----------------------------------------------------------------------------
@@ -1441,26 +1443,27 @@ print(sensCaliObject)[]
   # 5.1. Visualize output.hru
   
   # ****************************************************************************  
-  # Get HRU raster file
+  # Get HRU shape file file
   # ****************************************************************************
+  
   observe({
     volumes <- getVolumes()
-    shinyFileChoose(input, "getHruRaster", 
+    shinyFileChoose(input, "getHruShp", 
                     roots = volumes, 
-                    filetypes=c('', 'adf'),
+                    filetypes=c('', 'shp'),
                     session = session)
     
-    hruRasterFile <- parseFilePaths(volumes, input$getHruRaster)
+    hruShpFile <- parseFilePaths(volumes, input$getHruShp)
     
-    if(length(hruRasterFile$datapath) == 1){
-      hruRasterFile <- as.character(hruRasterFile$datapath)
-      output$printHruRaster <- renderText(hruRasterFile)
-      
-      if (file.exists(hruRasterFile)){
+    if(length(hruShpFile$datapath) == 1){
+      hruShpFile <- as.character(hruShpFile$datapath)
+      output$printHruShp <- renderText(hruShpFile)
+           
+      if (file.exists(hruShpFile)){
 
-        displayOutput$hruRaster <<- raster(hruRasterFile)
+        displayOutput$hruShp <<- readOGR(hruShpFile)
       } else {
-        displayOutput$hruRaster <<- NULL
+        displayOutput$hruShp <<- NULL
       }
     }
   })
@@ -1585,11 +1588,11 @@ print(sensCaliObject)[]
                                      input$hruSelectCol, 
                                      input$hruTempAgg)
 
-      if(!is.null(displayOutput$hruRaster)){
+      if(!is.null(displayOutput$hruShp)){
 
-        hruRaster <- hruRasterValue(displayOutput$hruRaster, 
-                                    hruPlotData, 
-                                    displayOutput$hruPlotDate)
+#        hruRaster <- hruRasterValue(displayOutput$hruShp, 
+#                                    hruPlotData, 
+#                                    displayOutput$hruPlotDate)
        
         outputText <- as.character(displayOutput$hruPlotDate)
         if (input$hruTempAgg == "Monthly"){
@@ -1605,19 +1608,56 @@ print(sensCaliObject)[]
                             outputText,
                             sep = "")
         output$hruPlotTitle <- renderText(outputText)  
-        output$hruPlotHRU <- renderPlot({plot(hruRaster)})
+        
+        displayOutput$plotHruValues <<- hruShpValue(hruPlotData, displayOutput$hruPlotDate)
+        
+        minVal <- min(displayOutput$plotHruValues)
+        maxVal <- max(displayOutput$plotHruValues)
+        
+        updateSliderInput(session, "hruPlotRange", "7. Set value range for plot",
+                          min = minVal, max = maxVal,
+                          value = c(minVal, maxVal),
+                          step = (maxVal - minVal)/100)
+        
+        output$hruPlotHRU <- renderPlot(ggplotHruPolygon(displayOutput$hruShp, 
+                                                         displayOutput$plotHruValues))
+        displayOutput$plotHru <<- TRUE
+
 
       } else {
         output$hruPlotHRU <- NULL
+        displayOutput$plotHru <<- FALSE
       }
       
     } else {
       output$hruPlotHRU <- NULL
+      displayOutput$plotHru <<- FALSE
     }
     
     
   })
-  
+
+  # ****************************************************************************  
+  # Update plot hru
+  # ****************************************************************************  
+  observe({
+    
+    req(input$hruPlotRange)
+    
+    if(displayOutput$plotHru){
+      # Update plot range
+      plotValues <- displayOutput$plotHruValues
+      plotValues <- replace(plotValues, plotValues <  input$hruPlotRange[1], input$hruPlotRange[1])
+      plotValues <- replace(plotValues, plotValues > input$hruPlotRange[2], input$hruPlotRange[2])
+      
+      output$hruPlotHRU <- renderPlot(ggplotHruPolygon(displayOutput$hruShp, 
+                                                       plotValues))     
+    } else {
+      output$hruPlotHRU <- NULL
+    }
+    
+  })
+
   # 6.1. Visualize output.rch
   # ****************************************************************************  
   # Read file.cio information
@@ -1884,22 +1924,59 @@ print(sensCaliObject)[]
                             outputText,
                             sep = "")
         output$subPlotTitle <- renderText(outputText) 
+        
+        displayOutput$plotSubValues <<- as.numeric(subPlotData[rowNr, 2:ncol(subPlotData)])
+        
+        minVal <- min(displayOutput$plotSubValues)
+        maxVal <- max(displayOutput$plotSubValues)
+        
+        updateSliderInput(session, "subPlotRange", "7. Set value range for plot",
+                          min = minVal, max = maxVal,
+                          value = c(minVal, maxVal),
+                          step = (maxVal - minVal)/100)
+
         output$subPlotSub <- renderPlot({
-          ggplotPolygon(displayOutput$subShape, as.numeric(subPlotData[rowNr, 2:ncol(subPlotData)]))
+          ggplotPolygon(displayOutput$subShape, displayOutput$plotSubValues)
         })
+        
+        displayOutput$plotSub <<- TRUE
         
       } else {
         output$subPlotSub <- NULL
+        displayOutput$plotSub <<- FALSE
       }
       
     } else {
       output$subPlotSub <- NULL
+      displayOutput$plotSub <<- FALSE
     }
-    
     
   })
   
 
+  # ****************************************************************************  
+  # Update plot sub
+  # ****************************************************************************  
+  observe({
+    
+    req(input$subPlotRange)
+    
+    if(displayOutput$plotSub){
+      # Update plot range
+      plotValues <- displayOutput$plotSubValues
+      plotValues <- replace(plotValues, plotValues <  input$subPlotRange[1], input$subPlotRange[1])
+      plotValues <- replace(plotValues, plotValues > input$subPlotRange[2], input$subPlotRange[2])
+      
+      output$subPlotSub <- renderPlot({
+        ggplotPolygon(displayOutput$subShape, plotValues)
+      })
+      
+    } else {
+      output$hruPlotHRU <- NULL
+    }
+    
+  })
+  
   #-----------------------------------------------------------------------------  
 }
 
