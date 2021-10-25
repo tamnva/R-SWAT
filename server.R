@@ -276,6 +276,7 @@ server <- function(input, output, session) {
   observe({
     req(input$samplingApproach)
     globalVariable$samplingApproach <<- input$samplingApproach
+
     if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "Delete all text here and type the number of iterations (number of parameter sets), for example, 
@@ -288,8 +289,7 @@ optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower
     } else if (input$samplingApproach == 'Cali_(from_hydroPSO_package)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "# Delete all text here and type command from the hydroPSO package, e.g., with the Particle Swarm Optimization approach
-hydroPSO(fn = SWAT, lower=minCol, upper=maxCol, control=list(write2disk=FALSE)
-                          )"
+hydroPSO(fn = SWAT, lower=minCol, upper=maxCol, control=list(maxit=1))"
       )
     } else if (input$samplingApproach == 'Cali_(from_nloptr_package)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 

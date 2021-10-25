@@ -1,0 +1,42 @@
+================================================================================
+hydroPSO version  :  0.5-1  
+hydroPSO Built    :  R 4.1.1; ; 2021-10-15 02:18:54 UTC; windows  
+R version         :  R version 4.1.1 (2021-08-10)  
+Platform          :  x86_64-w64-mingw32  
+================================================================================
+Starting Time     : Mon Oct 25 09:35:30 2021 
+================================================================================
+Objective Function: rastrigin 
+MinMax            : min 
+Dimension         : 5 
+Nmbr of Particles : 40 
+Max Iterations    : 1 
+Method            : spso2011 
+Topology          : random 
+K                 : 3 
+iter.ini          : 0 
+Boundary wall     : absorbing2011 
+normalise         : FALSE 
+Xini.type         : random 
+Vini.type         : random2011 
+Best update method: sync 
+Random update     : TRUE 
+c1                : 1.19314718055995 
+c2                : 1.19314718055995 
+use.IW            : TRUE 
+IW.w              : 0.721347520444482 
+lambda            : 1 
+use.RG            : FALSE 
+maxfn             : Inf 
+abstol            : -Inf 
+reltol            : 1.49011611938477e-08 
+parallel          : none 
+================================================================================
+Total fn calls    :  40  
+Nmbr of Iterations:  1  
+Regroupings       :  0  
+================================================================================
+Ending Time       :  Mon Oct 25 09:35:30 2021  
+================================================================================
+Elapsed Time      :  0.03 secs  
+================================================================================

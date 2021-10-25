@@ -1,0 +1,2 @@
+CN2.mgt     CH_N1.sub     CH_K2.rte     OV_N.hru    CH_N2.rte     GW_REVAP.gw
+-0.213      0.096         6.477         0.26        0.048         0.12
