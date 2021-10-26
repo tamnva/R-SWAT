@@ -94,6 +94,7 @@ paramSamplingUI <- function(id) {
                                      'Sensi_(from_sensitivity_package)',
                                      'Sensi_(from_userDefined_package)',
                                      'Cali_(from_optimization_package)',
+                                     'Cali_(from_hydroPSO_package)',
                                      'Cali_(from_nloptr_package)',
                                      'Cali_(Dynamically_Dimensioned_Search)',
                                      'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
@@ -126,6 +127,22 @@ paramSamplingUI <- function(id) {
              
              verbatimTextOutput("displayInputInfo"),
              ),
+      
+      column(width = 1,
+             tippy("Help", tooltip = "<span style='font-size:16px;text-align: left;'>
+                   Please use the keyword 'SWAT', 'nParam', 'minCol', 'maxCol' when you want to access variables
+                   from R-SWAT and use it in the senstitivity or optimization function. These keywords mean the 
+                   SWAT function, number of parameters, minimum and maximum ranges of these parameters (table above).
+                   SWAT function takes input is the parameter set (provided by the sensitivity or optimization function)
+                   and return the objective function value (with the obejctive function defined in Step 4.1). 
+                   The objective in here is ALWAYS minimize the objective function value (e.g., if you select the NSE, 
+                   the objective fucntion will automatically return - NSE).  
+                   <span>", 
+                   allowHTML = TRUE, 
+                   trigger = "click",
+                   theme = "translucent"),
+      ),
+      
     )
 
   )}

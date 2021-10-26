@@ -227,3 +227,30 @@
     return(subParameterSet)
   }  
   
+  # ------------------------------------------------------------------------------
+  # Create list of list
+  # ------------------------------------------------------------------------------
+  
+  listOfList <- function(minCol, maxCol){
+    out <- list()
+    for (i in 1:length(minCol)){
+      out[[i]] <- list()
+      out[[i]]$min <- minCol[i]
+      out[[i]]$max <- maxCol[i]    
+    }
+    return(out)
+  }
+  
+  # ------------------------------------------------------------------------------
+  # Create list of list with two element for delsa
+  # ------------------------------------------------------------------------------
+  
+  listof <- function(minCol, maxCol){
+    out <- list()
+    for (i in 1:length(minCol)){
+      out[[i]] <- list()
+      out[[i]] <- c(minCol[i], maxCol[i] )   
+    }
+    return(out)
+  }
+  
