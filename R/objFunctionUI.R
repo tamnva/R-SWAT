@@ -120,6 +120,7 @@ objFunctionUI <- function(id) {
 
       column(width = 10,
              actionButton("calObjFunction", "Click here to calculate objection"),
+             verbatimTextOutput("printCalObjFunction"),
       ),
 
       column(width = 10, 
