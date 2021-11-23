@@ -958,7 +958,7 @@ print(sensCaliObject)[]
         globalVariable$observedData[[i]] <<- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
         colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
       }
-      
+
       # Save observed data to globalVariables
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
                                            'RSWATObject.rds',
@@ -1010,14 +1010,18 @@ print(sensCaliObject)[]
                  globalVariable$samplingApproach == 'Read_User_Parameter_File'){
 
         # Caculate objective function
-        temp <- calObjFunction(globalVariable$parameterValue,
-                               globalVariable$ncores, 
-                               globalVariable$nOutputVar,
-                               globalVariable$userReadSwatOutput, 
-                               globalVariable$observedData, 
-                               globalVariable$workingFolder, 
-                               globalVariable$objFunction)
+        output$printCalObjFunction <- NULL
         
+        temp <- calObjFunction(globalVariable$parameterValue,
+                           globalVariable$ncores, 
+                           globalVariable$nOutputVar,
+                           globalVariable$userReadSwatOutput, 
+                           globalVariable$observedData, 
+                           globalVariable$workingFolder, 
+                           globalVariable$objFunction)
+
+        if(temp$error) output$printCalObjFunction <- renderText("ERROR in input data - please see R console")
+          
         globalVariable$objValue <<- temp$objValue
         globalVariable$perCriteria <<- temp$perCriteria
         globalVariable$simData <<- temp$simData

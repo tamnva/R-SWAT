@@ -220,6 +220,7 @@ calObjFunction <- function(parameterValue, ncores,
   
   counter <- rep(0, nOutputVar)
   output$objValue <-  rep(0, nrow(parameterValue))
+  output$error <- FALSE
   
   #Loop over number of cores
   for (i in 1:ncores){
@@ -239,35 +240,45 @@ calObjFunction <- function(parameterValue, ncores,
       fileNameSimData <- paste(workingFolder, "/Output/Core_", 
                                i, "/Output_Variable_", j, ".txt", sep = "")
       tempSimData <- read.table(fileNameSimData, header = FALSE, sep = "")
-      for (k in 1:nSim[i]){
-        sIndex <- (k-1)*ntimestep + 1
-        eIndex <- k*ntimestep
-        counter[j] <- counter[j] + 1
-        
-        simData[[j]][[counter[j]]] <- tempSimData[(sIndex + 1):eIndex, 1]
-        output$simData[[j]][[counter[j]]] <- simData[[j]][[counter[j]]]
-        
-        if (index == 'userObjFunction'){
-          # user userObjFunction in this case
-          output$perCriteria[[j]][[counter[j]]] <- userObjFunction(observedData[[j]][,2],
-                                                               simData[[j]][[counter[j]]])
+      
+      #Check if length of observed and simulated data are the same or not
+      if (nrow(tempSimData) %% ntimestep > 0){
+        print(" Error: length of observed data # length of the extracted variable")
+        print(fileNameSimData)
+        print(" Please load the corrected observed data and rerun this step")
+        output$objValue[] <- -999999
+        output$error <- TRUE
+      } else {
+        for (k in 1:nSim[i]){
+          sIndex <- (k-1)*ntimestep + 1
+          eIndex <- k*ntimestep
+          counter[j] <- counter[j] + 1
           
-          output$objValue[counter[j]] <- output$objValue[counter[j]] + 
-            as.numeric(output$perCriteria[[j]][[counter[j]]])  
+          simData[[j]][[counter[j]]] <- tempSimData[(sIndex + 1):eIndex, 1]
+          output$simData[[j]][[counter[j]]] <- simData[[j]][[counter[j]]]
           
-        } else {
-          # use objective function of RSWAT
-          output$perCriteria[[j]][[counter[j]]] <- perCriteria(observedData[[j]][,2],
-                                                               simData[[j]][[counter[j]]])
+          if (index == 'userObjFunction'){
+            # user userObjFunction in this case
+            output$perCriteria[[j]][[counter[j]]] <- userObjFunction(observedData[[j]][,2],
+                                                                     simData[[j]][[counter[j]]])
+            
+            output$objValue[counter[j]] <- output$objValue[counter[j]] + 
+              as.numeric(output$perCriteria[[j]][[counter[j]]])  
+            
+          } else {
+            # use objective function of RSWAT
+            output$perCriteria[[j]][[counter[j]]] <- perCriteria(observedData[[j]][,2],
+                                                                 simData[[j]][[counter[j]]])
+            
+            if((i == 1) & (j == 1)) {
+              perIndex <- match(index, 
+                                colnames(output$perCriteria[[j]][[counter[j]]]))
+            }   
+            output$objValue[counter[j]] <- output$objValue[counter[j]] + 
+              output$perCriteria[[j]][[counter[j]]][perIndex]  
+          }
           
-          if((i == 1) & (j == 1)) {
-            perIndex <- match(index, 
-                              colnames(output$perCriteria[[j]][[counter[j]]]))
-          }   
-          output$objValue[counter[j]] <- output$objValue[counter[j]] + 
-            output$perCriteria[[j]][[counter[j]]][perIndex]  
-        }
-
+        }        
       }
     }
     

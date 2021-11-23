@@ -44,12 +44,12 @@ userReadSwatOutput <- function(){
   month <- as.numeric(format(date, "%m")) 
   
   # Create a frame for this data
-  dataFrame <- data.frame(month = month,
-                          year = year,
-                          Q = output[[1]])
+  dataFrame <- data.frame(year = year,
+                              month = month,
+                              Q = output[[1]])
    
   # Aggregate to monthly
-  dataFrameMonthly <- aggregate(.~ month + year, dataFrame, FUN = sum)
+  dataFrameMonthly <- aggregate( .~ year + month, dataFrame, FUN = sum)
    
   # Only get the values of Q
   output[[1]] <- dataFrameMonthly$Q
