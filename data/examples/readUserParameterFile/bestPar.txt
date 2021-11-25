@@ -1,2 +1,2 @@
-CN2.mgt     CH_N1.sub     CH_K2.rte     OV_N.hru    CH_N2.rte     GW_REVAP.gw
--0.213      0.096         6.477         0.26        0.048         0.12
+GW_DELAY.gw  CN2.mgt    SOL_K.sol   ALPHA_BF.gw   ESCO.hru  SURLAG.hru   CH_K2.rte   SURLAG.bsn
+120.0        -0.1       -0.1        0.3           0.7       2.0          0.3         4.0

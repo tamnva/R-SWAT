@@ -212,6 +212,8 @@ calObjFunction <- function(parameterValue, ncores,
   
   output <- list()
   
+  count <- 0
+  
   nSim <- as.integer(nrow(parameterValue)/ncores)
   nSim <- rep(nSim, ncores)
   nSim[ncores] <- nSim[ncores] + nrow(parameterValue) - sum(nSim)
@@ -257,16 +259,8 @@ calObjFunction <- function(parameterValue, ncores,
           simData[[j]][[counter[j]]] <- tempSimData[(sIndex + 1):eIndex, 1]
           output$simData[[j]][[counter[j]]] <- simData[[j]][[counter[j]]]
           
-          if (index == 'userObjFunction'){
-            # user userObjFunction in this case
-            output$perCriteria[[j]][[counter[j]]] <- userObjFunction(observedData[[j]][,2],
-                                                                     simData[[j]][[counter[j]]])
+          if (index != 'userObjFunction'){
             
-            output$objValue[counter[j]] <- output$objValue[counter[j]] + 
-              as.numeric(output$perCriteria[[j]][[counter[j]]])  
-            
-          } else {
-            # use objective function of RSWAT
             output$perCriteria[[j]][[counter[j]]] <- perCriteria(observedData[[j]][,2],
                                                                  simData[[j]][[counter[j]]])
             
@@ -282,12 +276,46 @@ calObjFunction <- function(parameterValue, ncores,
       }
     }
     
+    # In case of user defined objective function
+    if (index == 'userObjFunction'){
+      for (k in 1:nSim[i]){
+        count <- count + 1
+        output$objValue[count] <- userObjFunction(observedToList(observedData), 
+                                                  simToList(simData, count))
+      }
+    }      
+    
   }
   
-  # Calculate objective function values
-  output$objValue <- output$objValue/nOutputVar
+  if (index != 'userObjFunction'){
+    output$objValue <- output$objValue/nOutputVar
+  }
   
   return(output) 
+}
+
+
+#------------------------------------------------------------------------------- 
+# Convert simulated data to list object
+# ------------------------------------------------------------------------------
+simToList <- function(simData, k){
+  output <- list()
+  for (i in 1:length(simData)){
+    output[[i]] <- simData[[i]][[k]]
+  }  
+  
+  return(output)
+}
+
+#------------------------------------------------------------------------------- 
+# Convert observed data to list object
+# ------------------------------------------------------------------------------
+observedToList <- function(observedData){
+  output <- list()
+  for (i in 1:length(observedData)){
+    output[[i]] <- observedData[[i]][,2]
+  }
+  return(output)
 }
 
 #------------------------------------------------------------------------------- 
