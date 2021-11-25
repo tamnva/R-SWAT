@@ -1,9 +1,9 @@
-## R-SWAT (Previous name: SWATshiny)
+## R-SWAT
 
-- This is an interactive web-based app (written in [R](https://cran.r-project.org/bin/windows/base/) language with [shiny](https://shiny.rstudio.com/) package) for parallel parameter sensitivity, calibration, and uncertainty analysis with the Soil and Water Assessment Tool ([SWAT](https://swat.tamu.edu/)).
+- This is an interactive web-based app (written in [R](https://cran.r-project.org/bin/windows/base/) language with [shiny](https://shiny.rstudio.com/) package) for parallel parameter sensitivity, calibration, and uncertainty analysis with the Soil and Water Assessment Tool ([SWAT](https://swat.tamu.edu/)). The official name of this app is R-SWAT (initially its name was SWATshiny)
 - The latest version of this app is always in the "master" branch.
 - If you would like to contribute to the code, have any suggestions, want to report errors, and have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/swatshiny) specially designed for this app. Tutorial videos can be found in [R-SWAT youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
-- This is the first version, the app will be continued to be developed to serve the SWAT community. If you would like to contribute to the development of this app, please let me know. **Together we can make this app much better as my time and R knowledge for this app are very limited.
+- This is the first version, the app will be continued to be developed to serve the SWAT community. If you would like to contribute to the development of this app, please let me know. Together we can make this app much better as my time and R knowledge for this app are very limited.
 - This work has not been published in any journal. If you use this program for your publication, please contact me.
 
 ## Getting Started!
@@ -13,7 +13,7 @@ This app is designed for R beginner to advance users, you can use this app even 
 To run this app, install latest **[R version 4.1.1](https://cran.r-project.org/bin/windows/base/)** or newer version (If you use old version of R this **might NOT** work). Then **[install R studio](https://www.rstudio.com/)**. Then do the following steps:
 
 - **Step 1**: [Click here](https://github.com/tamnva/SWATshiny/archive/refs/heads/master.zip) to download the whole code of this app.
-- **Step 2**: Extract the downloaded file => Click to the file *SWATshiny.Rproj* to open the project.
+- **Step 2**: Extract the downloaded file => Click to the file *RSWAT.Rproj* to open the project.
 - **Step 3**: Open the file *./R/loadPackages.R* with R studio and install all packages list in this file (take 5-10 minutes)
 - **Step 4**: Open the file server.R or ui.R in R studio => then click the green button named *Run App*
 
@@ -39,5 +39,6 @@ If you don't know which input is required, simply clicking to "Help?" at the rig
 
 ## R-SWAT user interface
 <p align="center">
-  <img src="data/figures/SWATshiny.gif" width=100% title="hover text">
+  <img src="data/figures/RSWAT.gif" width=100% title="hover text">
 </p>
+
