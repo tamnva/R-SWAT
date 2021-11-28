@@ -18,7 +18,7 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
     }
   }
   
-  # find 2.5% and 97.5 percentile
+  # find 2.5% and 97.5% percentile
   ncol <- length(behaIndex)
   nrow <- length(simData[[varNumber]][[1]])
   
@@ -90,7 +90,6 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   output$prFactor <- prFactor(observedData[[varNumber]]$Value,
                               ppuSimData$lower_95PPU,
                               ppuSimData$upper_95PPU)
-  
   return(output)
 }
 
@@ -170,36 +169,6 @@ prFactor <- function(obs, low, up){
     colnames(result) <- c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS')
     
     return(result)
-  }
-  
-
-
-#------------------------------------------------------------------------------- 
-# TODO 
-# ------------------------------------------------------------------------------
-  uncertaintyAnalysis <- function(outData, obsData, objFunction, 
-                                  objCriteria, behaThreshold){
-    
-    result <- list()
-    
-    # Loop over number of output file types
-    for (i in 1:length(outData$file)){
-      
-      #Loop over number of Iterations
-      for (j in 1:length(outData$file[[i]]$iter)){
-        
-        #Loop over number of variable
-        temp <- 0
-        for (k in 1:length(outData$file[[i]]$iter[[j]]$variable)){
-          
-        }
-        
-        objFunctionValue[j,] <- objFunctionValue[j,] + temp/k
-      }
-    }
-    
-    return(result)
-    
   }
   
 #------------------------------------------------------------------------------- 
@@ -302,8 +271,7 @@ simToList <- function(simData, k){
   output <- list()
   for (i in 1:length(simData)){
     output[[i]] <- simData[[i]][[k]]
-  }  
-  
+  }
   return(output)
 }
 
@@ -332,8 +300,5 @@ bindList <- function(toList, inList){
       toList[[i]][[lengthToList + j]] <- inList[[i]][[j]]   
     }
   }
-  
   return(toList)
 }
-  
-  
