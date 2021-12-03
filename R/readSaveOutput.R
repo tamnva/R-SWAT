@@ -82,7 +82,7 @@ readWatoutFile <- function(workingDirectory,
                     coreNumber, "/", fileName, sep = "")
   
   getWatoutData <- read.table(fileName, header = FALSE, sep = "", skip = 6)
-  timeSeries <- seq(fileCioInfo$startSim, fileCioInfo$endSim, by="days")
+  timeSeries <- seq(fileCioInfo$startEval, fileCioInfo$endSim, by="days")
   
   counter <- length(output)
   trim <- c(which(timeSeries ==  fromToDate[1]), 
