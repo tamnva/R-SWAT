@@ -16,10 +16,17 @@ readOutputRchFile <- function(workingDirectory,
                     fileName, sep = "")
   
   getOutputRsvData <- read.table(fileName, header = FALSE, sep = "", skip = 9)
+
+  # by default, assume that simulated data does not include warm up period
   timeSeries <- seq(fileCioInfo$startEval, fileCioInfo$endSim, by="days")
   
   nRch <- max(getOutputRsvData$V2)
-  
+
+  # Check whether simulated data including warm-up period
+  if (nrow(getOutputRsvData) != (nRch * length(timeSeries))){
+    timeSeries <- seq(fileCioInfo$startSim, fileCioInfo$endSim, by="days")
+  }
+ 
   ntimeStep <- nrow(getOutputRsvData)/nRch
   trim <- c(which(timeSeries ==  fromToDate[1]), 
             which(timeSeries ==  fromToDate[2]))
@@ -82,8 +89,15 @@ readWatoutFile <- function(workingDirectory,
                     coreNumber, "/", fileName, sep = "")
   
   getWatoutData <- read.table(fileName, header = FALSE, sep = "", skip = 6)
+
+  # by default, assume that simulated data does not include warm up period
   timeSeries <- seq(fileCioInfo$startEval, fileCioInfo$endSim, by="days")
-  
+
+  # Check whether simulated data including warm-up period
+  if (nrow(getWatoutData) != length(timeSeries)){
+    timeSeries <- seq(fileCioInfo$startSim, fileCioInfo$endSim, by="days")
+  }
+
   counter <- length(output)
   trim <- c(which(timeSeries ==  fromToDate[1]), 
             which(timeSeries ==  fromToDate[2]))
