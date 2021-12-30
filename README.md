@@ -13,7 +13,7 @@ This app is designed for R beginner to advance users, you can use this app even 
 To run this app, install latest **[R version 4.1.1](https://cran.r-project.org/bin/windows/base/)** or newer version (If you use old version of R this **might NOT** work). Then **[install R studio](https://www.rstudio.com/)**. Then do the following steps:
 
 - **Step 1**: [Click here](https://github.com/tamnva/SWATshiny/archive/refs/heads/master.zip) to download the whole code of this app.
-- **Step 2**: Extract the downloaded file => Click to the file *RSWAT.Rproj* to open the project.
+- **Step 2**: Extract the downloaded file => Open RStudio
 - **Step 3**: Open the file *./R/loadPackages.R* with R studio and install all packages list in this file (take 5-10 minutes).
 - **Step 4**: Open the file server.R or ui.R in R studio => then click the green button named *Run App*
 
