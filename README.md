@@ -4,7 +4,7 @@
 - The latest version of this app is always in the "master" branch.
 - If you would like to contribute to the code, have any suggestions, want to report errors, and have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/R-SWAT) specially designed for this app. Tutorial videos can be found in [R-SWAT youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - This is the first version, the app will be continued to be developed to serve the SWAT community. If you would like to contribute to the development of this app, please let me know. Together we can make this app much better as my time and R knowledge for this app are very limited.
-- This work has not been published in any journal. If you use this program for your publication, please contact me.
+- This work has not been published in any journal. If you use this program for your publication and want to know the technical behind this app, please contact me.
 
 ## Getting Started!
 
