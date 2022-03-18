@@ -170,10 +170,10 @@ saveOutput <- function(workingDirectory,
     OutputFileName <- paste(outputDirectory, '/Output_Variable_', i, 
                             '.txt', sep ='')
     
-      if (!firstRun){file.create(OutputFileName)}
-    
+      if (firstRun){file.create(OutputFileName)}
+
       write.table(as.character(simulationNumber), OutputFileName, append = TRUE,
-                  row.names = FALSE,col.names = FALSE)
+                  row.names = FALSE, col.names = FALSE)
       write.table(output[[i]], OutputFileName, append = TRUE,sep = '\t', 
                   row.names = FALSE, col.names = FALSE)      
 

@@ -45,6 +45,11 @@
       
       system(trimws(exeFile[length(exeFile)]))
 
+      # Check first run
+      if ((nrow(subParameterSet) > 1) & (i > 1)){
+        firstRun = FALSE
+      }
+      
       # Read and write output
       saveOutput(workingDirectory,
                  coreNumber,                   
@@ -252,5 +257,15 @@
       out[[i]] <- c(minCol[i], maxCol[i] )   
     }
     return(out)
+  }
+  
+  # ------------------------------------------------------------------------------
+  # Convert matrix with column range from [0,1] to column with range [a, b]
+  # ------------------------------------------------------------------------------
+  convertRange <- function(inMatrix, a, b){
+    for (i in 1:nrow(inMatrix)){
+      inMatrix[i,] <- a + as.numeric(inMatrix[i,]) * (b-a)
+    }
+    return(inMatrix)
   }
   

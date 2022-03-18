@@ -19,7 +19,7 @@ ui <- dashboardPage(
     ),
     
     sidebarMenu(
-      menuItem("1. General Setting", 
+      menuItem("1. General setting", 
                tabName = "generalSetting", 
                icon = icon("cog"), 
                selected = FALSE)

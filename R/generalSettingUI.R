@@ -12,14 +12,47 @@ generalSettingUI <- function(id) {
     
     fluidRow( 
       #-------------------------------------------------------------------------
-      # 1. Working folder
+      # 1. Load previous result
+      #------------------------------------------------------------------------- 
+      column(width = 10,
+             HTML("<b>",
+                  "1. Load R-SWAT settings from the previous R-SWAT project (optional)",
+                  "</b>"),
+      ),
+      
+      column(width = 1,
+             tippy("Help", tooltip = "<span style='font-size:16px;'>
+                   1. Load R-SWAT settings from the previous R-SWAT project: 
+                   If users have set up the R-SWAT project before, there is a file
+                   RSWATproject.rds was created and saved in the working folder.
+                   When this file is loaded,  all settings in 1. General 
+                   Setting to 4.1. Evaluate output will be updated)
+                   <span>", 
+                   allowHTML = TRUE, 
+                   trigger = "click",
+                   theme = "translucent"),
+      ),
+      
+      column(width = 10,
+             shinyFilesButton("getRSWATProjectFile", "Click here to select the RSWATproject.rds file" ,
+                              title = "Please select 'RSWATproject.rds' file",
+                              multiple = FALSE,
+                              buttonType = "default",
+                              style="background-color: #87CEFA; 
+                              border-color: #2e6da4",
+                              class = NULL),
+             verbatimTextOutput("printRSWATProjectFile", placeholder = TRUE),
+      ),
+      #-------------------------------------------------------------------------
+      # 2. Working folder
       #-------------------------------------------------------------------------
       column(width = 10,
              textInput("workingFolder",
-                       "1. Working folder",
-                       "C:/data/workingFolder",
+                       "2. Working folder",
+                       "C:/workingFolder",
                        width = "100%"
              ),
+             textOutput("checkWorkingFolder"),
       ),
       
       column(width = 1,
@@ -32,20 +65,22 @@ generalSettingUI <- function(id) {
       ),
 
       #-------------------------------------------------------------------------
-      # 2. TxtInOut folder
+      # 3. TxtInOut folder
       #-------------------------------------------------------------------------
       column(width = 10,
              textInput("TxtInOutFolder",
-                       "2. TxtInOut folder",
-                       "C:/data/Scenarios/Default/TxtInOut",
+                       "3. TxtInOut folder",
+                       "C:/Scenarios/Default/TxtInOut",
                        width = "100%"
              ),
+             textOutput("checkTxtInOutFolder"),
              
       ),
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
-             Link to the TxtInOut directory which contains all SWAT input files
+             Link to the TxtInOut directory which contains all 
+             original SWAT input files. These files will not be changed by R-SWAT
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -66,11 +101,11 @@ generalSettingUI <- function(id) {
       
 
       #-------------------------------------------------------------------------
-      # 3. Select executable SWAT file 
+      # 4. Select executable SWAT file 
       #------------------------------------------------------------------------- 
       column(width = 10,
              HTML("<b>",
-                        "3. Select executable SWAT file",
+                        "4. Select executable SWAT file",
                         "</b>"),
       ),
       
@@ -95,12 +130,12 @@ generalSettingUI <- function(id) {
       ),
 
       #-------------------------------------------------------------------------
-      # 4. Files with list of all SWAT parameters 
+      # 5. Files with list of all SWAT parameters 
       #-------------------------------------------------------------------------
       div( style = "margin-top: 15em",  
            column(width = 10,
                   HTML("<b>",
-                             "4. Files with list of all SWAT parameters",
+                             "5. Files with list of all SWAT parameters",
                              "</b>"),
            ),
       ),
@@ -124,18 +159,20 @@ generalSettingUI <- function(id) {
       
       column(width = 10,
              shinyFilesButton("getSWATParamFile", "Click here to select" ,
-                              title = "Please select SWAT parameter file:",
+                              title = "Please select the 'swatParam.txt' file:",
                               multiple = FALSE,
                               buttonType = "default", 
                               style="background-color: #87CEFA;
                               border-color: #2e6da4",
                               class = NULL),
+
+             
              verbatimTextOutput("printSWATParamFile", placeholder = TRUE),
       ),
       
       column(width = 10,
              checkboxInput('checkSWATParamFile', 
-                           'Display content of the SWAT parameter file', 
+                           "Display content of the 'swatParam.txt' file", 
                            value = FALSE, width = NULL),
       ),
       

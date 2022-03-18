@@ -100,6 +100,7 @@ paramSamplingUI <- function(id) {
                                      'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
                                      'Cali_(from_userDefined_package)',
                                      'Read_User_Parameter_File'),
+                         selected = 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
                          multiple = FALSE),
       ),
 
@@ -121,7 +122,7 @@ paramSamplingUI <- function(id) {
              textAreaInput("inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                            " ", 
                            width = "100%",
-                           height = "200px",
+                           height = "100px",
                            resize = "vertical") %>%
                shiny::tagAppendAttributes(style = 'width: 100%;'),
              
@@ -130,13 +131,8 @@ paramSamplingUI <- function(id) {
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;text-align: left;'>
-                   Please use the keyword 'SWAT', 'nParam', 'minCol', 'maxCol' when you want to access variables
-                   from R-SWAT and use it in the senstitivity or optimization function. These keywords mean the 
-                   SWAT function, number of parameters, minimum and maximum ranges of these parameters (table above).
-                   SWAT function takes input is the parameter set (provided by the sensitivity or optimization function)
-                   and return the objective function value (with the obejctive function defined in Step 4.1). 
-                   The objective in here is ALWAYS minimize the objective function value (e.g., if you select the NSE, 
-                   the objective fucntion will automatically return - NSE).  
+                   Default input for each method is given, please modify the text if necessary
+                   (see help text below for modifying)
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",

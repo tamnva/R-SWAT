@@ -14,7 +14,7 @@ subUI <- function(id) {
       # Input UI
       
       column(width = 4,
-             shinyFilesButton("getSubShape", "1. Click here to select subbasin file" ,
+             shinyFilesButton("getSubShape", "1. Click here to select subbasin shapefile" ,
                               title = "Please select the subbasin shape file:",
                               multiple = FALSE,
                               buttonType = "default",

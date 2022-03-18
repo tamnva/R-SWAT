@@ -39,12 +39,13 @@ objFunctionUI <- function(id) {
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   Please select the objective function: NSE = Nash–Sutcliffe 
+                   Please select the objective function: NSE = Nash-Sutcliffe 
                    efficiency, KGE = Kling-Gupta efficiency, R2 = R squared, 
-                   RMSE = Root-mean-square error, PBIAS =  Percent bias = 
-                   100 * (sumObserved - sumSimulated)/sumObserved. The objective 
-                   function currently just the average selected (e.g., NSE) for all 
-                   variables with equal weights. TODO...
+                   RMSE = Root-mean-square error, aPBIAS =  Absolute Percent bias = 
+                   abs(100 * (sumObserved - sumSimulated))/sumObserved. The same weights
+                   are applied for all variables. Users can define their own objective
+                   function using the option 'userObjFunction' by modifying the file
+                   ./R/userObjFunction.R
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -63,10 +64,10 @@ objFunctionUI <- function(id) {
              tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Load observed data, single file for each variable. 
                    Files should be in ASCII format with two columns and header,
-                   the first column is the date (format dd/mm/yyyy) and 
-                   the second column is the data. If there is missing value, simply
-                   put NA in that position. File name MUST be followed section 3.1,
-                   check 'Display your selected outputs'
+                   the first column is the date (format yyyy-mm-dd) and 
+                   the second column is the data. Use NA for missing values. 
+                   File name MUST be followed then name shown in 3.Run SWAT => 
+                   Display corresponding observed file names
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -75,24 +76,25 @@ objFunctionUI <- function(id) {
       
       column(width = 10,
              shinyFilesButton("getObservedDataFile", "Click here to select" ,
-                              title = "Please select observed data file",
+                              title = "Please select observed data file(s)",
                               multiple = TRUE,
                               buttonType = "default", 
                               class = NULL),
              verbatimTextOutput("printObservedDataFile"),
+             textOutput("checkGetObservedDataFile"),
       ),
       
       column(width = 10,
-             checkboxInput('checkDisplayObsVar', 'Display obseved variable', 
+             checkboxInput('checkDisplayObsVar', 'Display observed data', 
                            value = FALSE, width = NULL),
       ),
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   Show all observed variable here, each observed values have 
-                   2 columns, the first 2 columns are for 1st variable in the file
-                   obs_var_1.txt, the next 2 columns are for the 2nd variable in the
-                   file obs_var_2.txt and so on for the next 2 columns
+                   Show all observed data here, each observed data have 
+                   2 columns, the first 2 columns are data of the file
+                   obs_var_1.txt, the next 2 columns are data of the 
+                   file obs_var_2.txt and so on
                    <span>",
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -119,7 +121,7 @@ objFunctionUI <- function(id) {
       ),
 
       column(width = 10,
-             actionButton("calObjFunction", "Click here to calculate objection"),
+             actionButton("calObjFunction", "Click here to calculate the objective function"),
              verbatimTextOutput("printCalObjFunction"),
       ),
 
