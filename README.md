@@ -12,7 +12,7 @@ This app is designed for R beginner to advance users, you can use this app even 
 
 To run this app, install latest **[R version 4.1.1](https://cran.r-project.org/bin/windows/base/)** or newer version (If you use old version of R this **might NOT** work). Then **[install R studio](https://www.rstudio.com/)**. Then do the following steps:
 
-- **Step 1**: [Click here](https://github.com/tamnva/SWATshiny/archive/refs/heads/master.zip) to download the whole code of this app.
+- **Step 1**: [Click here](https://github.com/tamnva/R-SWAT/archive/refs/heads/master.zip) to download the whole code of this app.
 - **Step 2**: Extract the downloaded file => Open RStudio
 - **Step 3**: Open the file *./R/loadPackages.R* with R studio and install all packages list in this file (take 5-10 minutes).
 - **Step 4**: Open the file server.R or ui.R in R studio => then click the green button named *Run App*
@@ -23,14 +23,14 @@ To run this app, install latest **[R version 4.1.1](https://cran.r-project.org/b
     library(shiny)
     
     # Automatically download this R-SWAT app (code + data) to your local machine and run it
-    runGitHub("SWATshiny", "tamnva")
+    runGitHub("R-SWAT", "tamnva")
     
     # If you already manually downloaded it from the github, you can run the app using this command
     # runApp("RSWAT_folder")
 
 The following interface (attached screenshot on the end of this document) will appear and you can start using this app. Start with Tab '1. General setting' => '2. Parameter sampling' => and so on. On each tab there are subitems (e.g., in the first figure, start with '1. Working folder' => '2. TxtInOut folder' => and so on)
 
-If you don't know which input is required, simply clicking to "Help?" at the right side of each respective input field. A sample of data for running this app can be downloaded from my [GitHub repository](https://github.com/tamnva/SWATshiny/tree/master/data), including:
+If you don't know which input is required, simply clicking to "Help?" at the right side of each respective input field. A sample of data for running this app can be downloaded from my [GitHub repository](https://github.com/tamnva/R-SWAT/blob/master/data/obs_var_1.txt), including:
 
  1. _/data/TxtInOut_: A TxtInOut folder and all associated files created by ArcSWAT
  2. _swatParam.txt_: An input file describing all SWAT parameters that you will need for the input field _1. General Setting => 4. Files with list of all SWAT Parameters_
