@@ -1,11 +1,12 @@
 
 # maximum upload file 500 MB
 options(shiny.maxRequestSize = 500*1024^2)
+
 # Creating server
 server <- function(input, output, session) {
  
   #-----------------------------------------------------------------------------  
-  # Global variables (use <<- for storing globalVariable inside observe)
+  # Global variables (use <<- for saving globalVariable inside observe)
   #-----------------------------------------------------------------------------
   globalVariable <- list()
   displayOutput <- list()
@@ -18,23 +19,32 @@ server <- function(input, output, session) {
   # Global function for running SWAT
   #-----------------------------------------------------------------------------
   SWAT <- function(parameterValue){
+    
+    # Make sure that parameterValue is data frame or matrix
     if (is.matrix(parameterValue) |
         is.data.frame(parameterValue)){
+      
+      # Numbering the parameter set number and add to the 1st column
       nrow <- nrow(parameterValue)
       parameterValue <- cbind(c(1:nrow), parameterValue)
 
     } else {
+      
+      # Convert input vector to matrix, add 1 to 1st column as the parameter set number
       parameterValue <- matrix(c(1,parameterValue), nrow = 1)   
-
     }
+    
     #Remove row and column names
     rownames(parameterValue) <- NULL
     colnames(parameterValue) <- NULL
-
-    # Save 
+    
+    # Save parameter value to the globalVariable 
     globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
+    
+    # Number of parallel runs cannot be higher than number of input parameter sets
     globalVariable$ncores <- min(globalVariable$ncores, nrow(parameterValue))
     
+    # Run SWAT model
     runSWATpar(globalVariable$workingFolder, 
                globalVariable$TxtInOutFolder, 
                globalVariable$outputExtraction, 
@@ -46,7 +56,8 @@ server <- function(input, output, session) {
                globalVariable$fileCioInfo,
                globalVariable$dateRangeCali,
                globalVariable$firstRun)
-   
+    
+
     # Objective function with initial parameter set
     temp <- calObjFunction(parameterValue,
                            globalVariable$ncores, 
@@ -56,51 +67,72 @@ server <- function(input, output, session) {
                            globalVariable$workingFolder, 
                            globalVariable$objFunction)
    
-   if (is.null(globalVariable$simData)){
-     globalVariable$simData <<- temp$simData
-     globalVariable$objValue <<- temp$objValue
-   } else {
-     globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
-     globalVariable$objValue <<- c(globalVariable$objValue, temp$objValue)
-   }
-   
-   # Set first run is false
+    # If this is a first run
+    if (is.null(globalVariable$simData)){
+      globalVariable$simData <<- temp$simData
+      globalVariable$objValue <<- temp$objValue
+     
+    # If this is not the first run, then combine result to the existing data 
+    } else {
+      globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
+      globalVariable$objValue <<- c(globalVariable$objValue, temp$objValue)
+    }
+    
+   # Next run, don't need to copy unchanged SWAT input files
    globalVariable$copyUnchangeFiles <<- FALSE
    
-   # Minimize or maximize objective function value
+   # Parameter optimization: convert to the minimize problem, regardless of input
    if (globalVariable$minOrmax == "Minimize"){
      output <- temp$objValue
    } else {
      output <- - temp$objValue
    }
    
-   print(parameterValue)
-   print(output)
-   print(temp$objValue)
-   
+   # Return output
    return(output)
   }  
 
-  #
   #-----------------------------------------------------------------------------
-  # Tab 1. General Setting
+  # Save project setting
   #-----------------------------------------------------------------------------
-
-  # ****************************************************************************  
-  # Update all input fields if the project file is loaded
-  # ****************************************************************************  
+  observeEvent(input$saveProject, {
+    
+    if(dir.exists(input$workingFolder)){
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+                                           'RSWATproject.rds', sep ='')) 
+      showNotification("Project settings were saved as 'RSWATproject.rds'
+      in the working folder", type = "message", duration = 10)
+      
+    } else {
+      showNotification("Working folder does not exist, please define in 
+                       1.General setting => 1. Working folder",
+                       type = "error", duration = 10)
+    }
+    
+  })
+  
+  #-----------------------------------------------------------------------------
+  # Load project setting
+  #-----------------------------------------------------------------------------  
   observe({
+    
+    # Open file selection window
     volumes <- getVolumes()
-    shinyFileChoose(input, "getRSWATProjectFile", 
+    shinyFileChoose(input, "loadProject", 
                     roots = volumes, 
                     filetypes=c('', 'rds'),
                     session = session)
     
-    RSWATProjectFile <- parseFilePaths(volumes, input$getRSWATProjectFile)
-    
+    # Get full link of the selected file
+    RSWATProjectFile <- parseFilePaths(volumes, input$loadProject)
+
+    # Read RSWATproject.rds file and updated input fields
     if(length(RSWATProjectFile$datapath) == 1){
-      output$printRSWATProjectFile <- renderText(RSWATProjectFile$datapath)
+      
+      # Read data in this file
       globalVariable <<- readRDS(RSWATProjectFile$datapath)
+      
+      # Now the load project is true (because the RSWATproject.rds was given)
       globalVariable$loadProject <- TRUE
       
       #-------------------------------------------------------------------------      
@@ -108,12 +140,12 @@ server <- function(input, output, session) {
       #-------------------------------------------------------------------------
       # Update working folder
       updateTextInput(session, "workingFolder", 
-                      label = "2. Working folder", 
+                      label = "1. Working folder", 
                       value = globalVariable$workingFolder)
       
       # Update TxtInOut folder
       updateTextInput(session, "TxtInOutFolder", 
-                      label = "3. TxtInOut folder", 
+                      label = "2. TxtInOut folder", 
                       value = globalVariable$TxtInOutFolder)      
       
 
@@ -205,12 +237,18 @@ server <- function(input, output, session) {
       # Update get observed data files
       output$printObservedDataFile <- renderText(globalVariable$observedDataFile)
       
+      # Show meesage
+      showNotification("All project settings were loaded", type = "message", duration = 10)
+      
     }
     
   }) 
 
   
   
+  #-----------------------------------------------------------------------------
+  # Tab 1. General Setting
+  #-----------------------------------------------------------------------------
   # ****************************************************************************  
   # Get working folder
   # ****************************************************************************
@@ -225,7 +263,7 @@ server <- function(input, output, session) {
     } else {
       output$checkWorkingFolder <- renderText(" ")
     }
-     
+    
   })
   
   # ****************************************************************************  
@@ -569,6 +607,7 @@ print(sensCaliObject)[]")
     globalVariable$dateRangeCali <<- input$dateRangeCali
   })     
   
+
   # ****************************************************************************  
   # Get user input number of cores
   # ****************************************************************************
@@ -587,6 +626,9 @@ print(sensCaliObject)[]")
     # Parameter sampling: executing input R command in the input text box
     # ****************************************************************************
     # Display progress
+    
+    globalVariable$parameterValue <<- c()
+    
     withProgress(message = 'Running SWAT model(s)...', {
       
     checkList <- TRUE
@@ -600,6 +642,7 @@ print(sensCaliObject)[]")
     checkList <- checkList & !is.null(globalVariable$SWATexeFile) 
     checkList <- checkList & !is.null(globalVariable$fileCioInfo)
     checkList <- checkList & !is.null(globalVariable$dateRangeCali)
+    
     
     if (checkList){
       
@@ -993,6 +1036,9 @@ print(sensCaliObject)[]")
         width = rep(300, ncol(globalVariable$parameterValue)),
         type = rep('numeric', ncol(globalVariable$parameterValue))
         )
+      
+      print("print parameters")
+      print(globalVariable$parameterValue)
       
       output$tableDisplayParameterSet <- renderExcel(
         excelTable(data = globalVariable$parameterValue,

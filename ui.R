@@ -1,16 +1,37 @@
 
-
 # Create UI
 ui <- dashboardPage(
   
   # ----------------------------------------------------------------------Header
   dashboardHeader(
-    title = "R-SWAT"
+    title = "R-SWAT", 
+    
+    
+    tags$li(class = "dropdown", 
+            
+            # Save project button
+            actionButton(inputId = "saveProject",
+                         label = "Save project", 
+                         icon = icon("save"),
+                         style="background-color: #b1fa87; border-color: #b1fa87; 
+                         float:left; padding-top:13px; padding-bottom:13px;"),
+            
+            # Load project buttom
+            shinyFilesButton("loadProject", "Load project" , 
+                             title = "Load project: Please select the 'RSWATproject.rds' file",
+                             multiple = FALSE,
+                             buttonType = "default",
+                             icon = icon("upload"),
+                             style="background-color: #fafa87; border-color: 
+                             #2e6da4; padding-top:13px; padding-bottom:13px;",
+                             class = NULL)
+            )
   ),
   
   # ---------------------------------------------------------------------Sidebar
   dashboardSidebar(
 
+    # Introduction Tab
     sidebarMenu(
       menuItem("About this app", 
                tabName = "intro", 
@@ -18,6 +39,7 @@ ui <- dashboardPage(
                selected = TRUE)
     ),
     
+    # General setting tab
     sidebarMenu(
       menuItem("1. General setting", 
                tabName = "generalSetting", 
@@ -25,6 +47,7 @@ ui <- dashboardPage(
                selected = FALSE)
     ),
     
+    # Parameter sampling Tab
     sidebarMenu(
       menuItem("2. Parameter sampling", 
                tabName = "paramSampling", 
@@ -32,6 +55,7 @@ ui <- dashboardPage(
                selected = FALSE)
     ),
     
+    # Run SWAT Tab
     sidebarMenu(
       menuItem("3. Run SWAT", 
                tabName = "runSWAT", 
@@ -39,6 +63,7 @@ ui <- dashboardPage(
                selected = FALSE)
     ),
     
+    # Evaluate model output tab
     sidebarMenu(
       menuItem("4. Evaluate output", 
                tabName = "evalOutputTab",
@@ -56,6 +81,8 @@ ui <- dashboardPage(
                           selected = FALSE))
       
     ),
+    
+    # Visualization Tab
     sidebarMenu(
       menuItem("Visualization", tabName = "visual",icon = icon("eye"),
                startExpanded = FALSE, selected = FALSE,
@@ -64,6 +91,7 @@ ui <- dashboardPage(
                menuSubItem("output.rch", tabName = "rch", selected = FALSE),
                menuSubItem("output.sub", tabName = "sub", selected = FALSE))
     )
+    
   ),
 
   # ------------------------------------------------------------------------Body
@@ -116,7 +144,7 @@ ui <- dashboardPage(
 
       tabItem(tabName = "sub",
               subUI("subUI")
-      )     
+      )
     )
   ) 
  #------------------------------------------------------------------------------ 
