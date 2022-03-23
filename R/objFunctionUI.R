@@ -45,7 +45,8 @@ objFunctionUI <- function(id) {
                    abs(100 * (sumObserved - sumSimulated))/sumObserved. The same weights
                    are applied for all variables. Users can define their own objective
                    function using the option 'userObjFunction' by modifying the file
-                   ./R/userObjFunction.R
+                   ./R/userObjFunction.R. See section 5 of R-SWAT wiki page
+                   https://github.com/tamnva/R-SWAT/wiki/R-SWAT-User-Manual
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",

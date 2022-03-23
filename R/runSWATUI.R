@@ -32,7 +32,8 @@ runSwatUI <- function(id) {
                    '1,2 * 1,2,3 * 3' Note * must be use to seperate this expression. Currently
                    incase of reading from .hru, .sub, .rch the file name and file type 
                    must be identical. Please check the tick box below to ensure that 
-                   all numbers you enter here appear in the display table
+                   all numbers you enter here appear in the display table. Please also see section 4
+                   of R-SWAT wiki page https://github.com/tamnva/R-SWAT/wiki/R-SWAT-User-Manual
                    <span> ", 
                    allowHTML = TRUE, 
                    trigger = "click",

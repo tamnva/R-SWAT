@@ -261,14 +261,22 @@ server <- function(input, output, session) {
   # Get working folder
   # ****************************************************************************
   observe({ 
+    
+    # Save working directory in the global variable
     globalVariable$workingFolder <<- input$workingFolder
+    
+    # Save link to the simulation report log file to the global variable
     globalVariable$CurrentSimulationReportFile <<- paste(input$workingFolder, 
                                                          '/Output/CurrentSimulationReport.log', 
                                                          sep ='')
     # Check if working folder exists
     if(!dir.exists(input$workingFolder)){
+      
+      # Print out message if working dir does not exist
       output$checkWorkingFolder <- renderText("Input folder does not exist")
     } else {
+      
+      # If exists, does not display anything
       output$checkWorkingFolder <- renderText(" ")
     }
     
@@ -288,25 +296,32 @@ server <- function(input, output, session) {
       output$checkTxtInOutFolder <- renderText(" ")
     }
     
-    
+    # Check if .hru files exist in this folder
     if (checkDirFileExist(input$TxtInOutFolder, "", ".hru")){
       
+      # Get HRU information (land use, slope, soil, sub)
       globalVariable$HRUinfo <<- getHruInfo(input$TxtInOutFolder)
+      
+      # Save link to TxtInout Folder to the global variable
       globalVariable$TxtInOutFolder <<- input$TxtInOutFolder  
       
+      # Get unique soil, land use, slope, max number of subbasins
       uniqueSoil <- unique(globalVariable$HRUinfo$soil) 
       uniqueLandUse <- unique(globalVariable$HRUinfo$lu)
       uniqueSlope <- unique(globalVariable$HRUinfo$slope)
       minMaxSubbasin <- range(globalVariable$HRUinfo$sub)
       
+      # Number of soil, land use, slope
       nSoil <- length(uniqueSoil)
       nLU <- length(uniqueLandUse)
       nSlope <- length(uniqueSlope)
       
       nRow <- max(nSoil, nLU, nSlope, 2)
       
+      # Display table of HRU information (land use, soil, slope)
       output$tableHRUinfo <- renderDataTable(globalVariable$HRUinfo)
       
+      # Display unique land use, soil, slope
       displayOutput$uniqueHruProperties <<- 
         data.frame(minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
                    Landuse = c(uniqueLandUse,rep(NA, nRow - nLU)),
@@ -315,6 +330,8 @@ server <- function(input, output, session) {
         )
       
     } else {
+      
+      # If this is not TxtInOut folder, assign global variables to NULL
       globalVariable$HRUinfo <<- NULL
       globalVariable$TxtInOutFolder <<- NULL
       output$tableHRUinfo <- NULL
@@ -326,14 +343,19 @@ server <- function(input, output, session) {
   # Get executable SWAT file
   # ****************************************************************************  
   observe({
+    # Get volumes
     volumes <- getVolumes()
+    
+    # Show shinyFileChoose window
     shinyFileChoose(input, "getSWATexe", 
                     roots = volumes, 
                     filetypes=c('', 'exe'),
                     session = session)
     
+    # Get full path to SWAT exe file
     SWATexeFile <- parseFilePaths(volumes, input$getSWATexe)
     
+    # Display and assign SWAT exe file to the global variable
     if(length(SWATexeFile$datapath) == 1){
       output$printSWATexe <- renderText(SWATexeFile$datapath)
       globalVariable$SWATexeFile <<- as.character(SWATexeFile$datapath)
@@ -345,18 +367,24 @@ server <- function(input, output, session) {
   # ****************************************************************************
 
   observe({
+    # Get volumes
     volumes <- getVolumes()
+    
+    # Show shinyFileChoose window
     shinyFileChoose(input, "getSWATParamFile", 
                     roots = volumes,  
                     filetypes=c('', 'txt'),
                     session = session)
     
+    # Get full path to SWAT parameter file
     SWATParamFile <- parseFilePaths(volumes, input$getSWATParamFile)
     
+    # Print out link to SWAT parameter file/save to global variable
     output$printSWATParamFile <- NULL
     globalVariable$SWATParamFile <<- NULL
     globalVariable$SWATParam <<- NULL
     output$tableSWATParam <- NULL
+    
     
     if (length(SWATParamFile$datapath) == 1){
       if (SWATParamFile$name == "swatParam.txt"){
@@ -379,8 +407,11 @@ server <- function(input, output, session) {
   # **************************************************************************** 
   
   observe({
+    
+    # Requirement for activation these command
     req(input$helpParameterSelection)
     
+    # Check if there is no input SWAT parameter file
     if (is.null(globalVariable$SWATParam$parameter)){
       output$tableHelpParameterSelection <- 
         renderDataTable(displayOutput$uniqueHruProperties)
@@ -468,6 +499,8 @@ server <- function(input, output, session) {
   # ****************************************************************************
   observe({
     req(input$samplingApproach)
+    
+    # Save sampling approach to the global variable
     globalVariable$samplingApproach <<- input$samplingApproach
 
     if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
@@ -533,19 +566,24 @@ print(sensCaliObject)[]")
   # Parameter sampling: get input information
   # ****************************************************************************
   observe({
-    #--------------------------------------------------
     req(input$inputInfo)
-
+ 
+    # Check if user need to input R command
     if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
         input$samplingApproach == 'Cali_(from_optimization_package)' |
         input$samplingApproach == 'Cali_(from_hydroPSO_package)' |
         input$samplingApproach == 'Cali_(from_nloptr_package)' |
         input$samplingApproach == 'Sensi_(from_userDefined_package)' |
         input$samplingApproach == 'Cali_(from_userDefined_package)' ){
-      globalVariable$sensCaliCommand <<- input$inputInfo
-      globalVariable$sensCaliCommand <<- splitRemoveComment(globalVariable$sensCaliCommand)
       
+      # Save input as text
+      globalVariable$sensCaliCommand <<- input$inputInfo
+      
+      # Remove comments and split R command
+      globalVariable$sensCaliCommand <<- splitRemoveComment(globalVariable$sensCaliCommand)
     } else {
+      
+      # If input is not R command, then just save as text
       globalVariable$sensCaliCommand <<- input$inputInfo
     }
     
@@ -575,13 +613,24 @@ print(sensCaliObject)[]")
   # Get user output extraction
   # ****************************************************************************
   observe({
+    
+    # Get table of output extraction
     outputExtraction <- excel_to_R(input$tableOutputExtraction)
     
+    # Check if there is not such a table, then take default table
     if(is.null(outputExtraction)) outputExtraction <- dataOutputExtraction
+    
+    # Save this table to the global variable
     globalVariable$outputExtraction <<- outputExtraction  
+    
+    # Number of output variables
     OutputVar <- getNumberOutputVar(outputExtraction)
     globalVariable$nOutputVar <<- OutputVar$nOutputVar
-    globalVariable$userReadSwatOutput <<- OutputVar$userReadSwatOutput    
+    
+    # Check if this option is activated
+    globalVariable$userReadSwatOutput <<- OutputVar$userReadSwatOutput
+    
+    # Display table of observed file names needed for calibration/optimization
     output$tableOutputExtractionDisplayOnly <- renderDataTable(
       printVariableNameObservedFiles(outputExtraction)
     )
@@ -593,12 +642,20 @@ print(sensCaliObject)[]")
   # Update select input range based on file.cio in the TxtInOutFolder
   # ****************************************************************************
   observe({
+    
+    # Require the TxtInOut Folder input field
     req(input$TxtInOutFolder)
     
+    # Check if there is a file called file.cio in this TxtInOut
     if (checkDirFileExist(input$TxtInOutFolder, "file.cio", "")){
+      
+      # Get simulation dates
       myDate <- getFileCioInfo(input$TxtInOutFolder)
+      
+      # Assign simulation dates to the global variale 
       globalVariable$fileCioInfo <<- myDate
       
+      # Update selected date range for calibration/sensitivity
       updateDateRangeInput(session, "dateRangeCali",
                            start = myDate$startEval,
                            end = myDate$endSim,
@@ -612,6 +669,7 @@ print(sensCaliObject)[]")
   # Get user input range for calibration
   # ****************************************************************************
   observe({ 
+    # Assign selected date range for calibration/sensitivity analysis to the global variables
     globalVariable$dateRangeCali <<- input$dateRangeCali
   })     
   
@@ -620,6 +678,7 @@ print(sensCaliObject)[]")
   # Get user input number of cores
   # ****************************************************************************
   observe({ 
+    # Assing the number of selected cores to the global varialbes
     globalVariable$ncores <<- input$ncores
   })
  
@@ -628,17 +687,13 @@ print(sensCaliObject)[]")
   # ****************************************************************************
   observeEvent(input$runSWAT, {
     
-    # Performe check list otherwise RSWAT will be turn off when click this
-
-    # ****************************************************************************  
-    # Parameter sampling: executing input R command in the input text box
-    # ****************************************************************************
-    # Display progress
-    
+    # Refresh the parameter values in case of loading the projects
     globalVariable$parameterValue <<- c()
     
+    # Display progress bar
     withProgress(message = 'Running SWAT...', {
       
+    # Perform various checks to activate SWAT run
     checkList <- TRUE
     checkList <- checkList & !is.null(globalVariable$workingFolder)
     checkList <- checkList & !is.null(globalVariable$paraSelection)
@@ -654,7 +709,7 @@ print(sensCaliObject)[]")
     
     if (checkList){
 
-      # Message show all input was saved
+      # Print out message when click Run SWAT
       showModal(modalDialog(
         title = "SWAT is running...",
         HTML("SWAT is running, dismiss this message. You can open the text file 
@@ -717,7 +772,7 @@ print(sensCaliObject)[]")
         # Check max number of cores
         globalVariable$ncores <<- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
         
-        # run parallel
+        # Run SWAT in parallel
         runSWATpar(globalVariable$workingFolder, 
                    globalVariable$TxtInOutFolder, 
                    globalVariable$outputExtraction, 
@@ -733,6 +788,7 @@ print(sensCaliObject)[]")
         
         if(is.null(globalVariable$observedData)){
           
+          # Display message box if there is no observed data provided
           showModal(modalDialog(
             title = "Not enough information to perform SWAT run",
             HTML("You selected 'Cali_(DDS)', please defined objective function and load observed data (Step 4.1) before running SWAT"),
@@ -779,6 +835,7 @@ print(sensCaliObject)[]")
                                  globalVariable$workingFolder, 
                                  globalVariable$objFunction)
           
+          # Set new parameter
           newPar <- globalVariable$parameterValue
           
           # Set the best objective and parameter values
@@ -845,7 +902,7 @@ print(sensCaliObject)[]")
               
             }
             
-            # Run SWAT
+            # Run SWAT in parallel
             runSWATpar(globalVariable$workingFolder, 
                        globalVariable$TxtInOutFolder, 
                        globalVariable$outputExtraction, 
@@ -869,19 +926,14 @@ print(sensCaliObject)[]")
                                    globalVariable$objFunction)
             
             # Save iteration result
-            saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,
-                                                        newPar)
-            saveIterationResult$objValue <- c(saveIterationResult$objValue,
-                                              temp$objValue)
-            saveIterationResult$perCriteria <- bindList(saveIterationResult$perCriteria,
-                                                        temp$perCriteria)
-            
-            saveIterationResult$simData <- bindList(saveIterationResult$simData,
-                                                    temp$simData)
+            saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,newPar)
+            saveIterationResult$objValue <- c(saveIterationResult$objValue, temp$objValue)
+            saveIterationResult$perCriteria <- bindList(saveIterationResult$perCriteria,temp$perCriteria)
+            saveIterationResult$simData <- bindList(saveIterationResult$simData,temp$simData)
           }
           
           if (parallelMode == 1) {
-            # Take the better parameter set/data if exist
+            # Take the better parameter set/data if exists
             for (j in 1:nrow(newPar)){
               if(temp$objValue[j] > best$objValue[j]){
                 best$objValue[j] <- temp$objValue[j]
@@ -896,6 +948,7 @@ print(sensCaliObject)[]")
             }
           }
           
+          # print out intermediate results
           print(c(i, round(best$objValue, digits = 3)))
           
           # Assign back to global variables
@@ -907,10 +960,8 @@ print(sensCaliObject)[]")
         }
         
         # Update numeric input (threshold objective function)
-        
         minObjValue <- min(globalVariable$objValue)
         maxObjValue <- max(globalVariable$objValue)
-        
         updateNumericInput(session = session, "behThreshold", 
                            label = "1. Input behavioral threshold", 
                            value = minObjValue,
@@ -935,6 +986,8 @@ print(sensCaliObject)[]")
                  globalVariable$samplingApproach == 'Cali_(from_userDefined_package)') {
         
         if(is.null(globalVariable$observedData)){
+          
+          # Show message box if there is no observed data
           showModal(modalDialog(
             title = "Not enough information to perform SWAT run",
             HTML("Please defined objective function and load observed data (Step 4.1) before running SWAT"),
@@ -958,10 +1011,8 @@ print(sensCaliObject)[]")
            print(globalVariable$objValue)
            
            # Update numeric input (threshold objective function)
-           
            minObjValue <- min(globalVariable$objValue)
            maxObjValue <- max(globalVariable$objValue)
-           
            updateNumericInput(session = session, "behThreshold", 
                               label = "1. Input behavioral threshold", 
                               value = minObjValue,
@@ -980,6 +1031,7 @@ print(sensCaliObject)[]")
         }
 
       } else {
+        # Show message box if there is no observed data
         showModal(modalDialog(
           title = "Not enough information to perform SWAT run",
           HTML("Unkown method"),
@@ -988,13 +1040,15 @@ print(sensCaliObject)[]")
         ))       
      }
       
-      # End run SWAT for all iterations ----------------------------------------
+      # End run SWAT for all iterations
       globalVariable$checkSimComplete <<- TRUE
       
+      # Save all results as RSWAT project
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep ='')) 
       
     } else {
-      # Message show all input was saved
+      
+      # Show message box if there is no observed data
       showModal(modalDialog(
         title = "Input data/information is missing, please check again",
         easyClose = TRUE,
