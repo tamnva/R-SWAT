@@ -1065,16 +1065,19 @@ print(sensCaliObject)[]")
   # ****************************************************************************
   observe({
     req(input$checkCurrentSimulation)
+    
+    # Check if the CurrentSimulationReport.log file exists
     if (file.exists(globalVariable$CurrentSimulationReportFile)){
       
+      # Read CurrentSimulationReport.log content
       fileContent <- readLines(globalVariable$CurrentSimulationReportFile, -1,
                                warn = FALSE)  
       
+      # Display content of the CurrentSimulationReport.log
       printFileContent <- list()
       for (i in 1:length(fileContent)){
         printFileContent[[i]] <- fileContent[i]
       }
-      
       output$tableCurrentSimulation <- renderUI({
         return(lapply(printFileContent, p))
       }) 
@@ -1088,8 +1091,10 @@ print(sensCaliObject)[]")
   observe({
     req(input$checkDisplayParameterSet)
     
+    # Check if the parameterValue exists
     if (!is.null(globalVariable$parameterValue)){
       
+      # Collumn setting of the parameter value table
       columnsParameterValue <- data.frame(
         title = c("Simulation Nr.", globalVariable$paraSelection$Parameter), 
         source = rep(NA, ncol(globalVariable$parameterValue)),
@@ -1097,9 +1102,7 @@ print(sensCaliObject)[]")
         type = rep('numeric', ncol(globalVariable$parameterValue))
         )
       
-      print("print parameters")
-      print(globalVariable$parameterValue)
-      
+      # Fill the parameter table with content (parameter values)
       output$tableDisplayParameterSet <- renderExcel(
         excelTable(data = globalVariable$parameterValue,
                    columns = columnsParameterValue,
@@ -1113,6 +1116,8 @@ print(sensCaliObject)[]")
                    wordWrap = FALSE)
         )      
     } else {
+      
+      # If there is no parameter, don't display anything
       output$tableDisplayParameterSet <- NULL
     }
   })
@@ -1125,8 +1130,11 @@ print(sensCaliObject)[]")
   # ****************************************************************************    
   observe({
     req(input$objFunction)
+    
+    # Get the type of objective function
     globalVariable$objFunction  <<- input$objFunction
     
+    # Check when the objecive function needs to be maximize or minimize
     if (input$objFunction == 'NSE' | input$objFunction == 'KGE' |
         input$objFunction == 'R2'){
       updateSelectInput(session, 'minOrmax', 
@@ -1149,6 +1157,8 @@ print(sensCaliObject)[]")
   # ****************************************************************************    
   observe({
     req(input$minOrmax)
+    
+    # Assign the maximum and miminum objective fuction values to the global variables
     globalVariable$minOrmax  <<- input$minOrmax
   })
   
@@ -1156,18 +1166,29 @@ print(sensCaliObject)[]")
   # Get observed data files
   # ****************************************************************************  
   observe({
+    
+    # Get volumes
     volumes <- getVolumes()
+    
+    # Display shinyFileChoose
     shinyFileChoose(input, "getObservedDataFile", 
                     roots = volumes,   
                     filetypes=c('', 'txt'),
                     session = session)
     
+    # Get full path to the observed data files
     observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile)
     
     # Get observed data
     if(length(observedDataFile$datapath) > 0){
+      
+      # Display observed data file paths
       output$printObservedDataFile <- renderText(observedDataFile$datapath)
+      
+      # Assign observed data file paths to the global variables
       globalVariable$observedDataFile <<- sortObservedDataFile(as.character(observedDataFile$datapath))
+      
+      # Observed data 
       globalVariable$observedData <<- list()
       
       checkGetObservedDataFileMessage <- " "
@@ -1175,12 +1196,14 @@ print(sensCaliObject)[]")
 
       if (globalVariable$nOutputVar != length(globalVariable$observedDataFile)){
 
+        # Print out message if there are more/less number of observed data files
         checkGetObservedDataFileMessage <- paste("Error: Number of observed files should be: ", 
                                                  globalVariable$nOutputVar, 
                                                  sep ="")
 
         } else {
      
+        # Get concent of observed data files
         for (i in 1:length(globalVariable$observedDataFile)){
 
           if (!grepl(paste("obs_var_", i, ".txt", sep =""), globalVariable$observedDataFile[i], fixed = TRUE)){
@@ -1214,6 +1237,7 @@ print(sensCaliObject)[]")
         }
       }  
  
+      # Display check message
       output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
  
       # Save observed data to globalVariables
@@ -1226,6 +1250,8 @@ print(sensCaliObject)[]")
   # ****************************************************************************
   observe({
     req(input$checkDisplayObsVar)
+    
+    # Display content of the observed data files
     output$tableObsVarDisplay <- renderDataTable(
       mergeDataFrameDiffRow(globalVariable$observedData)
       )
@@ -1236,6 +1262,7 @@ print(sensCaliObject)[]")
   # ****************************************************************************
   observeEvent(input$calObjFunction, {
     
+    # Check if all simulations are finished
     if (globalVariable$checkSimComplete){
       
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)' |
@@ -1259,7 +1286,7 @@ print(sensCaliObject)[]")
         
         withProgress(message = 'Calculating objective function...', {
           
-          # Caculate objective function
+          # Calculate objective function
           output$printCalObjFunction <- NULL
           
           temp <- calObjFunction(globalVariable$parameterValue,
