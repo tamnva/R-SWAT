@@ -15,7 +15,7 @@ hruUI <- function(id) {
       
       column(width = 4,
              shinyFilesButton("getHruShp", "1. Click here to select HRU shape file" ,
-                              title = "Please select the Hru raster file:",
+                              title = "Please select the Hru shape file:",
                               multiple = FALSE,
                               buttonType = "default",
                               style="font-weight: bold",

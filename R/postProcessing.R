@@ -4,7 +4,7 @@
 behaSimulation <- function(objValue, simData, parameterValue, behThreshold, 
                            varNumber, statIndex, observedData, minOrmax,
                            samplingApproach){
-  
+    
   # find index of simulation which are behavioral simulations
   if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
     behaIndex <- which (objValue >= behThreshold)
@@ -17,7 +17,7 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
       behaIndex <- which (objValue <= behThreshold)
     }
   }
-  
+
   # find 2.5% and 97.5% percentile
   ncol <- length(behaIndex)
   nrow <- length(simData[[varNumber]][[1]])
@@ -51,17 +51,21 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
 
   # find best simulation
   if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
-    ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))]]
+
+    
+    
+    ppuSimData[,4] <- simData[[varNumber]][[which(objValue == max(objValue))[1]]]
+
   } else if(statIndex == "aBIAS" | statIndex == "RMSE") {
-    ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))]]
+    ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))[1]]]
   } else {
     if (minOrmax == "Maximize"){
-      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))]]
+      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))[1]]]
     } else {
-      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))]]
+      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))[1]]]
     }
   }  
-  
+ 
   ppuSimData <- as.data.frame(ppuSimData)
   ppuSimData <- cbind(observedData[[varNumber]]$Date, ppuSimData)
   colnames(ppuSimData) <- c('Date','lower_95PPU', 'median', 
@@ -77,7 +81,7 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   
   
   #Best parameter
-  ppuParaRange[,4] <- parameterValue[which (objValue == max(objValue)),
+  ppuParaRange[,4] <- parameterValue[which (objValue == max(objValue))[1],
                                      2:ncol(parameterValue)]
   ppuParaRange <- as.data.frame(ppuParaRange)
   
@@ -90,6 +94,7 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   output$prFactor <- prFactor(observedData[[varNumber]]$Value,
                               ppuSimData$lower_95PPU,
                               ppuSimData$upper_95PPU)
+
   return(output)
 }
 

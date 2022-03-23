@@ -24,14 +24,6 @@ requiredPackages <- c('foreach',         # version >= 1.5.2
                       'hydroPSO',        # version >= 0.5-1
                       'nloptr'           # version >= 2.0.0
                       )
-
-# 'DEoptim'
-# outDEoptim <- DEoptim(SWAT, minCol, maxCol, DEoptim.control(VTR = -0.5, itermax = 5))
-
-# 'sensobol'
-# sensCaliObject <- SWAT(convertRange(sobol_matrices(N = 3, params = paste("X", 1:nParam, sep = "")), minCol, maxCol))
-# sobol_indices(Y = sensCaliObject, N = 3, params = paste("X", 1:nParam, sep = ""))$results
-
                      
 # Check and install only missing packages
 install.packages(setdiff(requiredPackages,rownames(installed.packages())), dependencies = TRUE) 
@@ -41,4 +33,3 @@ update.packages(requiredPackages, ask = FALSE)
   
 # Load dependency packages
 invisible(lapply(requiredPackages, library, character.only = TRUE))
-

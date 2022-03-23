@@ -116,7 +116,6 @@ subsetOutputHru <- function(hruData, sDate, eDate, colNam, tempAgg){
   
   # Aggregated result
   hru <- as.data.frame(matrix(rep(NA, nHrus*nTimeSteps), ncol = nHrus, nrow = nTimeSteps))
- 
   # Time step 
   plotPeriod <- seq(sDate, eDate, by ="days")
   byMonth <- strftime(plotPeriod, "%m")

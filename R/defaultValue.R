@@ -99,8 +99,8 @@ helpTextCali <- paste("Please write a SINGLE line R command from the selected pa
 
 # ------------------------------------------------------------------------------
 helpTextSensi <- paste("Please write TWO R commands (EACH command MUST be on a SINGLE line) from the selected package",  "\n",
-                      "   First R command line creates a 'sensitivity object', the variable name MUST be 'sensiObject'","\n",
-                      "   Second R command line tells this tool where the resulted sensitivity table are stored","\n",
+                      "   The first R command line (MUST start with sensCaliObject) executes SWAT runs with parameters from the sensitivity function","\n",
+                      "   The second R command line shows where the result is stored (Table with sensitivity indices) ","\n",
                       " ","\n",
                       "Use following keywords to access user settings from R-SWAT, e.g.,", "\n",
                       "  'nParam' : the number of parameters (see Table above) ", "\n",

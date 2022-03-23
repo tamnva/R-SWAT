@@ -19,7 +19,7 @@ server <- function(input, output, session) {
   # Global function for running SWAT
   #-----------------------------------------------------------------------------
   SWAT <- function(parameterValue){
-    
+    print(parameterValue)
     # Make sure that parameterValue is data frame or matrix
     if (is.matrix(parameterValue) |
         is.data.frame(parameterValue)){
@@ -44,6 +44,9 @@ server <- function(input, output, session) {
     # Number of parallel runs cannot be higher than number of input parameter sets
     globalVariable$ncores <- min(globalVariable$ncores, nrow(parameterValue))
     
+    # Convert input parameter to matrix
+    parameterValue <- as.matrix(parameterValue)
+
     # Run SWAT model
     runSWATpar(globalVariable$workingFolder, 
                globalVariable$TxtInOutFolder, 
@@ -56,7 +59,6 @@ server <- function(input, output, session) {
                globalVariable$fileCioInfo,
                globalVariable$dateRangeCali,
                globalVariable$firstRun)
-    
 
     # Objective function with initial parameter set
     temp <- calObjFunction(parameterValue,
@@ -97,13 +99,20 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   observeEvent(input$saveProject, {
     
+    # Check if working directory exists
     if(dir.exists(input$workingFolder)){
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'RSWATproject.rds', sep ='')) 
+      
+      # Display message that save was done
       showNotification("Project settings were saved as 'RSWATproject.rds'
       in the working folder", type = "message", duration = 10)
       
+      # Save project setting
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+                                           'RSWATproject.rds', sep ='')) 
+      
     } else {
+      
+      # Display error message
       showNotification("Working folder does not exist, please define in 
                        1.General setting => 1. Working folder",
                        type = "error", duration = 10)
@@ -206,7 +215,6 @@ server <- function(input, output, session) {
                                                              rowDrag = FALSE,
                                                              columnResize = FALSE,
                                                              wordWrap = TRUE)) 
-      
       # Update display corresponding observed file names
       output$tableOutputExtractionDisplayOnly <- renderDataTable(
         printVariableNameObservedFiles(globalVariable$outputExtraction))
@@ -491,7 +499,7 @@ server <- function(input, output, session) {
     } else if (input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "100")
-      outputText <- helpTextCali
+      outputText <- paste("Please input the number of iterations, e.g., 100", sep ="")
     } else if (input$samplingApproach == 'Read_User_Parameter_File'){
       updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
                           "C:/data/myParameterFile.txt")
@@ -629,7 +637,7 @@ print(sensCaliObject)[]")
     
     globalVariable$parameterValue <<- c()
     
-    withProgress(message = 'Running SWAT model(s)...', {
+    withProgress(message = 'Running SWAT...', {
       
     checkList <- TRUE
     checkList <- checkList & !is.null(globalVariable$workingFolder)
@@ -645,6 +653,15 @@ print(sensCaliObject)[]")
     
     
     if (checkList){
+
+      # Message show all input was saved
+      showModal(modalDialog(
+        title = "SWAT is running...",
+        HTML("SWAT is running, dismiss this message. You can open the text file 
+        'Output/CurrentSimulationReport.log' in the working folder to see the current simulation."),
+        easyClose = TRUE,
+        size = "l"
+      ))
       
       # First get or generate parameter set
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
@@ -662,17 +679,6 @@ print(sensCaliObject)[]")
 
       # Save global variables
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
-      
-      
-      # Message show all input was saved
-      showModal(modalDialog(
-        title = "Save current input",
-        HTML("All current inputs were saved to the file 'RSWATproject.rds' in the working folder.<br> 
-      SWAT is running, dismiss this message. You can open the text file '.\\Output\\CurrentSimulationReport.log' .<br>
-      in the working folder to see the current simulation."),
-        easyClose = TRUE,
-        size = "l"
-      ))
       
       # Copy unchanged file for the first simulation
       copyUnchangeFiles <- TRUE
@@ -1574,16 +1580,18 @@ print(sensCaliObject)[]")
   #-----------------------------------------------------------------------------
   # Tab 5. Visualization
   #-----------------------------------------------------------------------------  
-  # 5.1. Visualize watout  
+  # 5.1. Visualize watout file 
   # ****************************************************************************  
   # Update selected column watout.dat file type
   # ****************************************************************************
   observe({
     req(input$watoutFile)
-    # update select input
+    
+    # Read data and header of the watout file
     globalVariable$visualWatoutData <<- readWatout(input$watoutFile$datapath)
     globalVariable$visualWatoutHeader <<- readWatoutHeader(input$watoutFile$datapath)
     
+    # Display column header
     updateSelectizeInput(session, "selectColWatout",
                          choices = globalVariable$visualWatoutHeader,
                          selected = globalVariable$visualWatoutHeader[2]
@@ -1595,8 +1603,11 @@ print(sensCaliObject)[]")
   # ****************************************************************************  
   observe({
     req(input$observedFile)
-    # update select input
+    
+    # Read observed data
     globalVariable$visualObserveData <<- read.table(input$observedFile$datapath, header = TRUE, sep = "")
+
+    # Display header of observed data
     updateSelectizeInput(session, "selectColObs",
                          choices = colnames(globalVariable$visualObserveData),
                          selected = globalVariable$visualObserveData[2]
@@ -1609,16 +1620,24 @@ print(sensCaliObject)[]")
   observe({
     req(input$watoutFile)
   
+    # Plot selected data
     if(is.data.frame(globalVariable$visualWatoutData)){
+      
+      # Check if observed data file is missing 
       if (!is.null(input$observedFile$datapath)){
+        
+        # Search for data in the selected column
         if (input$selectColObs %in% colnames(globalVariable$visualObserveData)){
+          
+          # Plot the selected data
           pltWatout <- plotWatout(globalVariable$visualWatoutData, globalVariable$visualWatoutHeader, input$selectColWatout, 
                                   globalVariable$visualObserveData, input$selectColObs)
           output$plotWatout <- renderPlotly(pltWatout$plot)
         }
 
       } else {
-
+ 
+        # Only plot simulated data is observed dtaa is not provided
         if (input$selectColWatout %in% globalVariable$visualWatoutHeader){
           pltWatout <- plotWatout(globalVariable$visualWatoutData, globalVariable$visualWatoutHeader, input$selectColWatout, 
                                   NULL, NULL)
@@ -1630,29 +1649,41 @@ print(sensCaliObject)[]")
     
   })
 
-  # 5.1. Visualize output.hru
-  
+  # 5.2. Visualize output.hru
   # ****************************************************************************  
   # Get HRU shape file file
   # ****************************************************************************
   
   observe({
+    
+    # Get a list of available volumes
     volumes <- getVolumes()
+    
+    # Create a connection to the server side filesystem
     shinyFileChoose(input, "getHruShp", 
                     roots = volumes, 
                     filetypes=c('', 'shp'),
                     session = session)
     
+    # Full link to the selected file
     hruShpFile <- parseFilePaths(volumes, input$getHruShp)
     
     if(length(hruShpFile$datapath) == 1){
+      
+      # HRU file path
       hruShpFile <- as.character(hruShpFile$datapath)
+      
+      # Print out selected file
       output$printHruShp <- renderText(hruShpFile)
            
+      # Check if file exist
       if (file.exists(hruShpFile)){
 
+        # Read hru shape file
         displayOutput$hruShp <<- readOGR(hruShpFile)
       } else {
+        
+        # If hru shape file does not exit, return Null
         displayOutput$hruShp <<- NULL
       }
     }
@@ -1661,48 +1692,57 @@ print(sensCaliObject)[]")
   # ****************************************************************************  
   # Get TxtInOut directory 
   # ****************************************************************************
-  observe({
-    req(input$hruTempAgg)
-  })
+  #  observe({
+  #    req(input$hruTempAgg)
+  #  })
+  
   # Update select date rnage
   observe({
     
+    # Require input of the TxtInOut folder
     req(input$hruTxtInOutFolder)
     
+    # Read file.cio
     fileCio <- trimws(paste(input$hruTxtInOutFolder, '/file.cio', sep=''))
     
     if (file.exists(fileCio)){
 
+      # Get information from the file.cio
       displayOutput$hruFileCioInfo <<- getFileCioInfo(input$hruTxtInOutFolder)
       
+      # Update date for plot based on file.cio 
       updateDateInput(session, "hruPlotDate",
                       min = displayOutput$hruFileCioInfo$startEval,
                       max = displayOutput$hruFileCioInfo$endSim, 
                       value = displayOutput$hruFileCioInfo$startEval[1])  
       
+      # Update date for plot based on file.cio 
       updateDateRangeInput(session, "hruInputDateRange",
                            start = displayOutput$hruFileCioInfo$startEval,
                            end = displayOutput$hruFileCioInfo$endSim,
                            min = displayOutput$hruFileCioInfo$startEval,
                            max = displayOutput$hruFileCioInfo$endSim)
       
-      
+      # Update date for plot based on file.cio 
       updateDateInput(session, "hruPlotMonth",
                       min = displayOutput$hruFileCioInfo$startEval,
                       max = displayOutput$hruFileCioInfo$endSim, 
                       value = displayOutput$hruFileCioInfo$startEval[1])  
       
+      # Update date for plot based on file.cio 
       updateDateRangeInput(session, "hruInputMonthRange",
                            start = displayOutput$hruFileCioInfo$startEval,
                            end = displayOutput$hruFileCioInfo$endSim,
                            min = displayOutput$hruFileCioInfo$startEval,
                            max = displayOutput$hruFileCioInfo$endSim)
       
+      # Update date for plot based on file.cio 
       updateDateInput(session, "hruPlotYear",
                       min = displayOutput$hruFileCioInfo$startEval,
                       max = displayOutput$hruFileCioInfo$endSim, 
                       value = displayOutput$hruFileCioInfo$startEval[1])
       
+      # Update date for plot based on file.cio 
       updateDateRangeInput(session, "hruInputYearRange",
                            start = displayOutput$hruFileCioInfo$startEval,
                            end = displayOutput$hruFileCioInfo$endSim,
@@ -1711,20 +1751,27 @@ print(sensCaliObject)[]")
       
     }
     
+    # Get full link to the output.hru file
     fileHru <- trimws(paste(input$hruTxtInOutFolder, '/output.hru', sep=''))
   
+    # Check if fileHRU exists
     if(file.exists(fileHru)){
      
+      # Read header of output.hru
       ouputHruHeader <- readOutputHruHeader(fileHru)
 
+      # Remove column with these names out of plot data
       temp <- c('LULC', 'HRU', 'GIS', 'SUB', 'MGT', 'MO', 'DA', 'YR')
-
       ouputHruHeader <- ouputHruHeader[-na.omit(match(temp,ouputHruHeader))]
 
+      # Update selected column for plot
       updateSelectizeInput(session, "hruSelectCol",
                            choices = ouputHruHeader,
                            selected = ouputHruHeader[1])
+      
     } else {
+      
+      # If file does not exist, return null
       updateSelectizeInput(session, "hruSelectCol",
                            choices = NULL)      
     }
@@ -1738,15 +1785,23 @@ print(sensCaliObject)[]")
     
     req(input$hruTxtInOutFolder)
     
+    # Get full path of the file output.hru
     fileHru <- trimws(paste(input$hruTxtInOutFolder, '/output.hru', sep=''))
     
     if(file.exists(fileHru)){
-      # Read HRU data
       
+      # Read HRU data
       temp <- read.table(fileHru, header = FALSE, sep = "", skip = 9)
+      
+      # Get header of output.hru
       colnames(temp) <- readOutputHruHeader(fileHru)
+      
+      # Assign header to its data frame
       displayOutput$hruData <<- temp
+
     } else {
+      
+      # If file does not exist, return null
       displayOutput$hruData <<- NULL
     }
   })
@@ -1756,13 +1811,17 @@ print(sensCaliObject)[]")
   # ****************************************************************************
   observe({
     
+    # Required input to activate these commands
     req(input$hruTxtInOutFolder, 
         input$hruSelectCol,
         input$hruTempAgg)
-  
+    
+    # Check which temporal aggregation daily - monthly - or yearly 
+    # Get input date/date range and assigned them to global variables
+    
     if (input$hruTempAgg == 'Daily'){
       displayOutput$hruInputDateRange <<- input$hruInputDateRange
-      displayOutput$hruPlotDate <<- input$hruPlotDate       
+      displayOutput$hruPlotDate <<- input$hruPlotDate   
     } else if (input$hruTempAgg == 'Monthly'){
       displayOutput$hruInputDateRange <<- input$hruInputMonthRange
       displayOutput$hruPlotDate <<- input$hruPlotMonth  
@@ -1779,10 +1838,6 @@ print(sensCaliObject)[]")
                                      input$hruTempAgg)
 
       if(!is.null(displayOutput$hruShp)){
-
-#        hruRaster <- hruRasterValue(displayOutput$hruShp, 
-#                                    hruPlotData, 
-#                                    displayOutput$hruPlotDate)
        
         outputText <- as.character(displayOutput$hruPlotDate)
         if (input$hruTempAgg == "Monthly"){
@@ -2169,7 +2224,3 @@ print(sensCaliObject)[]")
   
   #-----------------------------------------------------------------------------  
 }
-
-# globalVariable <- readRDS(file = 'C:/Users/nguyenta/Documents/DemoRSWAT/RSWATproject.rds') 
-# globalVariable <- readRDS(file = 'C:/data/workingFolder/RSWATproject.rds') 
-# order(x, decreasing = TRUE)

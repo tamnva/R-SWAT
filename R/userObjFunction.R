@@ -36,9 +36,11 @@ userObjFunction <- function(obs, sim){
     }    
   }
   
-  # Calculate your user defined objective function here: START HERE
-  # -------------------------------------------------------------------------
-  # -------------------------------------------------------------------------
+  # Calculate your user defined objective function here
+  # ----------------------------------------------------------------------------  
+  # Delete the existing code below and add your code below this line
+  # PLEASE TEST YOUR CODE BEFORE RUNNING R-SWAT
+  # ----------------------------------------------------------------------------
   # In this example, lets say you extracted two outputs and want to calculate 
   #                  R square and put more weight to the second variable
   #
@@ -53,9 +55,9 @@ userObjFunction <- function(obs, sim){
   # Final objective function value (with different weights), must be with the name "output"
   output <- (1 * R2_var_1 + 2 * R2_var_2)/3
   
-  # Calculate your user defined objective function here: END HERE
-  # -------------------------------------------------------------------------
-  # -------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------  
+  # End: Don't modify anything after this line
+  # ----------------------------------------------------------------------------
 
   return(output)
   

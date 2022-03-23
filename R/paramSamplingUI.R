@@ -132,7 +132,9 @@ paramSamplingUI <- function(id) {
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;text-align: left;'>
                    Default input for each method is given, please modify the text if necessary
-                   (see help text below for modifying)
+                   (see help text below for modifying). Please see also Sections 2.1 and 2.2
+                   in the R-SWAT wiki page: https://github.com/tamnva/R-SWAT/wiki/R-SWAT-User-Manual
+ 
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",

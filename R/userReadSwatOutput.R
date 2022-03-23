@@ -21,6 +21,7 @@ userReadSwatOutput <- function(){
   output <- list()
   # ----------------------------------------------------------------------------  
   # Delete the existing code below and add your code below this line
+  # PLEASE TEST YOUR CODE BEFORE RUNNING R-SWAT
   # ----------------------------------------------------------------------------
   # Example: This function extracts data in the 7th column of the file  output.rch 
   #          and aggregate to monthly
