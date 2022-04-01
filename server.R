@@ -4,8 +4,8 @@ options(shiny.maxRequestSize = 500*1024^2)
 
 # Creating server
 server <- function(input, output, session) {
- 
-  #-----------------------------------------------------------------------------  
+
+  #-----------------------------------------------------------------------------
   # Global variables (use <<- for saving globalVariable inside observe)
   #-----------------------------------------------------------------------------
   globalVariable <- list()
@@ -23,36 +23,36 @@ server <- function(input, output, session) {
     # Make sure that parameterValue is data frame or matrix
     if (is.matrix(parameterValue) |
         is.data.frame(parameterValue)){
-      
+
       # Numbering the parameter set number and add to the 1st column
       nrow <- nrow(parameterValue)
       parameterValue <- cbind(c(1:nrow), parameterValue)
 
     } else {
-      
+
       # Convert input vector to matrix, add 1 to 1st column as the parameter set number
-      parameterValue <- matrix(c(1,parameterValue), nrow = 1)   
+      parameterValue <- matrix(c(1,parameterValue), nrow = 1)
     }
-    
+
     #Remove row and column names
     rownames(parameterValue) <- NULL
     colnames(parameterValue) <- NULL
-    
-    # Save parameter value to the globalVariable 
+
+    # Save parameter value to the globalVariable
     globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
-    
+
     # Number of parallel runs cannot be higher than number of input parameter sets
     globalVariable$ncores <- min(globalVariable$ncores, nrow(parameterValue))
-    
+
     # Convert input parameter to matrix
     parameterValue <- as.matrix(parameterValue)
 
     # Run SWAT model
-    runSWATpar(globalVariable$workingFolder, 
-               globalVariable$TxtInOutFolder, 
-               globalVariable$outputExtraction, 
-               globalVariable$ncores, 
-               globalVariable$SWATexeFile, 
+    runSWATpar(globalVariable$workingFolder,
+               globalVariable$TxtInOutFolder,
+               globalVariable$outputExtraction,
+               globalVariable$ncores,
+               globalVariable$SWATexeFile,
                parameterValue,
                globalVariable$caliParam,
                globalVariable$copyUnchangeFiles,
@@ -62,131 +62,131 @@ server <- function(input, output, session) {
 
     # Objective function with initial parameter set
     temp <- calObjFunction(parameterValue,
-                           globalVariable$ncores, 
+                           globalVariable$ncores,
                            globalVariable$nOutputVar,
-                           globalVariable$userReadSwatOutput, 
-                           globalVariable$observedData, 
-                           globalVariable$workingFolder, 
+                           globalVariable$userReadSwatOutput,
+                           globalVariable$observedData,
+                           globalVariable$workingFolder,
                            globalVariable$objFunction)
-   
+
     # If this is a first run
     if (is.null(globalVariable$simData)){
       globalVariable$simData <<- temp$simData
       globalVariable$objValue <<- temp$objValue
-     
-    # If this is not the first run, then combine result to the existing data 
+
+    # If this is not the first run, then combine result to the existing data
     } else {
       globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
       globalVariable$objValue <<- c(globalVariable$objValue, temp$objValue)
     }
-    
+
    # Next run, don't need to copy unchanged SWAT input files
    globalVariable$copyUnchangeFiles <<- FALSE
-   
+
    # Parameter optimization: convert to the minimize problem, regardless of input
    if (globalVariable$minOrmax == "Minimize"){
      output <- temp$objValue
    } else {
      output <- - temp$objValue
    }
-   
+
    # Return output
    return(output)
-  }  
+  }
 
   #-----------------------------------------------------------------------------
   # Save project setting
   #-----------------------------------------------------------------------------
   observeEvent(input$saveProject, {
-    
+
     # Check if working directory exists
     if(dir.exists(input$workingFolder)){
-      
+
       # Display message that save was done
       showNotification("Project settings were saved as 'RSWATproject.rds'
       in the working folder", type = "message", duration = 10)
-      
+
       # Save project setting
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
-                                           'RSWATproject.rds', sep ='')) 
-      
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/',
+                                           'RSWATproject.rds', sep =''))
+
     } else {
-      
+
       # Display error message
-      showNotification("Working folder does not exist, please define in 
+      showNotification("Working folder does not exist, please define in
                        1.General setting => 1. Working folder",
                        type = "error", duration = 10)
     }
-    
+
   })
-  
+
   #-----------------------------------------------------------------------------
   # Load project setting
-  #-----------------------------------------------------------------------------  
+  #-----------------------------------------------------------------------------
   observe({
-    
+
     # Open file selection window
     volumes <- getVolumes()
-    shinyFileChoose(input, "loadProject", 
-                    roots = volumes, 
+    shinyFileChoose(input, "loadProject",
+                    roots = volumes,
                     filetypes=c('', 'rds'),
                     session = session)
-    
+
     # Get full link of the selected file
     RSWATProjectFile <- parseFilePaths(volumes, input$loadProject)
 
     # Read RSWATproject.rds file and updated input fields
     if(length(RSWATProjectFile$datapath) == 1){
-      
+
       # Read data in this file
       globalVariable <<- readRDS(RSWATProjectFile$datapath)
-      
+
       # Now the load project is true (because the RSWATproject.rds was given)
       globalVariable$loadProject <- TRUE
-      
-      #-------------------------------------------------------------------------      
+
+      #-------------------------------------------------------------------------
       # Update Tab 1: General Setting
       #-------------------------------------------------------------------------
       # Update working folder
-      updateTextInput(session, "workingFolder", 
-                      label = "1. Working folder", 
+      updateTextInput(session, "workingFolder",
+                      label = "1. Working folder",
                       value = globalVariable$workingFolder)
-      
+
       # Update TxtInOut folder
-      updateTextInput(session, "TxtInOutFolder", 
-                      label = "2. TxtInOut folder", 
-                      value = globalVariable$TxtInOutFolder)      
-      
+      updateTextInput(session, "TxtInOutFolder",
+                      label = "2. TxtInOut folder",
+                      value = globalVariable$TxtInOutFolder)
+
 
       # Update Select executable SWAT file Help
       output$printSWATexe <- renderText(globalVariable$SWATexeFile)
-      
+
       # Update Files with list of all SWAT parameters
       output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
-      
+
       # Update display content of the SWAT parameter file
       output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
 
-      #-------------------------------------------------------------------------      
+      #-------------------------------------------------------------------------
       # Update Tab 2: Parameter sampling
       #-------------------------------------------------------------------------
-      
+
       # Update Select SWAT parameters for calibration and/or sensitivity analysis
-      output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection, 
-                                                          columns = columnsParaSelection, 
+      output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection,
+                                                          columns = columnsParaSelection,
                                                           editable = TRUE,
                                                           allowInsertRow = TRUE,
                                                           allowInsertColumn = TRUE,
                                                           allowDeleteColumn = TRUE,
-                                                          allowDeleteRow = TRUE, 
+                                                          allowDeleteRow = TRUE,
                                                           rowDrag = TRUE,
-                                                          columnResize = FALSE, 
+                                                          columnResize = FALSE,
                                                           wordWrap = TRUE))
       # Update Select sensitivity or calibration approach
-      updateSelectInput(session, 
-                        "samplingApproach", 
+      updateSelectInput(session,
+                        "samplingApproach",
                         label = "2. Select sensitivity or calibration approach",
-                        choices = c('Sensi_Cali_(uniform_Latin_Hypercube_Sampling)', 
+                        choices = c('Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
                                     'Sensi_(from_sensitivity_package)',
                                     'Sensi_(from_userDefined_package)',
                                     'Cali_(from_optimization_package)',
@@ -197,330 +197,330 @@ server <- function(input, output, session) {
                                     'Cali_(from_userDefined_package)',
                                     'Read_User_Parameter_File'),
                         selected = globalVariable$samplingApproach)
-      
+
       # Update Additional information about the selected sensitivty/calibration approach
-      updateTextAreaInput(session, 
-                          "inputInfo", 
-                          "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session,
+                          "inputInfo",
+                          "3. Additional infomation about the selected sensitivity/calibration approach",
                           globalVariable$sensCaliCommand)
-      
+
       # Update define model output for extraction
-      output$tableOutputExtraction <- renderExcel(excelTable(data = globalVariable$outputExtraction, 
-                                                             columns = columnsOutputExtraction, 
+      output$tableOutputExtraction <- renderExcel(excelTable(data = globalVariable$outputExtraction,
+                                                             columns = columnsOutputExtraction,
                                                              editable = TRUE,
                                                              allowInsertRow = TRUE,
                                                              allowInsertColumn = FALSE,
                                                              allowDeleteColumn = FALSE,
-                                                             allowDeleteRow = TRUE, 
+                                                             allowDeleteRow = TRUE,
                                                              rowDrag = FALSE,
                                                              columnResize = FALSE,
-                                                             wordWrap = TRUE)) 
+                                                             wordWrap = TRUE))
       # Update display corresponding observed file names
       output$tableOutputExtractionDisplayOnly <- renderDataTable(
         printVariableNameObservedFiles(globalVariable$outputExtraction))
-      
+
       # Update select date range
       updateDateRangeInput(session,
-                           "dateRangeCali", 
+                           "dateRangeCali",
                            "2. Select date range",
                            start = globalVariable$dateRangeCali[1],
                            end   = globalVariable$dateRangeCali[1])
-      
+
       # Update number of parallel runs
       updateSliderInput(session,
-                        "ncores", 
-                        "3. Select number of parallel runs (cores)", 
-                        value = globalVariable$ncores, 
-                        min = 1, 
+                        "ncores",
+                        "3. Select number of parallel runs (cores)",
+                        value = globalVariable$ncores,
+                        min = 1,
                         max = detectCores())
-      
+
       # Update objective function
-      updateSelectInput(session, 
+      updateSelectInput(session,
                         "objFunction",
-                        label = "1. Select objective function", 
-                        choices = c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS', 
+                        label = "1. Select objective function",
+                        choices = c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS',
                                     'userObjFunction'),
                         selected = globalVariable$objFunction)
-      
+
       # Update get observed data files
       output$printObservedDataFile <- renderText(globalVariable$observedDataFile)
-      
+
       # Show meesage
       showNotification("All project settings were loaded", type = "message", duration = 10)
-      
-    }
-    
-  }) 
 
-  
-  
+    }
+
+  })
+
+
+
   #-----------------------------------------------------------------------------
   # Tab 1. General Setting
   #-----------------------------------------------------------------------------
-  # ****************************************************************************  
+  # ****************************************************************************
   # Get working folder
   # ****************************************************************************
-  observe({ 
-    
+  observe({
+
     # Save working directory in the global variable
     globalVariable$workingFolder <<- input$workingFolder
-    
+
     # Save link to the simulation report log file to the global variable
-    globalVariable$CurrentSimulationReportFile <<- paste(input$workingFolder, 
-                                                         '/Output/CurrentSimulationReport.log', 
+    globalVariable$CurrentSimulationReportFile <<- paste(input$workingFolder,
+                                                         '/Output/CurrentSimulationReport.log',
                                                          sep ='')
     # Check if working folder exists
     if(!dir.exists(input$workingFolder)){
-      
+
       # Print out message if working dir does not exist
       output$checkWorkingFolder <- renderText("Input folder does not exist")
     } else {
-      
+
       # If exists, does not display anything
       output$checkWorkingFolder <- renderText(" ")
     }
-    
+
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # TxtInOut folder: Display HRU info from TxtInOut folder
   # ****************************************************************************
-  
+
   observe({
     req(input$TxtInOutFolder)
-    
+
     # Check if TxtInOut folder exists
     if(!dir.exists(input$TxtInOutFolder)){
       output$checkTxtInOutFolder <- renderText("Input folder does not exist")
     } else {
       output$checkTxtInOutFolder <- renderText(" ")
     }
-    
+
     # Check if .hru files exist in this folder
     if (checkDirFileExist(input$TxtInOutFolder, "", ".hru")){
-      
+
       # Get HRU information (land use, slope, soil, sub)
       globalVariable$HRUinfo <<- getHruInfo(input$TxtInOutFolder)
-      
+
       # Save link to TxtInout Folder to the global variable
-      globalVariable$TxtInOutFolder <<- input$TxtInOutFolder  
-      
+      globalVariable$TxtInOutFolder <<- input$TxtInOutFolder
+
       # Get unique soil, land use, slope, max number of subbasins
-      uniqueSoil <- unique(globalVariable$HRUinfo$soil) 
+      uniqueSoil <- unique(globalVariable$HRUinfo$soil)
       uniqueLandUse <- unique(globalVariable$HRUinfo$lu)
       uniqueSlope <- unique(globalVariable$HRUinfo$slope)
       minMaxSubbasin <- range(globalVariable$HRUinfo$sub)
-      
+
       # Number of soil, land use, slope
       nSoil <- length(uniqueSoil)
       nLU <- length(uniqueLandUse)
       nSlope <- length(uniqueSlope)
-      
+
       nRow <- max(nSoil, nLU, nSlope, 2)
-      
+
       # Display table of HRU information (land use, soil, slope)
       output$tableHRUinfo <- renderDataTable(globalVariable$HRUinfo)
-      
+
       # Display unique land use, soil, slope
-      displayOutput$uniqueHruProperties <<- 
+      displayOutput$uniqueHruProperties <<-
         data.frame(minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
                    Landuse = c(uniqueLandUse,rep(NA, nRow - nLU)),
                    soilName = c(uniqueSoil,rep(NA, nRow - nSoil)),
                    slopeClass = c(uniqueSlope,rep(NA, nRow - nSlope))
         )
-      
+
     } else {
-      
+
       # If this is not TxtInOut folder, assign global variables to NULL
       globalVariable$HRUinfo <<- NULL
       globalVariable$TxtInOutFolder <<- NULL
       output$tableHRUinfo <- NULL
       displayOutput$uniqueHruProperties <<- NULL
     }
-  })  
- 
-  # ****************************************************************************  
+  })
+
+  # ****************************************************************************
   # Get executable SWAT file
-  # ****************************************************************************  
+  # ****************************************************************************
   observe({
     # Get volumes
     volumes <- getVolumes()
-    
+
     # Show shinyFileChoose window
-    shinyFileChoose(input, "getSWATexe", 
-                    roots = volumes, 
+    shinyFileChoose(input, "getSWATexe",
+                    roots = volumes,
                     filetypes=c('', 'exe'),
                     session = session)
-    
+
     # Get full path to SWAT exe file
     SWATexeFile <- parseFilePaths(volumes, input$getSWATexe)
-    
+
     # Display and assign SWAT exe file to the global variable
     if(length(SWATexeFile$datapath) == 1){
       output$printSWATexe <- renderText(SWATexeFile$datapath)
       globalVariable$SWATexeFile <<- as.character(SWATexeFile$datapath)
     }
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Files with list of all SWAT parameters (get file) + display content of file
   # ****************************************************************************
 
   observe({
     # Get volumes
     volumes <- getVolumes()
-    
+
     # Show shinyFileChoose window
-    shinyFileChoose(input, "getSWATParamFile", 
-                    roots = volumes,  
+    shinyFileChoose(input, "getSWATParamFile",
+                    roots = volumes,
                     filetypes=c('', 'txt'),
                     session = session)
-    
+
     # Get full path to SWAT parameter file
     SWATParamFile <- parseFilePaths(volumes, input$getSWATParamFile)
-    
+
     # Print out link to SWAT parameter file/save to global variable
     output$printSWATParamFile <- NULL
     globalVariable$SWATParamFile <<- NULL
     globalVariable$SWATParam <<- NULL
     output$tableSWATParam <- NULL
-    
-    
+
+
     if (length(SWATParamFile$datapath) == 1){
       if (SWATParamFile$name == "swatParam.txt"){
-        globalVariable$SWATParamFile <<- as.character(SWATParamFile$datapath) 
+        globalVariable$SWATParamFile <<- as.character(SWATParamFile$datapath)
         globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
         output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
         output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
       }
     }
-    
+
   })
 
 
   #-----------------------------------------------------------------------------
   # Tab 2. Parameter sampling
-  #----------------------------------------------------------------------------- 
+  #-----------------------------------------------------------------------------
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Display help for parameter selection
-  # **************************************************************************** 
-  
+  # ****************************************************************************
+
   observe({
-    
+
     # Requirement for activation these command
     req(input$helpParameterSelection)
-    
+
     # Check if there is no input SWAT parameter file
     if (is.null(globalVariable$SWATParam$parameter)){
-      output$tableHelpParameterSelection <- 
+      output$tableHelpParameterSelection <-
         renderDataTable(displayOutput$uniqueHruProperties)
     } else {
       SWATParamName <- globalVariable$SWATParam$parameter
       nSWATParamName <- length(SWATParamName)
-      
+
       if(is.null(displayOutput$uniqueHruProperties)){
         output$tableHelpParameterSelection <- NULL
       } else {
         nRowUniqueHRU <- nrow(displayOutput$uniqueHruProperties)
         compareLength <- max(nRowUniqueHRU, nSWATParamName)
         if (nRowUniqueHRU < compareLength){
-          newRow <- data.frame(matrix(rep(NA, (compareLength - nRowUniqueHRU)*4), 
+          newRow <- data.frame(matrix(rep(NA, (compareLength - nRowUniqueHRU)*4),
                                       ncol = 4))
           names(newRow) <- names(displayOutput$uniqueHruProperties)
           tempUniqueHruProperties <- rbind(displayOutput$uniqueHruProperties,
                                            newRow)
-          
+
         } else {
           SWATParamName <- c(SWATParamName, rep(NA, compareLength - nSWATParamName))
         }
-        
+
         tempUniqueHruProperties <- cbind(SWATParamName,tempUniqueHruProperties)
-        
+
         output$tableHelpParameterSelection <- renderDataTable(tempUniqueHruProperties)
       }
     }
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Select SWAT parameters to calibration and/or sensitivity: Default setting
   # ****************************************************************************
   if (!globalVariable$loadProject){
-    output$tableParaSelection <- renderExcel(excelTable(data = dataParaSelection, 
-                                                        columns = columnsParaSelection, 
+    output$tableParaSelection <- renderExcel(excelTable(data = dataParaSelection,
+                                                        columns = columnsParaSelection,
                                                         editable = TRUE,
                                                         allowInsertRow = TRUE,
                                                         allowInsertColumn = TRUE,
                                                         allowDeleteColumn = TRUE,
-                                                        allowDeleteRow = TRUE, 
+                                                        allowDeleteRow = TRUE,
                                                         rowDrag = TRUE,
-                                                        columnResize = FALSE, 
+                                                        columnResize = FALSE,
                                                         wordWrap = TRUE))
     }
- 
 
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Check input 'Select SWAT parameters for calibration'
-  # ****************************************************************************  
+  # ****************************************************************************
   observeEvent(input$checkParameterTableButton, {
-    checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection, 
-                                                  globalVariable$SWATParam, 
+    checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection,
+                                                  globalVariable$SWATParam,
                                                   globalVariable$HRUinfo)
     output$checkParameterTableTxtOuput <- renderText(checkParameterTable$checkMessage)
   })
-  
 
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Save "SWAT parameters for calibration" to global variable
-  # ****************************************************************************  
+  # ****************************************************************************
   observe({
     paraSelection <-  excel_to_R(input$tableParaSelection)
     if(is.null(paraSelection)) paraSelection <- dataParaSelection
     globalVariable$paraSelection  <<- paraSelection
-    
+
   })
-  
-  # ****************************************************************************  
-  # Parameter sampling: Default setting 
+
   # ****************************************************************************
-  output$tableParaSampling <- renderExcel(excelTable(data = dataParaSampling, 
-                                                     columns = ColumnsParaSampling, 
+  # Parameter sampling: Default setting
+  # ****************************************************************************
+  output$tableParaSampling <- renderExcel(excelTable(data = dataParaSampling,
+                                                     columns = ColumnsParaSampling,
                                                      editable = TRUE,
                                                      allowInsertRow = FALSE,
                                                      allowInsertColumn = FALSE,
                                                      allowDeleteColumn = FALSE,
-                                                     allowDeleteRow = FALSE, 
+                                                     allowDeleteRow = FALSE,
                                                      rowDrag = FALSE,
                                                      columnResize = FALSE,
                                                      wordWrap = TRUE))
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Parameter sampling: Get user input for parameter sampling
   # ****************************************************************************
   observe({
     req(input$samplingApproach)
-    
+
     # Save sampling approach to the global variable
     globalVariable$samplingApproach <<- input$samplingApproach
 
     if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "100")
       outputText <- paste("Please input the number of iterations, e.g., 100", sep ="")
     } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))")
       outputText <- helpTextCali
     } else if (input$samplingApproach == 'Cali_(from_hydroPSO_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "hydroPSO(fn = SWAT, lower=minCol, upper=maxCol, control=list(maxit=1))")
       outputText <- helpTextCali
     } else if (input$samplingApproach == 'Cali_(from_nloptr_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "bobyqa(runif(nParam, min = minCol, max = maxCol), SWAT, lower = minCol, upper = maxCol, control = list(maxeval = 100))")
       outputText <- helpTextCali
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "100, 1")
       outputText <- paste("Please write two INTEGER numbers in a SINGLE line, separated by a comma", "\n",
                           "The first number is the number of iterations", "\n",
@@ -530,11 +530,11 @@ server <- function(input, output, session) {
                           "    and is assigned as an inital parameter set for the next run with all cores",
                           sep ="")
     } else if (input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "100")
       outputText <- paste("Please input the number of iterations, e.g., 100", sep ="")
     } else if (input$samplingApproach == 'Read_User_Parameter_File'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "C:/data/myParameterFile.txt")
       outputText <- paste("Please input a link to the parameter set file, formatted as follows:","\n",
                           "   First row: Name of the parameters","\n",
@@ -545,29 +545,29 @@ server <- function(input, output, session) {
                           "   The order of parameters in these columns follows the order of the parameters in the above Table", "\n",
                          sep = "")
     } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
                           "Write_your_first_R_command_here \n
-Write_your_second_R_command_here") 
+Write_your_second_R_command_here")
       outputText <- helpTextSensi
     } else if (input$samplingApproach == 'Cali_(from_userDefined_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach", 
-                          "Write_your_SINGLE_line_R_command_here") 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
+                          "Write_your_SINGLE_line_R_command_here")
       outputText <- helpTextCali
     } else {
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh", 
+      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh",
                           "sensCaliObject <-  morris(model = SWAT, factors = nParam, binf = minCol, bsup = maxCol, r = 4, design = list(type = 'oat', levels = 5, grid.jump = 3))
-print(sensCaliObject)[]")   
+print(sensCaliObject)[]")
       outputText <- helpTextSensi
     }
     output$displayInputInfo <- renderText(outputText)
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Parameter sampling: get input information
   # ****************************************************************************
   observe({
     req(input$inputInfo)
- 
+
     # Check if user need to input R command
     if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
         input$samplingApproach == 'Cali_(from_optimization_package)' |
@@ -575,86 +575,86 @@ print(sensCaliObject)[]")
         input$samplingApproach == 'Cali_(from_nloptr_package)' |
         input$samplingApproach == 'Sensi_(from_userDefined_package)' |
         input$samplingApproach == 'Cali_(from_userDefined_package)' ){
-      
+
       # Save input as text
       globalVariable$sensCaliCommand <<- input$inputInfo
-      
+
       # Remove comments and split R command
       globalVariable$sensCaliCommand <<- splitRemoveComment(globalVariable$sensCaliCommand)
     } else {
-      
+
       # If input is not R command, then just save as text
       globalVariable$sensCaliCommand <<- input$inputInfo
     }
-    
+
     })
 
   #-----------------------------------------------------------------------------
   # Tab 3. Run SWAT
-  #-----------------------------------------------------------------------------  
+  #-----------------------------------------------------------------------------
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Output extraction: Default setting
   # ****************************************************************************
   if(!globalVariable$loadProject){
-    output$tableOutputExtraction <- renderExcel(excelTable(data = dataOutputExtraction, 
-                                                           columns = columnsOutputExtraction, 
+    output$tableOutputExtraction <- renderExcel(excelTable(data = dataOutputExtraction,
+                                                           columns = columnsOutputExtraction,
                                                            editable = TRUE,
                                                            allowInsertRow = TRUE,
                                                            allowInsertColumn = FALSE,
                                                            allowDeleteColumn = FALSE,
-                                                           allowDeleteRow = TRUE, 
+                                                           allowDeleteRow = TRUE,
                                                            rowDrag = FALSE,
                                                            columnResize = FALSE,
                                                            wordWrap = TRUE))
   }
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Get user output extraction
   # ****************************************************************************
   observe({
-    
+
     # Get table of output extraction
     outputExtraction <- excel_to_R(input$tableOutputExtraction)
-    
+
     # Check if there is not such a table, then take default table
     if(is.null(outputExtraction)) outputExtraction <- dataOutputExtraction
-    
+
     # Save this table to the global variable
-    globalVariable$outputExtraction <<- outputExtraction  
-    
+    globalVariable$outputExtraction <<- outputExtraction
+
     # Number of output variables
     OutputVar <- getNumberOutputVar(outputExtraction)
     globalVariable$nOutputVar <<- OutputVar$nOutputVar
-    
+
     # Check if this option is activated
     globalVariable$userReadSwatOutput <<- OutputVar$userReadSwatOutput
-    
+
     # Display table of observed file names needed for calibration/optimization
     output$tableOutputExtractionDisplayOnly <- renderDataTable(
       printVariableNameObservedFiles(outputExtraction)
     )
-    
+
   })
-  
-  
-  # ****************************************************************************  
+
+
+  # ****************************************************************************
   # Update select input range based on file.cio in the TxtInOutFolder
   # ****************************************************************************
   observe({
-    
+
     # Require the TxtInOut Folder input field
     req(input$TxtInOutFolder)
-    
+
     # Check if there is a file called file.cio in this TxtInOut
     if (checkDirFileExist(input$TxtInOutFolder, "file.cio", "")){
-      
+
       # Get simulation dates
       myDate <- getFileCioInfo(input$TxtInOutFolder)
-      
-      # Assign simulation dates to the global variale 
+
+      # Assign simulation dates to the global variale
       globalVariable$fileCioInfo <<- myDate
-      
+
       # Update selected date range for calibration/sensitivity
       updateDateRangeInput(session, "dateRangeCali",
                            start = myDate$startEval,
@@ -665,197 +665,197 @@ print(sensCaliObject)[]")
     }
   })
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Get user input range for calibration
   # ****************************************************************************
-  observe({ 
+  observe({
     # Assign selected date range for calibration/sensitivity analysis to the global variables
     globalVariable$dateRangeCali <<- input$dateRangeCali
-  })     
-  
+  })
 
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Get user input number of cores
   # ****************************************************************************
-  observe({ 
+  observe({
     # Assing the number of selected cores to the global varialbes
     globalVariable$ncores <<- input$ncores
   })
- 
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Run SWAT
   # ****************************************************************************
   observeEvent(input$runSWAT, {
-    
+
     # Refresh the parameter values in case of loading the projects
     globalVariable$parameterValue <<- c()
-    
+
     # Display progress bar
     withProgress(message = 'Running SWAT...', {
-      
+
     # Perform various checks to activate SWAT run
     checkList <- TRUE
     checkList <- checkList & !is.null(globalVariable$workingFolder)
     checkList <- checkList & !is.null(globalVariable$paraSelection)
-    checkList <- checkList & !is.null(globalVariable$HRUinfo) 
+    checkList <- checkList & !is.null(globalVariable$HRUinfo)
     checkList <- checkList & !is.null(globalVariable$SWATParam)
-    checkList <- checkList & !is.null(globalVariable$TxtInOutFolder)     
+    checkList <- checkList & !is.null(globalVariable$TxtInOutFolder)
     checkList <- checkList & !is.null(globalVariable$outputExtraction)
-    checkList <- checkList & !is.null(globalVariable$ncores) 
-    checkList <- checkList & !is.null(globalVariable$SWATexeFile) 
+    checkList <- checkList & !is.null(globalVariable$ncores)
+    checkList <- checkList & !is.null(globalVariable$SWATexeFile)
     checkList <- checkList & !is.null(globalVariable$fileCioInfo)
     checkList <- checkList & !is.null(globalVariable$dateRangeCali)
-    
-    
+
+
     if (checkList){
 
       # Print out message when click Run SWAT
       showModal(modalDialog(
         title = "SWAT is running...",
-        HTML("SWAT is running, dismiss this message. You can open the text file 
+        HTML("SWAT is running, dismiss this message. You can open the text file
         'Output/CurrentSimulationReport.log' in the working folder to see the current simulation."),
         easyClose = TRUE,
         size = "l"
       ))
-      
+
       # First get or generate parameter set
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
-        
+
         # Generate initial parameter set
         globalVariable$parameterValue <<- lhsRange(globalVariable$ncores,
                                                    getParamRange(globalVariable$paraSelection))
-      } 
-      
+      }
+
       # Load all files that are going to be updated
-      globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo, 
+      globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo,
                                                               globalVariable$paraSelection,
-                                                              globalVariable$SWATParam, 
+                                                              globalVariable$SWATParam,
                                                               globalVariable$TxtInOutFolder)
 
       # Save global variables
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
-      
+
       # Copy unchanged file for the first simulation
       copyUnchangeFiles <- TRUE
       firstRun <- TRUE
 
 
-      
-      # Run SWAT for all iteration ---------------------------------------------  
+
+      # Run SWAT for all iteration ---------------------------------------------
       if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)') |
           (globalVariable$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)') |
         (globalVariable$samplingApproach == 'Read_User_Parameter_File')){
-        
+
         # Generate parameter values
         if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
           globalVariable$parameterValue <<- lhsRange(as.numeric(input$inputInfo),
-                                                     getParamRange(globalVariable$paraSelection)) 
-          
+                                                     getParamRange(globalVariable$paraSelection))
+
         } else if(input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
           globalVariable$parameterValue <<- runifSampling(as.numeric(input$inputInfo),
-                                                          as.numeric(globalVariable$paraSelection$Min), 
+                                                          as.numeric(globalVariable$paraSelection$Min),
                                                           as.numeric(globalVariable$paraSelection$Max))
-            
+
         } else if (globalVariable$samplingApproach == "Read_User_Parameter_File"){
           parameterValue <- as.matrix(read.table(file = trimws(input$inputInfo),
                                                  header = TRUE, sep =""))
           parameterValue <- cbind(c(1:nrow(parameterValue)),parameterValue)
           colnames(parameterValue) <- NULL
           rownames(parameterValue) <- NULL
-          
+
           globalVariable$parameterValue <<- parameterValue
         } else {
           globalVariable$parameterValue <<- NULL
         }
 
-        
+
         # Check max number of cores
         globalVariable$ncores <<- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
-        
+
         # Run SWAT in parallel
-        runSWATpar(globalVariable$workingFolder, 
-                   globalVariable$TxtInOutFolder, 
-                   globalVariable$outputExtraction, 
-                   globalVariable$ncores, 
-                   globalVariable$SWATexeFile, 
+        runSWATpar(globalVariable$workingFolder,
+                   globalVariable$TxtInOutFolder,
+                   globalVariable$outputExtraction,
+                   globalVariable$ncores,
+                   globalVariable$SWATexeFile,
                    globalVariable$parameterValue,
                    globalVariable$caliParam,
                    copyUnchangeFiles,
                    globalVariable$fileCioInfo,
                    globalVariable$dateRangeCali,
-                   firstRun)       
+                   firstRun)
       } else if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)') {
-        
+
         if(is.null(globalVariable$observedData)){
-          
+
           # Display message box if there is no observed data provided
           showModal(modalDialog(
             title = "Not enough information to perform SWAT run",
             HTML("You selected 'Cali_(DDS)', please defined objective function and load observed data (Step 4.1) before running SWAT"),
             easyClose = TRUE,
             size = "l"
-          )) 
-          
+          ))
+
         } else {
           # Save results between iteration
           saveIterationResult <- list()
-          
-          # Run SWAT with init       
-          runSWATpar(globalVariable$workingFolder, 
-                     globalVariable$TxtInOutFolder, 
-                     globalVariable$outputExtraction, 
-                     globalVariable$ncores, 
-                     globalVariable$SWATexeFile, 
+
+          # Run SWAT with init
+          runSWATpar(globalVariable$workingFolder,
+                     globalVariable$TxtInOutFolder,
+                     globalVariable$outputExtraction,
+                     globalVariable$ncores,
+                     globalVariable$SWATexeFile,
                      globalVariable$parameterValue,
                      globalVariable$caliParam,
                      copyUnchangeFiles,
                      globalVariable$fileCioInfo,
                      globalVariable$dateRangeCali,
                      firstRun)
-          
+
           # Set firstRun = FALSE -> don't need to copy unchanged files again
           firstRun = FALSE
-          
+
           # Run SWAT with first initial parameter set
-          nIters <- as.numeric(strsplit(input$inputInfo, 
-                                        split = ",", 
+          nIters <- as.numeric(strsplit(input$inputInfo,
+                                        split = ",",
                                         fixed = TRUE)[[1]][1])
-          
+
           # Get parallel mode
-          parallelMode <- as.numeric(strsplit(input$inputInfo, 
-                                              split = ",", 
+          parallelMode <- as.numeric(strsplit(input$inputInfo,
+                                              split = ",",
                                               fixed = TRUE)[[1]][2])
-          
+
           # Objective function with initial parameter set
           temp <- calObjFunction(globalVariable$parameterValue,
-                                 globalVariable$ncores, 
+                                 globalVariable$ncores,
                                  globalVariable$nOutputVar,
-                                 globalVariable$userReadSwatOutput, 
-                                 globalVariable$observedData, 
-                                 globalVariable$workingFolder, 
+                                 globalVariable$userReadSwatOutput,
+                                 globalVariable$observedData,
+                                 globalVariable$workingFolder,
                                  globalVariable$objFunction)
-          
+
           # Set new parameter
           newPar <- globalVariable$parameterValue
-          
+
           # Set the best objective and parameter values
           best <- list()
           if(parallelMode == 1){
             best$objValue <- temp$objValue
             best$perCriteria <- temp$perCriteria
-            best$simData <- temp$simData          
+            best$simData <- temp$simData
           } else {
             idBest <- which(temp$objValue == max(temp$objValue))
             if (length(idBest) > 1) {idBest = idBest[1]}
-            
+
             # Take the better parameter value and objective function values
             best$parameterValue <- best$parameterValue[idBest, ]
             best$objValue <- temp$objValue[idBest]
           }
-          
+
           # Loop over number of iteration
           for (i in 1:nIters){
-            
+
             if (i == 1){
               # Save iteration result
               saveIterationResult$parameterValue <- globalVariable$parameterValue
@@ -864,9 +864,9 @@ print(sensCaliObject)[]")
               saveIterationResult$simData <- temp$simData
               print("Iteration - Best objective function value (from the respective core if parallel mode = 1)")
             }
-            
+
             print(c(i-1, round(best$objValue, digits = 3)))
-            
+
             # Take better parameter + Generate new parameter set with DDS
             if (parallelMode == 1) {
               # Take the better parameter set/data if exist
@@ -876,19 +876,19 @@ print(sensCaliObject)[]")
                   best$objValue[j] <- temp$objValue[j]
                 }
               }
-              
+
               # Generate new parameter set
               newPar <- data.frame(min = as.numeric(globalVariable$paraSelection$Min),
                                    max = as.numeric(globalVariable$paraSelection$Max))
               parameterValue <- saveIterationResult$parameterValue[,2:ncol(saveIterationResult$parameterValue)]
               newPar <- cbind(newPar, t(parameterValue))
-              newPar <- dds(newPar, globalVariable$ncores, i, nIters, 0.2, parallelMode) 
-              
+              newPar <- dds(newPar, globalVariable$ncores, i, nIters, 0.2, parallelMode)
+
             } else {
-              
+
               idBest <- which(temp$objValue == max(temp$objValue))
               if (length(idBest) > 1) {idBest = idBest[1]}
-              
+
               if(temp$objValue[idBest] > best$objValue){
                 globalVariable$parameterValue <<- newPar[idBest, ]
                 best$objValue <- temp$objValue[idBest]
@@ -899,39 +899,39 @@ print(sensCaliObject)[]")
               parameterValue <- saveIterationResult$parameterValue[,2:ncol(saveIterationResult$parameterValue)]
               newPar <- cbind(newPar, t(parameterValue))
               newPar <- dds(newPar, globalVariable$ncores, i, nIters, 0.2, parallelMode)
-              
+
             }
-            
+
             # Run SWAT in parallel
-            runSWATpar(globalVariable$workingFolder, 
-                       globalVariable$TxtInOutFolder, 
-                       globalVariable$outputExtraction, 
-                       globalVariable$ncores, 
-                       globalVariable$SWATexeFile, 
+            runSWATpar(globalVariable$workingFolder,
+                       globalVariable$TxtInOutFolder,
+                       globalVariable$outputExtraction,
+                       globalVariable$ncores,
+                       globalVariable$SWATexeFile,
                        newPar,
                        globalVariable$caliParam,
                        FALSE,
                        globalVariable$fileCioInfo,
                        globalVariable$dateRangeCali,
                        firstRun)
-            
-            
+
+
             # Caculate objective function
             temp <- calObjFunction(newPar,
-                                   globalVariable$ncores, 
+                                   globalVariable$ncores,
                                    globalVariable$nOutputVar,
-                                   globalVariable$userReadSwatOutput, 
-                                   globalVariable$observedData, 
-                                   globalVariable$workingFolder, 
+                                   globalVariable$userReadSwatOutput,
+                                   globalVariable$observedData,
+                                   globalVariable$workingFolder,
                                    globalVariable$objFunction)
-            
+
             # Save iteration result
             saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,newPar)
             saveIterationResult$objValue <- c(saveIterationResult$objValue, temp$objValue)
             saveIterationResult$perCriteria <- bindList(saveIterationResult$perCriteria,temp$perCriteria)
             saveIterationResult$simData <- bindList(saveIterationResult$simData,temp$simData)
           }
-          
+
           if (parallelMode == 1) {
             # Take the better parameter set/data if exists
             for (j in 1:nrow(newPar)){
@@ -942,15 +942,15 @@ print(sensCaliObject)[]")
           } else {
             idBest <- which(temp$objValue == max(temp$objValue))
             if (length(idBest) > 1) {idBest = idBest[1]}
-            
+
             if(temp$objValue[idBest] > best$objValue){
               best$objValue <- temp$objValue[idBest]
             }
           }
-          
+
           # print out intermediate results
           print(c(i, round(best$objValue, digits = 3)))
-          
+
           # Assign back to global variables
           globalVariable$parameterValue <<- saveIterationResult$parameterValue
           globalVariable$objValue <<- saveIterationResult$objValue
@@ -958,35 +958,35 @@ print(sensCaliObject)[]")
           globalVariable$simData <<- saveIterationResult$simData
           globalVariable$parameterValue[,1] <<- c(1:nrow(globalVariable$parameterValue))
         }
-        
+
         # Update numeric input (threshold objective function)
         minObjValue <- min(globalVariable$objValue)
         maxObjValue <- max(globalVariable$objValue)
-        updateNumericInput(session = session, "behThreshold", 
-                           label = "1. Input behavioral threshold", 
+        updateNumericInput(session = session, "behThreshold",
+                           label = "1. Input behavioral threshold",
                            value = minObjValue,
-                           min = minObjValue, 
-                           max = maxObjValue, 
+                           min = minObjValue,
+                           max = maxObjValue,
                            step = (maxObjValue - minObjValue)/20)
-        
+
         # Update select variable number
         updateSliderInput(session = session,
-                          "plotVarNumber", 
-                          "2. Input variable number to plot", 
-                          value = 1, 
-                          min = 1, 
+                          "plotVarNumber",
+                          "2. Input variable number to plot",
+                          value = 1,
+                          min = 1,
                           max = globalVariable$nOutputVar,
                           step = 1)
-        
+
       } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
                  globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' |
                  globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
                  globalVariable$samplingApproach == 'Cali_(from_hydroPSO_package)' |
                  globalVariable$samplingApproach == 'Cali_(from_nloptr_package)' |
                  globalVariable$samplingApproach == 'Cali_(from_userDefined_package)') {
-        
+
         if(is.null(globalVariable$observedData)){
-          
+
           # Show message box if there is no observed data
           showModal(modalDialog(
             title = "Not enough information to perform SWAT run",
@@ -994,38 +994,38 @@ print(sensCaliObject)[]")
             easyClose = TRUE,
             size = "l"
           ))
-          
+
         } else {
           # There is no simulated data and obj function values when the model has not been run
           globalVariable$simData <<- NULL
           globalVariable$objValue <<- NULL
-          
+
           # First run is true
           globalVariable$copyUnchangeFiles <<- TRUE
           globalVariable$firstRun <<- TRUE
-          
+
           globalVariable$sensCaliObject <<- eval(parse(text = globalVariable$sensCaliCommand[1]))
-          
+
           # Print output to screen
            print(globalVariable$sensCaliObject)
            print(globalVariable$objValue)
-           
+
            # Update numeric input (threshold objective function)
            minObjValue <- min(globalVariable$objValue)
            maxObjValue <- max(globalVariable$objValue)
-           updateNumericInput(session = session, "behThreshold", 
-                              label = "1. Input behavioral threshold", 
+           updateNumericInput(session = session, "behThreshold",
+                              label = "1. Input behavioral threshold",
                               value = minObjValue,
-                              min = minObjValue, 
-                              max = maxObjValue, 
+                              min = minObjValue,
+                              max = maxObjValue,
                               step = (maxObjValue - minObjValue)/20)
-           
+
            # Update select variable number
            updateSliderInput(session = session,
-                             "plotVarNumber", 
-                             "2. Input variable number to plot", 
-                             value = 1, 
-                             min = 1, 
+                             "plotVarNumber",
+                             "2. Input variable number to plot",
+                             value = 1,
+                             min = 1,
                              max = globalVariable$nOutputVar,
                              step = 1)
         }
@@ -1037,17 +1037,17 @@ print(sensCaliObject)[]")
           HTML("Unkown method"),
           easyClose = TRUE,
           size = "l"
-        ))       
+        ))
      }
-      
+
       # End run SWAT for all iterations
       globalVariable$checkSimComplete <<- TRUE
-      
+
       # Save all results as RSWAT project
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep ='')) 
-      
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
+
     } else {
-      
+
       # Show message box if there is no observed data
       showModal(modalDialog(
         title = "Input data/information is missing, please check again",
@@ -1059,20 +1059,20 @@ print(sensCaliObject)[]")
     incProgress(1/nrow(globalVariable$parameterValue))
     })
   })
-  
-  # ****************************************************************************  
-  # See simulation report - Open file CurrentSimulationReport.log 
+
+  # ****************************************************************************
+  # See simulation report - Open file CurrentSimulationReport.log
   # ****************************************************************************
   observe({
     req(input$checkCurrentSimulation)
-    
+
     # Check if the CurrentSimulationReport.log file exists
     if (file.exists(globalVariable$CurrentSimulationReportFile)){
-      
+
       # Read CurrentSimulationReport.log content
       fileContent <- readLines(globalVariable$CurrentSimulationReportFile, -1,
-                               warn = FALSE)  
-      
+                               warn = FALSE)
+
       # Display content of the CurrentSimulationReport.log
       printFileContent <- list()
       for (i in 1:length(fileContent)){
@@ -1080,28 +1080,28 @@ print(sensCaliObject)[]")
       }
       output$tableCurrentSimulation <- renderUI({
         return(lapply(printFileContent, p))
-      }) 
+      })
     }
-  })  
+  })
 
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Display parameter sets used for simulations
   # ****************************************************************************
   observe({
     req(input$checkDisplayParameterSet)
-    
+
     # Check if the parameterValue exists
     if (!is.null(globalVariable$parameterValue)){
-      
+
       # Collumn setting of the parameter value table
       columnsParameterValue <- data.frame(
-        title = c("Simulation Nr.", globalVariable$paraSelection$Parameter), 
+        title = c("Simulation Nr.", globalVariable$paraSelection$Parameter),
         source = rep(NA, ncol(globalVariable$parameterValue)),
         width = rep(300, ncol(globalVariable$parameterValue)),
         type = rep('numeric', ncol(globalVariable$parameterValue))
         )
-      
+
       # Fill the parameter table with content (parameter values)
       output$tableDisplayParameterSet <- renderExcel(
         excelTable(data = globalVariable$parameterValue,
@@ -1110,161 +1110,162 @@ print(sensCaliObject)[]")
                    allowInsertRow = FALSE,
                    allowInsertColumn = FALSE,
                    allowDeleteColumn = FALSE,
-                   allowDeleteRow = FALSE, 
+                   allowDeleteRow = FALSE,
                    rowDrag = FALSE,
                    columnResize = FALSE,
                    wordWrap = FALSE)
-        )      
+        )
     } else {
-      
+
       # If there is no parameter, don't display anything
       output$tableDisplayParameterSet <- NULL
     }
   })
-  
+
   #-----------------------------------------------------------------------------
   # Tab 4. Evaluate output
-  #-----------------------------------------------------------------------------  
-  # ****************************************************************************  
+  #-----------------------------------------------------------------------------
+  # ****************************************************************************
   # 4.1. Get user input Objective function
-  # ****************************************************************************    
+  # ****************************************************************************
   observe({
     req(input$objFunction)
-    
+
     # Get the type of objective function
     globalVariable$objFunction  <<- input$objFunction
-    
-    # Check when the objecive function needs to be maximize or minimize
+
+    # Check when the objective function needs to be maximize or minimize
     if (input$objFunction == 'NSE' | input$objFunction == 'KGE' |
         input$objFunction == 'R2'){
-      updateSelectInput(session, 'minOrmax', 
+      updateSelectInput(session, 'minOrmax',
                         label = 'Minimize or maximize the objective function?',
-                        selected = 'Maximize')      
+                        selected = 'Maximize')
     } else if (input$objFunction == 'aBIAS' | input$objFunction == 'RMSE'){
-      updateSelectInput(session, 'minOrmax', 
+      updateSelectInput(session, 'minOrmax',
                         label = 'Minimize or maximize the objective function?',
                         selected = 'Minimize')
     } else {
-      updateSelectInput(session, 'minOrmax', 
+      updateSelectInput(session, 'minOrmax',
                         label = 'Minimize or maximize the objective function?',
                         selected = ' ')
    }
 
   })
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Target min or max of the objective function
-  # ****************************************************************************    
+  # ****************************************************************************
   observe({
     req(input$minOrmax)
-    
+
     # Assign the maximum and miminum objective fuction values to the global variables
     globalVariable$minOrmax  <<- input$minOrmax
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Get observed data files
-  # ****************************************************************************  
+  # ****************************************************************************
   observe({
-    
+
     # Get volumes
     volumes <- getVolumes()
-    
+
     # Display shinyFileChoose
-    shinyFileChoose(input, "getObservedDataFile", 
-                    roots = volumes,   
+    shinyFileChoose(input, "getObservedDataFile",
+                    roots = volumes,
                     filetypes=c('', 'txt'),
                     session = session)
-    
+
     # Get full path to the observed data files
     observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile)
-    
+
     # Get observed data
     if(length(observedDataFile$datapath) > 0){
-      
+
       # Display observed data file paths
       output$printObservedDataFile <- renderText(observedDataFile$datapath)
-      
+
       # Assign observed data file paths to the global variables
       globalVariable$observedDataFile <<- sortObservedDataFile(as.character(observedDataFile$datapath))
-      
-      # Observed data 
+
+      # Observed data
       globalVariable$observedData <<- list()
-      
+
       checkGetObservedDataFileMessage <- " "
       # Check number of output variable files
 
       if (globalVariable$nOutputVar != length(globalVariable$observedDataFile)){
 
         # Print out message if there are more/less number of observed data files
-        checkGetObservedDataFileMessage <- paste("Error: Number of observed files should be: ", 
-                                                 globalVariable$nOutputVar, 
+        checkGetObservedDataFileMessage <- paste("Error: Number of observed files should be: ",
+                                                 globalVariable$nOutputVar,
                                                  sep ="")
 
         } else {
-     
+
         # Get concent of observed data files
         for (i in 1:length(globalVariable$observedDataFile)){
 
           if (!grepl(paste("obs_var_", i, ".txt", sep =""), globalVariable$observedDataFile[i], fixed = TRUE)){
-            checkGetObservedDataFileMessage <- paste("Error: change file name ", 
-                                                     globalVariable$observedDataFile[i]," to ", 
+            checkGetObservedDataFileMessage <- paste("Error: change file name ",
+                                                     globalVariable$observedDataFile[i]," to ",
                                                      paste("obs_var_", i, ".txt", sep =""), sep = "")
           } else {
             temp <- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
             if (ncol(temp) != 2){
-              checkGetObservedDataFileMessage <- paste("Error: Observed data", 
-                                                       globalVariable$observedDataFile[i],  
+              checkGetObservedDataFileMessage <- paste("Error: Observed data",
+                                                       globalVariable$observedDataFile[i],
                                                        " shoud have two columns",
                                                        sep = "")
-                                                       
+
             } else {
- 
+
               if (is.numeric(temp$V2)){
                 globalVariable$observedData[[i]] <<- temp
-                colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")  
-                
+                colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
+
               } else {
-                checkGetObservedDataFileMessage <- paste("Error: Data in the second column are not numeric values: ", 
+                checkGetObservedDataFileMessage <- paste("Error: Data in the second column are not numeric values: ",
                                                          globalVariable$observedDataFile[i],
                                                          sep = "")
               }
 
-              
+
             }
 
           }
         }
-      }  
- 
+      }
+
       # Display check message
       output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
- 
+
       # Save observed data to globalVariables
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep ='')) 
+      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
     }
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Display list of input observed data files
   # ****************************************************************************
   observe({
     req(input$checkDisplayObsVar)
-    
+
     # Display content of the observed data files
     output$tableObsVarDisplay <- renderDataTable(
       mergeDataFrameDiffRow(globalVariable$observedData)
       )
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Calculate objective function values
   # ****************************************************************************
   observeEvent(input$calObjFunction, {
-    
+
     # Check if all simulations are finished
     if (globalVariable$checkSimComplete){
-      
+
+      # check which parameter sampling approach is selected
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)' |
           globalVariable$samplingApproach == 'Cali_(from_userDefined_package)'  |
           globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
@@ -1272,58 +1273,63 @@ print(sensCaliObject)[]")
           globalVariable$samplingApproach == 'Cali_(from_nloptr_package)' |
           globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
           globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' ){
-        
+
+        # Display message
         showModal(modalDialog(
           title = "Important message",
           "The objective function was/will be calculated after each model run (Step 3)",
           easyClose = TRUE,
           size = "l"
         ))
-        
+
+      # If the below approaches are selected, then calculate objective function
       } else if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'|
                  globalVariable$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'|
                  globalVariable$samplingApproach == 'Read_User_Parameter_File'){
-        
+
         withProgress(message = 'Calculating objective function...', {
-          
+
           # Calculate objective function
           output$printCalObjFunction <- NULL
-          
+
+          # Objective function in the intermediate step
           temp <- calObjFunction(globalVariable$parameterValue,
-                                 globalVariable$ncores, 
+                                 globalVariable$ncores,
                                  globalVariable$nOutputVar,
-                                 globalVariable$userReadSwatOutput, 
-                                 globalVariable$observedData, 
-                                 globalVariable$workingFolder, 
+                                 globalVariable$userReadSwatOutput,
+                                 globalVariable$observedData,
+                                 globalVariable$workingFolder,
                                  globalVariable$objFunction)
-          
+
+          # If there is error in the observed data, display an error message
           if(temp$error) output$printCalObjFunction <- renderText("ERROR in input data - please see R console")
-          
+
+          # Assign the intermidate objective function values to the global variable
           globalVariable$objValue <<- temp$objValue
           globalVariable$perCriteria <<- temp$perCriteria
           globalVariable$simData <<- temp$simData
-          
+
           # Update numeric input (threshold objective function)
-          
           minObjValue <- min(globalVariable$objValue)
           maxObjValue <- max(globalVariable$objValue)
-          
-          updateNumericInput(session = session, "behThreshold", 
-                             label = "1. Input behavioral threshold", 
+
+          updateNumericInput(session = session, "behThreshold",
+                             label = "1. Input behavioral threshold",
                              value = minObjValue,
-                             min = minObjValue, 
-                             max = maxObjValue, 
+                             min = minObjValue,
+                             max = maxObjValue,
                              step = (maxObjValue - minObjValue)/20)
-          
+
           # Update select variable number
           updateSliderInput(session = session,
-                            "plotVarNumber", 
-                            "2. Input variable number to plot", 
-                            value = 1, 
-                            min = 1, 
+                            "plotVarNumber",
+                            "2. Input variable number to plot",
+                            value = 1,
+                            min = 1,
                             max = globalVariable$nOutputVar,
                             step = 1)
-          
+
+          # Some cases the calculate is too fast, add 1 second of delay
           Sys.sleep(1)
           incProgress(1/2)
         })
@@ -1335,27 +1341,28 @@ print(sensCaliObject)[]")
           size = "l"
         ))
       }
-      
+
     } else {
       showModal(modalDialog(
         title = "Important message",
         "Not all simulations were finised ...",
         easyClose = TRUE,
         size = "l"
-      ))       
+      ))
     }
-    
+
     #Save RSWATObject
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep ='')) 
+    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
   })
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Calculate objective function: Display objective function values
   # ****************************************************************************
   observe({
+
     req(input$checkDisplayObjFunctionPlot)
-    # Get parameter values
-    
+
+    # Plot parameter values and objective function
     if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
       output$plotObjFunction <- renderPlotly(plotObjFuncParaValue(globalVariable))
     } else {
@@ -1363,38 +1370,40 @@ print(sensCaliObject)[]")
     }
   })
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Calculate objective function: Display objective function values
   # ****************************************************************************
   observe({
     req(input$checkDisplayObjFunction)
     # Get parameter values
-    
+
     if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
-      tableParaObj <- globalVariable$parameterValue 
-      
-      # replace the first row as it is the simulation number with the obj function value
-      tableParaObj[,1] <- globalVariable$objValue 
+      tableParaObj <- globalVariable$parameterValue
+
+      # Replace the first row as it is the simulation number with the obj function value
+      tableParaObj[,1] <- globalVariable$objValue
       tableParaObj <- as.data.frame(tableParaObj)
-      
+
       colnames(tableParaObj) <- c("objectiveFunction", globalVariable$paraSelection$Parameter)
-      
+
       # round up to 3 decimal digits
       is.num <- sapply(tableParaObj, is.numeric)
       tableParaObj[is.num] <- lapply(tableParaObj[is.num], round, 3)
-      
-      columnsCalObjFunction <- data.frame(title = colnames(tableParaObj), 
+
+      # Visual setting for the output table
+      columnsCalObjFunction <- data.frame(title = colnames(tableParaObj),
                                           source = rep(NA, ncol(tableParaObj)),
                                           width = rep(300, ncol(tableParaObj)),
                                           type = rep('text', ncol(tableParaObj)))
-      
+
+      # Fill output tables with parameter and objective function values
       output$tableCalObjFunction <- renderExcel(excelTable(data = tableParaObj,
                                                            columns = columnsCalObjFunction,
                                                            editable = FALSE,
                                                            allowInsertRow = FALSE,
                                                            allowInsertColumn = FALSE,
                                                            allowDeleteColumn = FALSE,
-                                                           allowDeleteRow = FALSE, 
+                                                           allowDeleteRow = FALSE,
                                                            rowDrag = FALSE,
                                                            columnResize = FALSE,
                                                            wordWrap = FALSE))
@@ -1402,74 +1411,84 @@ print(sensCaliObject)[]")
       output$tableCalObjFunction <- NULL
     }
   })
-  
+
   # 4.2. Sensitivity Analysis
-  
-  # ****************************************************************************  
+  # ****************************************************************************
   # Display parameter sensitivity ranking: need to break this to smaller code
   # ****************************************************************************
   observeEvent(input$calSensitivity, {
-    
-    
+
+    # check if all simluations are finised
     if (globalVariable$checkSimComplete & !is.null(globalVariable$objValue)){
-      
-      #-------------------------------------      
+
+      # Check which parameter sampling approach is used
       if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
-        
+
         withProgress(message = 'Performing sensitivity analysis...', {
-          
+
           # Table with parameter and objective function values
-          tableSensitivity <- globalVariable$parameterValue 
-          tableSensitivity[,1] <- globalVariable$objValue 
-          
-          # Column names 
+          tableSensitivity <- globalVariable$parameterValue
+          tableSensitivity[,1] <- globalVariable$objValue
+
+          # Column names
           colnames(tableSensitivity) <- c("objFunction", globalVariable$paraSelection[,1])
           tableSensitivity <- as.data.frame(tableSensitivity)
-          
-          # parameter sensitivity using multivariate regression analysis
+
+          # Parameter sensitivity using multivariate regression analysis
           tableSensitivity <- summary(lm(formula = objFunction ~ ., tableSensitivity))[4]$coefficients[,3:4]
-          
-          # remove the first row because it is the intercept
+
+          # Remove the first row because it is the intercept
           tableSensitivity <- tableSensitivity[-c(1),]
-          
-          # assign result to the global variables
-          
+
+          # Assign result to the global variables
+
           tableSensitivity <- as.data.frame(tableSensitivity)
-          
+
+          # Creat data frame with the results from parameter sensi. analysis
           globalVariable$tableSensitivity <<- data.frame(Parameter = rownames(tableSensitivity),
                                                          t_stat = tableSensitivity[,1],
                                                          absolute_t_stat = abs(tableSensitivity[,1]),
                                                          p_value = tableSensitivity[,2])
-          
+
+          # Fill output table with values
           output$tableSensitivity <- renderDataTable(globalVariable$tableSensitivity)
-          
+
+          # Set 1 second delay for the progress bar
           Sys.sleep(1)
           incProgress(1/2)
         })
-        
+
+      # Check if users do sensi. analysis with R packages
       } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)'|
                  globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)'){
-        
+
+        # Text for the progress bar
         withProgress(message = 'Performing sensitivity analysis...', {
-          
+
+          # Prepare output table of sensitivity analysis
           sensCaliObject <- globalVariable$sensCaliObject
-          sensiReport <- eval(parse(text = globalVariable$sensCaliCommand[2])) 
-          
+          sensiReport <- eval(parse(text = globalVariable$sensCaliCommand[2]))
+
+          # Print to screen the result
           print(sensiReport)[]
-          
+
+          # Assign names for the table row
           if ("X1" %in% rownames(sensiReport)) {
             sensiReport <- cbind(parameters = globalVariable$paraSelection[,1],sensiReport)
           }
-          
+
+          # Save result table to the global variable
           globalVariable$tableSensitivity <<- sensiReport
           output$tableSensitivity <- renderDataTable(globalVariable$tableSensitivity)
-          
+
+          # Set 1 second delay for the progress bar
           Sys.sleep(1)
           incProgress(1/2)
         })
-        
+
       } else if(globalVariable$samplingApproach == "Read_User_Parameter_File"){
         output$tableSensitivity <- NULL
+
         # Message show all input was saved
         showModal(modalDialog(
           title = "Sensitivity analysis",
@@ -1477,18 +1496,22 @@ print(sensCaliObject)[]")
           easyClose = TRUE,
           size = "l"
         ))
+
       } else {
         showModal(modalDialog(
           title = "Sensitivity analysis",
           HTML("The approach you selected in step 2 is not for parameter sensitivity analysis - skip this step"),
           easyClose = TRUE,
           size = "l"
-        ))  
+        ))
+
+        # Set output = NUll in other cases
         output$tableSensitivity <- NULL
       }
-      
+
     } else {
-      # Message show all input was saved
+
+      # Display a message that all simulated hasn't been finished
       showModal(modalDialog(
         title = "Sensitivity analysis",
         HTML("Not all simulations are finished"),
@@ -1496,24 +1519,30 @@ print(sensCaliObject)[]")
         size = "l"
       ))
     }
-  })  
-  
-  #---------------------
+  })
+
+
   # 4.3. Optimization/Uncertainty
-  
-  # ****************************************************************************  
+  # ****************************************************************************
   # Input behavioral threshold: Check if the input behavioral threshold is valid
   # ****************************************************************************
   observe({
+
+    # By default the input behavioral threshold value is not valid
     globalVariable$isBehThresholdValid <<- FALSE
+
+    # Check if the user-defined behavioral threshold is in a valid range
     if(!is.null(input$behThreshold)){
       if(!is.null(globalVariable$objValue)){
         if (input$behThreshold > max(globalVariable$objValue)){
-          output$printMaxBehThreshold <- renderText(paste("The selected value is ", 
-                                                          "greater than the maximum value ", 
-                                                          max(globalVariable$objValue), 
+
+          # Display check message
+          output$printMaxBehThreshold <- renderText(paste("The selected value is ",
+                                                          "greater than the maximum value ",
+                                                          max(globalVariable$objValue),
                                                           sep =""))
         } else {
+          # Display check message
           globalVariable$isBehThresholdValid <<- TRUE
           output$printMaxBehThreshold <- renderText("check threshold value OK")
         }
@@ -1523,15 +1552,18 @@ print(sensCaliObject)[]")
     } else {
       output$printMaxBehThreshold <- NULL
     }
-  })  
+  })
 
-  # ****************************************************************************  
-  # Input variable number to plot: Calculate values of all tables for display 
-  # ****************************************************************************  
+  # ****************************************************************************
+  # Input variable number to plot: Calculate values of all tables for display
+  # ****************************************************************************
   observe({
     req(input$checkPlotVariableNumber)
+
+    # Check if there are parameter values and the selected behavioral threshold is valid
     if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
 
+      # Find behavioral simulations - 95PPU
       globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue,
                                                                globalVariable$simData,
                                                                globalVariable$parameterValue,
@@ -1541,39 +1573,43 @@ print(sensCaliObject)[]")
                                                                globalVariable$observedData,
                                                                globalVariable$minOrmax,
                                                                globalVariable$samplingApproach)
-      
+
+      # Store 95PPU in a temporary variable
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData
       tempVar <- cbind(tempVar, globalVariable$observedData[[input$plotVarNumber]]$Value)
-      
+
+      # Give column names for the 95PPU table
       colnames(tempVar) <- c("date", "lower", "median", "upper", "best", "observed")
       globalVariable$PlotVariableNumber <<- plotSimulated(tempVar)
 
+      # Plot the 95PPU
+      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber + theme(text = element_text(size=10))))
 
-      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber + theme(text = element_text(size=10)))) 
-      
-      # Table
-      columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'), 
+      # Set format for the 95PPU table
+      columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'),
                                         source = rep(NA, 5),
                                         width = rep(300, 5),
                                         type = rep('numeric', 5))
-      
+
+      # Fill the 95PPU table with values
       output$tableBehaSim <- renderExcel(excelTable(data = globalVariable$dataPlotVariableNumber$ppuSimData,
                                                     columns = columnsTableBehaSim,
                                                     editable = FALSE,
                                                     allowInsertRow = FALSE,
                                                     allowInsertColumn = FALSE,
                                                     allowDeleteColumn = FALSE,
-                                                    allowDeleteRow = FALSE, 
+                                                    allowDeleteRow = FALSE,
                                                     rowDrag = FALSE,
                                                     columnResize = FALSE,
-                                                    wordWrap = FALSE)) 
-      #Table beha parameter range
-      columnsTableBehaParam <- data.frame(title = c('parameter', 'lower_95PPU', 'median', 
-                                                    'upper_95PPU', 'bestParameter'), 
+                                                    wordWrap = FALSE))
+      #Table behavioral parameter range
+      columnsTableBehaParam <- data.frame(title = c('parameter', 'lower_95PPU', 'median',
+                                                    'upper_95PPU', 'bestParameter'),
                                           source = rep(NA, 5),
                                           width = rep(300, 5),
                                           type = rep('numeric', 5))
-      
+
+      # Set format for the behavioral parameter range table
       output$tableBehaParam <- renderExcel(excelTable(data = cbind(globalVariable$paraSelection$Parameter,
                                                                    globalVariable$dataPlotVariableNumber$ppuParaRange),
                                                       columns = columnsTableBehaParam,
@@ -1581,58 +1617,65 @@ print(sensCaliObject)[]")
                                                       allowInsertRow = FALSE,
                                                       allowInsertColumn = FALSE,
                                                       allowDeleteColumn = FALSE,
-                                                      allowDeleteRow = FALSE, 
+                                                      allowDeleteRow = FALSE,
                                                       rowDrag = FALSE,
                                                       columnResize = FALSE,
-                                                      wordWrap = FALSE))   
-      # P and r factor
+                                                      wordWrap = FALSE))
+      # Show p- and r-factor
       output$printPandRFactor <- renderText(
         paste("p-factor = ", globalVariable$dataPlotVariableNumber$prFactor[1],
               " r-factor = ", globalVariable$dataPlotVariableNumber$prFactor[2],
               sep =""))
-    }    
-    
+    }
+
   })
-  
-  # ****************************************************************************  
-  # Save plot simulated result 
+
+  # ****************************************************************************
+  # Save plot simulated result
   # ****************************************************************************
   observe({
     req(input$savePlotVariableNumber)
-    
+
+    # Display window for saving plot
     showModal(
       modalDialog(
         textInput("savePlotVariableNumberFileName", "File name (must have .pdf)",
                   placeholder = 'RSWATPlot.pdf'
         ),
-        
+
+        # User defined setting for figure width
         numericInput("savePlotVariableNumberWidth", "Width in cm", 10, min = 1, max = 100),
-        
+
+        # User defined setting for figure height
         numericInput("savePlotVariableNumberHeight", "Height in cm", 10, min = 1, max = 100),
-        
+
+        # Display instruction
         span('Press OK to save plot as .pdf file in the working folder'),
-        
+
+        # Set displayed texts for the the modal and action button
         footer = tagList(
           modalButton("Cancel"),
           actionButton("savePlotVariableNumberok", "OK")
         )
       )
     )
-    
+
   })
-  
+
+  # Saving figure only when user press the OK button
   observeEvent(input$savePlotVariableNumberok, {
-    
-    # Save plot
+
+    # Set working directory, which is the working folder
     setwd(globalVariable$workingFolder)
-    
-    ggsave(input$savePlotVariableNumberFileName, 
+
+    # Now save the plot as pdf file
+    ggsave(input$savePlotVariableNumberFileName,
            plot = globalVariable$PlotVariableNumber,
            device = "pdf",
            width = input$savePlotVariableNumberWidth,
            height = input$savePlotVariableNumberHeight,
            units = c("cm"))
-    
+
     # print message
     showModal(modalDialog(
       title = " ",
@@ -1641,16 +1684,19 @@ print(sensCaliObject)[]")
       size = "l"
     ))
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Save all results
   # ****************************************************************************
   observe({
     req(input$saveAllResults)
-    # Save observed data to globalVariables
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 
+
+    # Save observed data to global variable
+    saveRDS(globalVariable, file = paste(input$workingFolder, '/',
                                          'RSWATproject.rds',
-                                         sep ='')) 
+                                         sep =''))
+
+    # Display message that all settings/results were saved
     showModal(modalDialog(
       title = "Save results",
       HTML("All results was saved as 'RSWATproject.rds' in the working folder"),
@@ -1658,33 +1704,34 @@ print(sensCaliObject)[]")
       size = "l"
     ))
   })
+
   #-----------------------------------------------------------------------------
   # Tab 5. Visualization
-  #-----------------------------------------------------------------------------  
-  # 5.1. Visualize watout file 
-  # ****************************************************************************  
+  #-----------------------------------------------------------------------------
+  # 5.1. Visualize watout file
+  # ****************************************************************************
   # Update selected column watout.dat file type
   # ****************************************************************************
   observe({
     req(input$watoutFile)
-    
+
     # Read data and header of the watout file
     globalVariable$visualWatoutData <<- readWatout(input$watoutFile$datapath)
     globalVariable$visualWatoutHeader <<- readWatoutHeader(input$watoutFile$datapath)
-    
+
     # Display column header
     updateSelectizeInput(session, "selectColWatout",
                          choices = globalVariable$visualWatoutHeader,
                          selected = globalVariable$visualWatoutHeader[2]
-    )   
+    )
   })
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Update selected column observed
-  # ****************************************************************************  
+  # ****************************************************************************
   observe({
     req(input$observedFile)
-    
+
     # Read observed data
     globalVariable$visualObserveData <<- read.table(input$observedFile$datapath, header = TRUE, sep = "")
 
@@ -1694,150 +1741,151 @@ print(sensCaliObject)[]")
                          selected = globalVariable$visualObserveData[2]
     )
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Plot watout file
   # ****************************************************************************
   observe({
     req(input$watoutFile)
-  
+
     # Plot selected data
     if(is.data.frame(globalVariable$visualWatoutData)){
-      
-      # Check if observed data file is missing 
+
+      # Check if observed data file is missing
       if (!is.null(input$observedFile$datapath)){
-        
+
         # Search for data in the selected column
         if (input$selectColObs %in% colnames(globalVariable$visualObserveData)){
-          
+
           # Plot the selected data
-          pltWatout <- plotWatout(globalVariable$visualWatoutData, globalVariable$visualWatoutHeader, input$selectColWatout, 
-                                  globalVariable$visualObserveData, input$selectColObs)
+          pltWatout <- plotWatout(globalVariable$visualWatoutData,
+                                  globalVariable$visualWatoutHeader,
+                                  input$selectColWatout,
+                                  globalVariable$visualObserveData,
+                                  input$selectColObs)
           output$plotWatout <- renderPlotly(pltWatout$plot)
         }
 
       } else {
- 
-        # Only plot simulated data is observed dtaa is not provided
+
+        # Only plot simulated data if observed data is not provided
         if (input$selectColWatout %in% globalVariable$visualWatoutHeader){
-          pltWatout <- plotWatout(globalVariable$visualWatoutData, globalVariable$visualWatoutHeader, input$selectColWatout, 
-                                  NULL, NULL)
+          pltWatout <- plotWatout(globalVariable$visualWatoutData,
+                                  globalVariable$visualWatoutHeader,
+                                  input$selectColWatout,
+                                  NULL,
+                                  NULL)
           output$plotWatout <- renderPlotly(pltWatout$plot)
         }
 
       }
     }
-    
+
   })
 
   # 5.2. Visualize output.hru
-  # ****************************************************************************  
+  # ****************************************************************************
   # Get HRU shape file file
   # ****************************************************************************
-  
   observe({
-    
+
     # Get a list of available volumes
     volumes <- getVolumes()
-    
+
     # Create a connection to the server side filesystem
-    shinyFileChoose(input, "getHruShp", 
-                    roots = volumes, 
+    shinyFileChoose(input, "getHruShp",
+                    roots = volumes,
                     filetypes=c('', 'shp'),
                     session = session)
-    
+
     # Full link to the selected file
     hruShpFile <- parseFilePaths(volumes, input$getHruShp)
-    
+
     if(length(hruShpFile$datapath) == 1){
-      
+
       # HRU file path
       hruShpFile <- as.character(hruShpFile$datapath)
-      
+
       # Print out selected file
       output$printHruShp <- renderText(hruShpFile)
-           
+
       # Check if file exist
       if (file.exists(hruShpFile)){
 
         # Read hru shape file
         displayOutput$hruShp <<- readOGR(hruShpFile)
       } else {
-        
+
         # If hru shape file does not exit, return Null
         displayOutput$hruShp <<- NULL
       }
     }
   })
-  
-  # ****************************************************************************  
-  # Get TxtInOut directory 
+
   # ****************************************************************************
-  #  observe({
-  #    req(input$hruTempAgg)
-  #  })
-  
+  # Get TxtInOut directory
+  # ****************************************************************************
   # Update select date rnage
   observe({
-    
+
     # Require input of the TxtInOut folder
     req(input$hruTxtInOutFolder)
-    
+
     # Read file.cio
     fileCio <- trimws(paste(input$hruTxtInOutFolder, '/file.cio', sep=''))
-    
+
     if (file.exists(fileCio)){
 
       # Get information from the file.cio
       displayOutput$hruFileCioInfo <<- getFileCioInfo(input$hruTxtInOutFolder)
-      
-      # Update date for plot based on file.cio 
+
+      # Update date for plot based on file.cio
       updateDateInput(session, "hruPlotDate",
                       min = displayOutput$hruFileCioInfo$startEval,
-                      max = displayOutput$hruFileCioInfo$endSim, 
-                      value = displayOutput$hruFileCioInfo$startEval[1])  
-      
-      # Update date for plot based on file.cio 
+                      max = displayOutput$hruFileCioInfo$endSim,
+                      value = displayOutput$hruFileCioInfo$startEval[1])
+
+      # Update date for plot based on file.cio
       updateDateRangeInput(session, "hruInputDateRange",
                            start = displayOutput$hruFileCioInfo$startEval,
                            end = displayOutput$hruFileCioInfo$endSim,
                            min = displayOutput$hruFileCioInfo$startEval,
                            max = displayOutput$hruFileCioInfo$endSim)
-      
-      # Update date for plot based on file.cio 
+
+      # Update date for plot based on file.cio
       updateDateInput(session, "hruPlotMonth",
                       min = displayOutput$hruFileCioInfo$startEval,
-                      max = displayOutput$hruFileCioInfo$endSim, 
-                      value = displayOutput$hruFileCioInfo$startEval[1])  
-      
-      # Update date for plot based on file.cio 
+                      max = displayOutput$hruFileCioInfo$endSim,
+                      value = displayOutput$hruFileCioInfo$startEval[1])
+
+      # Update date for plot based on file.cio
       updateDateRangeInput(session, "hruInputMonthRange",
                            start = displayOutput$hruFileCioInfo$startEval,
                            end = displayOutput$hruFileCioInfo$endSim,
                            min = displayOutput$hruFileCioInfo$startEval,
                            max = displayOutput$hruFileCioInfo$endSim)
-      
-      # Update date for plot based on file.cio 
+
+      # Update date for plot based on file.cio
       updateDateInput(session, "hruPlotYear",
                       min = displayOutput$hruFileCioInfo$startEval,
-                      max = displayOutput$hruFileCioInfo$endSim, 
+                      max = displayOutput$hruFileCioInfo$endSim,
                       value = displayOutput$hruFileCioInfo$startEval[1])
-      
-      # Update date for plot based on file.cio 
+
+      # Update date for plot based on file.cio
       updateDateRangeInput(session, "hruInputYearRange",
                            start = displayOutput$hruFileCioInfo$startEval,
                            end = displayOutput$hruFileCioInfo$endSim,
                            min = displayOutput$hruFileCioInfo$startEval,
                            max = displayOutput$hruFileCioInfo$endSim)
-      
+
     }
-    
+
     # Get full link to the output.hru file
     fileHru <- trimws(paste(input$hruTxtInOutFolder, '/output.hru', sep=''))
-  
+
     # Check if fileHRU exists
     if(file.exists(fileHru)){
-     
+
       # Read header of output.hru
       ouputHruHeader <- readOutputHruHeader(fileHru)
 
@@ -1849,170 +1897,199 @@ print(sensCaliObject)[]")
       updateSelectizeInput(session, "hruSelectCol",
                            choices = ouputHruHeader,
                            selected = ouputHruHeader[1])
-      
+
     } else {
-      
+
       # If file does not exist, return null
       updateSelectizeInput(session, "hruSelectCol",
-                           choices = NULL)      
+                           choices = NULL)
     }
-    
+
   })
- 
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # get HRU data
   # ****************************************************************************
   observe({
-    
+
     req(input$hruTxtInOutFolder)
-    
+
     # Get full path of the file output.hru
     fileHru <- trimws(paste(input$hruTxtInOutFolder, '/output.hru', sep=''))
-    
+
     if(file.exists(fileHru)){
-      
+
       # Read HRU data
       temp <- read.table(fileHru, header = FALSE, sep = "", skip = 9)
-      
+
       # Get header of output.hru
       colnames(temp) <- readOutputHruHeader(fileHru)
-      
+
       # Assign header to its data frame
       displayOutput$hruData <<- temp
 
     } else {
-      
+
       # If file does not exist, return null
       displayOutput$hruData <<- NULL
     }
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Plot hru
   # ****************************************************************************
   observe({
-    
+
     # Required input to activate these commands
-    req(input$hruTxtInOutFolder, 
+    req(input$hruTxtInOutFolder,
         input$hruSelectCol,
         input$hruTempAgg)
-    
-    # Check which temporal aggregation daily - monthly - or yearly 
+
+    # Check which temporal aggregation daily - monthly - or yearly
     # Get input date/date range and assigned them to global variables
-    
     if (input$hruTempAgg == 'Daily'){
       displayOutput$hruInputDateRange <<- input$hruInputDateRange
-      displayOutput$hruPlotDate <<- input$hruPlotDate   
+      displayOutput$hruPlotDate <<- input$hruPlotDate
     } else if (input$hruTempAgg == 'Monthly'){
       displayOutput$hruInputDateRange <<- input$hruInputMonthRange
-      displayOutput$hruPlotDate <<- input$hruPlotMonth  
+      displayOutput$hruPlotDate <<- input$hruPlotMonth
     } else {
       displayOutput$hruInputDateRange <<- input$hruInputYearRange
-      displayOutput$hruPlotDate <<- input$hruPlotYear 
+      displayOutput$hruPlotDate <<- input$hruPlotYear
     }
-     
+
+    # Check if there is data for plot
     if (!is.null(displayOutput$hruData)){
-      hruPlotData <- subsetOutputHru(displayOutput$hruData, 
-                                     displayOutput$hruInputDateRange[1], 
-                                     displayOutput$hruInputDateRange[2], 
-                                     input$hruSelectCol, 
+
+      # Get subset of the data for plot
+      hruPlotData <- subsetOutputHru(displayOutput$hruData,
+                                     displayOutput$hruInputDateRange[1],
+                                     displayOutput$hruInputDateRange[2],
+                                     input$hruSelectCol,
                                      input$hruTempAgg)
 
+      # Check if there is no hru shape file
       if(!is.null(displayOutput$hruShp)){
-       
+
+        # Display output text (by default)
         outputText <- as.character(displayOutput$hruPlotDate)
+
+        # Modify output text depending on the selected temporal aggregation
         if (input$hruTempAgg == "Monthly"){
           outputText <- substr(outputText,1,7)
         } else if (input$hruTempAgg == "Yearly"){
           outputText <- substr(outputText,1,4)
         }
-        outputText <- paste("You selected Variable: ", 
-                            input$hruSelectCol, 
+
+        # Now display output text
+        outputText <- paste("You selected Variable: ",
+                            input$hruSelectCol,
                             ", Timestep: ",
                             input$hruTempAgg,
                             ", Time: ",
                             outputText,
                             sep = "")
-        output$hruPlotTitle <- renderText(outputText)  
-        
+
+        # Set title for the plot
+        output$hruPlotTitle <- renderText(outputText)
+
+        # Set min-max range for color of the plot
         displayOutput$plotHruValues <<- hruShpValue(hruPlotData, displayOutput$hruPlotDate)
-        
+
         minVal <- min(displayOutput$plotHruValues)
         maxVal <- max(displayOutput$plotHruValues)
-        
+
+        # Update the min-max range in the slider input
         updateSliderInput(session, "hruPlotRange", "7. Set value range for plot",
                           min = minVal, max = maxVal,
                           value = c(minVal, maxVal),
                           step = (maxVal - minVal)/100)
-        
-        output$hruPlotHRU <- renderPlot(ggplotHruPolygon(displayOutput$hruShp, 
+
+        # Now plot the result
+        output$hruPlotHRU <- renderPlot(ggplotHruPolygon(displayOutput$hruShp,
                                                          displayOutput$plotHruValues))
         displayOutput$plotHru <<- TRUE
 
 
+      # In other cases, don't display any plot
       } else {
         output$hruPlotHRU <- NULL
         displayOutput$plotHru <<- FALSE
       }
-      
+
     } else {
       output$hruPlotHRU <- NULL
       displayOutput$plotHru <<- FALSE
     }
-    
-    
+
+
   })
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Update plot hru
-  # ****************************************************************************  
+  # ****************************************************************************
   observe({
-    
+
     req(input$hruPlotRange)
-    
+
     if(displayOutput$plotHru){
       # Update plot range
       plotValues <- displayOutput$plotHruValues
       plotValues <- replace(plotValues, plotValues <  input$hruPlotRange[1], input$hruPlotRange[1])
       plotValues <- replace(plotValues, plotValues > input$hruPlotRange[2], input$hruPlotRange[2])
-      
-      output$hruPlotHRU <- renderPlot(ggplotHruPolygon(displayOutput$hruShp, 
-                                                       plotValues))     
+
+      # Now display the hru plot
+      output$hruPlotHRU <- renderPlot(ggplotHruPolygon(displayOutput$hruShp,
+                                                       plotValues))
     } else {
       output$hruPlotHRU <- NULL
     }
-    
+
   })
 
   # 6.1. Visualize output.rch
-  # ****************************************************************************  
+  # ****************************************************************************
   # Read file.cio information
   # ****************************************************************************
   observe({
     req(input$rchFileCio)
-    
+
+    # Get full path to the .cio file
     fileName <- input$rchFileCio$datapath
+
+    # Check if this is the .cio file
     if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".cio") {
-      displayOutput$rchFileCioInfo <<- getFileCioInfo(input$rchFileCio$datapath)  
+
+      # Get information about simulation time in this file
+      displayOutput$rchFileCioInfo <<- getFileCioInfo(input$rchFileCio$datapath)
+
+    # Otherwise set output is null - no information about the simulation time
     } else {
       displayOutput$rchFileCioInfo <<- NULL
     }
-    
+
   })
 
-  # ****************************************************************************  
+  # ****************************************************************************
   # Read output.rch  file
   # ****************************************************************************
   observe({
     req(input$outputRchFile)
-    
+
+    # Get full path to the output.rch file
     fileName <- input$outputRchFile$datapath
+
+    # Chek if this is really .rch file
     if (substr(fileName, nchar(fileName) - 3, nchar(fileName)) == ".rch") {
+
+      # Load data in this file
       displayOutput$outputRchFile <<- readOutputRch(fileName)
-      
+
+      # Update/Give the reach number that user can select
       updateSelectizeInput(session, "rchSelectedReach",
                            choices = c(1:max(displayOutput$outputRchFile[,1])))
-      
+
+      # Update/Give the list of variables that user can select
       updateSelectizeInput(session, "rchSelectedVariable",
                            choices = colnames(displayOutput$outputRchFile))
     } else {
@@ -2020,211 +2097,242 @@ print(sensCaliObject)[]")
     }
   })
 
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Read observed data  file
-  # **************************************************************************** 
+  # ****************************************************************************
   observe({
     req(input$rchObservedFile)
-    
-    displayOutput$rchObsData <<- read.table(input$rchObservedFile$datapath, 
+
+    # Read observed data
+    displayOutput$rchObsData <<- read.table(input$rchObservedFile$datapath,
                                            header = TRUE, sep = "")
-    displayOutput$rchObsData[,1] <<- as.Date(displayOutput$rchObsData[,1], 
+
+    # Assign date for observed data
+    displayOutput$rchObsData[,1] <<- as.Date(displayOutput$rchObsData[,1],
                                             "%Y-%m-%d")
-    
+
+    # Update variable name in the observed data
     updateSelectizeInput(session, "rchObsVariable",
                          choices = colnames(displayOutput$rchObsData)
                          [2:ncol(displayOutput$rchObsData)])
-    
-    
+
+
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Subset observed data file
-  # **************************************************************************** 
-  observe({  
+  # ****************************************************************************
+  observe({
     req(input$rchObsVariable)
-    
-    if (!is.null(input$rchObsVariable) & 
+
+    # check if there are observed data
+    if (!is.null(input$rchObsVariable) &
         exists("rchObsData", where = displayOutput)){
-      
+
+      # Get subset of observed data
       colNr <- match(input$rchObsVariable, colnames(displayOutput$rchObsData))
       displayOutput$rchSubsetObsData <<- displayOutput$rchObsData[,c(1, colNr)]
     }
-    
-  }) 
-  
-  # ****************************************************************************  
+
+  })
+
+  # ****************************************************************************
   # Plot result
-  # **************************************************************************** 
+  # ****************************************************************************
   observe({
-    
+
     req(input$rchTempAgg)
     req(input$rchSelectedVariable)
     req(input$rchSelectedReach)
 
+    # Check if observed are also given
     if (isTruthy(input$rchObsVariable) & isTruthy(input$rchObservedFile)){
       if (exists("rchSubsetObsData", where = displayOutput) &
           exists("outputRchFile", where = displayOutput)&
           exists("rchFileCioInfo", where = displayOutput)){
-        
+
+        # Get subset of data in the .rch file
         outputRchSubset <- subsetOutputRch(displayOutput$outputRchFile,
-                                           input$rchTempAgg, 
-                                           input$rchSelectedVariable, 
-                                           c(displayOutput$rchFileCioInfo$startEval, 
-                                             displayOutput$rchFileCioInfo$endSim), 
+                                           input$rchTempAgg,
+                                           input$rchSelectedVariable,
+                                           c(displayOutput$rchFileCioInfo$startEval,
+                                             displayOutput$rchFileCioInfo$endSim),
                                            input$rchSelectedReach)
-        
+
+        # Plot the result
         plt <- plotOutputRchSubset(outputRchSubset, displayOutput$rchSubsetObsData)
-        
-        
+
+        # Display plot
         output$rchPlotRch <- renderPlotly(plt)
-        
+
       } else {
         output$rchPlotRch <- NULL
-      }      
+      }
     } else {
       if (exists("outputRchFile", where = displayOutput)){
-        
+
         outputRchSubset <- subsetOutputRch(displayOutput$outputRchFile,
-                                           input$rchTempAgg, 
-                                           input$rchSelectedVariable, 
-                                           c(displayOutput$rchFileCioInfo$startEval, 
-                                             displayOutput$rchFileCioInfo$endSim), 
+                                           input$rchTempAgg,
+                                           input$rchSelectedVariable,
+                                           c(displayOutput$rchFileCioInfo$startEval,
+                                             displayOutput$rchFileCioInfo$endSim),
                                            input$rchSelectedReach)
         temp <- NULL
         plt <- plotOutputRchSubset(outputRchSubset, temp)
-        
-        
+
+
         output$rchPlotRch <- renderPlotly(plt)
-        
+
       } else {
         output$rchPlotRch <- NULL
       }
     }
 
 
-  }) 
+  })
 
   # 7.1. Visualize output.sub
-  # ****************************************************************************  
+  # ****************************************************************************
   # Read subbasin shape file
   # ****************************************************************************
   observe({
+
+    # Get all available volumes
     volumes <- getVolumes()
-    shinyFileChoose(input, "getSubShape", 
-                    roots = volumes, 
+
+    # Display select file window
+    shinyFileChoose(input, "getSubShape",
+                    roots = volumes,
                     filetypes=c('', 'shp'),
                     session = session)
-    
+
+    # Get full path to the selected file
     subShapeFile <- parseFilePaths(volumes, input$getSubShape)
-    
+
+    # Read subbasin shape file
     if(length(subShapeFile$datapath) == 1){
       subShapeFile <- as.character(subShapeFile$datapath)
       output$printSubShape <- renderText(subShapeFile)
-      
+
       if (file.exists(subShapeFile)){
-        
+
         displayOutput$subShape <<- readOGR(subShapeFile)
       } else {
         displayOutput$subShape <<- NULL
       }
     }
   })
-  
-  # ****************************************************************************  
-  # Get TxtInOut directory 
+
+  # ****************************************************************************
+  # Get TxtInOut directory
   # ****************************************************************************
   # Update select date range
   observe({
-    
+
     req(input$subTxtInOutFolder)
-    
+
+    # Get full path to the file.cio file
     fileCio <- trimws(paste(input$subTxtInOutFolder, '/file.cio', sep=''))
-    
+
+    # check if file.cio exists
     if (file.exists(fileCio)){
-      
+
+      # Get simulation date from file.cio
       displayOutput$subFileCioInfo <<- getFileCioInfo(input$subTxtInOutFolder)
-      
+
+      # Update the selected date
       updateDateInput(session, "subPlotDate",
                       min = displayOutput$subFileCioInfo$startEval,
-                      max = displayOutput$subFileCioInfo$endSim, 
-                      value = displayOutput$subFileCioInfo$startEval[1])  
-      
+                      max = displayOutput$subFileCioInfo$endSim,
+                      value = displayOutput$subFileCioInfo$startEval[1])
+
+      # Update the selected date range
       updateDateRangeInput(session, "subInputDateRange",
                            start = displayOutput$subFileCioInfo$startEval,
                            end = displayOutput$subFileCioInfo$endSim,
                            min = displayOutput$subFileCioInfo$startEval,
                            max = displayOutput$subFileCioInfo$endSim)
-      
-      
+
+
+      # Update the selected month
       updateDateInput(session, "subPlotMonth",
                       min = displayOutput$subFileCioInfo$startEval,
-                      max = displayOutput$subFileCioInfo$endSim, 
-                      value = displayOutput$subFileCioInfo$startEval[1])  
-      
+                      max = displayOutput$subFileCioInfo$endSim,
+                      value = displayOutput$subFileCioInfo$startEval[1])
+
+      # Update the selected month range
       updateDateRangeInput(session, "subInputMonthRange",
                            start = displayOutput$subFileCioInfo$startEval,
                            end = displayOutput$subFileCioInfo$endSim,
                            min = displayOutput$subFileCioInfo$startEval,
                            max = displayOutput$subFileCioInfo$endSim)
-      
+
+      # Update the selected year
       updateDateInput(session, "subPlotYear",
                       min = displayOutput$subFileCioInfo$startEval,
-                      max = displayOutput$subFileCioInfo$endSim, 
+                      max = displayOutput$subFileCioInfo$endSim,
                       value = displayOutput$subFileCioInfo$startEval[1])
-      
+
+      # Update the selected year range
       updateDateRangeInput(session, "subInputYearRange",
                            start = displayOutput$subFileCioInfo$startEval,
                            end = displayOutput$subFileCioInfo$endSim,
                            min = displayOutput$subFileCioInfo$startEval,
                            max = displayOutput$subFileCioInfo$endSim)
-      
+
     }
-    
+
     # Get output.sub data and update select column
     fileSub <- trimws(paste(input$subTxtInOutFolder, '/output.sub', sep=''))
-    
+
+    # check if output.sub file exists
     if(file.exists(fileSub)){
+
+        # Read data in the output.sub file
         displayOutput$subData <<- readOutputRch(fileSub)
 
+        # Update variables name for selection
         updateSelectizeInput(session, "subSelectCol",
                              choices = colnames(displayOutput$subData)[-c(1)])
     } else {
       updateSelectizeInput(session, "subSelectCol",
-                           choices = NULL) 
+                           choices = NULL)
       displayOutput$subData <<- NULL
     }
-    
+
   })
-  
-  # ****************************************************************************  
+
+  # ****************************************************************************
   # Plot sub
   # ****************************************************************************
   observe({
-    
-    req(input$subTxtInOutFolder, 
+
+    req(input$subTxtInOutFolder,
         input$subSelectCol,
         input$subTempAgg)
-    
+
+    # Check with temporal aggregation is given
     if (input$subTempAgg == 'Daily'){
       displayOutput$subInputDateRange <<- input$subInputDateRange
-      displayOutput$subPlotDate <<- input$subPlotDate 
+      displayOutput$subPlotDate <<- input$subPlotDate
     } else if (input$subTempAgg == 'Monthly'){
       displayOutput$subInputDateRange <<- input$subInputMonthRange
-      displayOutput$subPlotDate <<- input$subPlotMonth  
+      displayOutput$subPlotDate <<- input$subPlotMonth
     } else {
       displayOutput$subInputDateRange <<- input$subInputYearRange
-      displayOutput$subPlotDate <<- input$subPlotYear 
+      displayOutput$subPlotDate <<- input$subPlotYear
     }
-    
+
+    # Get subset of data based on user selection criteria
     if (!is.null(displayOutput$subData)){
-      subPlotData <- subsetOutputHru(displayOutput$subData, 
-                                     displayOutput$subInputDateRange[1], 
-                                     displayOutput$subInputDateRange[2], 
-                                     input$subSelectCol, 
+      subPlotData <- subsetOutputHru(displayOutput$subData,
+                                     displayOutput$subInputDateRange[1],
+                                     displayOutput$subInputDateRange[2],
+                                     input$subSelectCol,
                                      input$subTempAgg)
-      
+
+      # Check if subbasin shape file exist
       if(!is.null(displayOutput$subShape)){
          rowNr <- match(displayOutput$subPlotDate, subPlotData[,1])
          if (input$subTempAgg == 'Monthly'){
@@ -2242,66 +2350,76 @@ print(sensCaliObject)[]")
         } else if (input$subTempAgg == "Yearly"){
           outputText <- substr(outputText,1,4)
         }
-        outputText <- paste("You selected Variable: ", 
-                            input$subSelectCol, 
+        outputText <- paste("You selected Variable: ",
+                            input$subSelectCol,
                             ", Timestep: ",
                             input$subTempAgg,
                             ", Time: ",
                             outputText,
                             sep = "")
-        output$subPlotTitle <- renderText(outputText) 
-        
+
+        # Display title for the subbasin plot
+        output$subPlotTitle <- renderText(outputText)
+
+        # Data for subbasin plot
         displayOutput$plotSubValues <<- as.numeric(subPlotData[rowNr, 2:ncol(subPlotData)])
-        
+
+        # Get range for plot
         minVal <- min(displayOutput$plotSubValues)
         maxVal <- max(displayOutput$plotSubValues)
-        
+
+        # Update the allowable range for plot
         updateSliderInput(session, "subPlotRange", "7. Set value range for plot",
                           min = minVal, max = maxVal,
                           value = c(minVal, maxVal),
                           step = (maxVal - minVal)/100)
 
+        # Display plot
         output$subPlotSub <- renderPlot({
           ggplotPolygon(displayOutput$subShape, displayOutput$plotSubValues)
         })
-        
+
         displayOutput$plotSub <<- TRUE
-        
+
       } else {
         output$subPlotSub <- NULL
         displayOutput$plotSub <<- FALSE
       }
-      
+
     } else {
       output$subPlotSub <- NULL
       displayOutput$plotSub <<- FALSE
     }
-    
-  })
-  
 
-  # ****************************************************************************  
+  })
+
+
+  # ****************************************************************************
   # Update plot sub
-  # ****************************************************************************  
+  # ****************************************************************************
   observe({
-    
+
     req(input$subPlotRange)
-    
+
+    # check if user selects to plot subbasin outputs
     if(displayOutput$plotSub){
+
       # Update plot range
       plotValues <- displayOutput$plotSubValues
       plotValues <- replace(plotValues, plotValues <  input$subPlotRange[1], input$subPlotRange[1])
       plotValues <- replace(plotValues, plotValues > input$subPlotRange[2], input$subPlotRange[2])
-      
+
+      # Display the plot
       output$subPlotSub <- renderPlot({
         ggplotPolygon(displayOutput$subShape, plotValues)
       })
-      
+
+    # Other cases, don't display anything
     } else {
       output$hruPlotHRU <- NULL
     }
-    
+
   })
-  
-  #-----------------------------------------------------------------------------  
+
+  #-----------------------------------------------------------------------------
 }
