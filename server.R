@@ -1564,15 +1564,17 @@ print(sensCaliObject)[]")
     if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
 
       # Find behavioral simulations - 95PPU
-      globalVariable$dataPlotVariableNumber <<- behaSimulation(globalVariable$objValue,
-                                                               globalVariable$simData,
-                                                               globalVariable$parameterValue,
-                                                               input$behThreshold,
-                                                               input$plotVarNumber,
-                                                               globalVariable$objFunction,
-                                                               globalVariable$observedData,
-                                                               globalVariable$minOrmax,
-                                                               globalVariable$samplingApproach)
+      globalVariable$dataPlotVariableNumber <<- behaSimulation(
+        globalVariable$objValue,
+        globalVariable$simData,
+        globalVariable$parameterValue,
+        input$behThreshold,
+        input$plotVarNumber,
+        globalVariable$objFunction,
+        globalVariable$observedData,
+        globalVariable$minOrmax,
+        globalVariable$samplingApproach
+        )
 
       # Store 95PPU in a temporary variable
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData
@@ -1583,44 +1585,54 @@ print(sensCaliObject)[]")
       globalVariable$PlotVariableNumber <<- plotSimulated(tempVar)
 
       # Plot the 95PPU
-      output$PlotVariableNumber <- renderPlotly(ggplotly(globalVariable$PlotVariableNumber + theme(text = element_text(size=10))))
+      output$PlotVariableNumber <- renderPlotly(
+        ggplotly(globalVariable$PlotVariableNumber +
+                   theme(text = element_text(size=10)))
+        )
 
       # Set format for the 95PPU table
-      columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median', 'Upper 95PPU', 'Best Simulation'),
+      columnsTableBehaSim <- data.frame(title = c('Date','Lower 95PPU', 'Median',
+                                                  'Upper 95PPU', 'Best Simulation'),
                                         source = rep(NA, 5),
                                         width = rep(300, 5),
                                         type = rep('numeric', 5))
 
       # Fill the 95PPU table with values
-      output$tableBehaSim <- renderExcel(excelTable(data = globalVariable$dataPlotVariableNumber$ppuSimData,
-                                                    columns = columnsTableBehaSim,
-                                                    editable = FALSE,
-                                                    allowInsertRow = FALSE,
-                                                    allowInsertColumn = FALSE,
-                                                    allowDeleteColumn = FALSE,
-                                                    allowDeleteRow = FALSE,
-                                                    rowDrag = FALSE,
-                                                    columnResize = FALSE,
-                                                    wordWrap = FALSE))
+      output$tableBehaSim <- renderExcel(excelTable(
+        data = globalVariable$dataPlotVariableNumber$ppuSimData,
+        columns = columnsTableBehaSim,
+        editable = FALSE,
+        allowInsertRow = FALSE,
+        allowInsertColumn = FALSE,
+        allowDeleteColumn = FALSE,
+        allowDeleteRow = FALSE,
+        rowDrag = FALSE,
+        columnResize = FALSE,
+        wordWrap = FALSE))
+
       #Table behavioral parameter range
-      columnsTableBehaParam <- data.frame(title = c('parameter', 'lower_95PPU', 'median',
-                                                    'upper_95PPU', 'bestParameter'),
+      columnsTableBehaParam <- data.frame(title = c('parameter', 'lower_95PPU',
+                                                    'median','upper_95PPU',
+                                                    'bestParameter'),
                                           source = rep(NA, 5),
                                           width = rep(300, 5),
                                           type = rep('numeric', 5))
 
       # Set format for the behavioral parameter range table
-      output$tableBehaParam <- renderExcel(excelTable(data = cbind(globalVariable$paraSelection$Parameter,
-                                                                   globalVariable$dataPlotVariableNumber$ppuParaRange),
-                                                      columns = columnsTableBehaParam,
-                                                      editable = FALSE,
-                                                      allowInsertRow = FALSE,
-                                                      allowInsertColumn = FALSE,
-                                                      allowDeleteColumn = FALSE,
-                                                      allowDeleteRow = FALSE,
-                                                      rowDrag = FALSE,
-                                                      columnResize = FALSE,
-                                                      wordWrap = FALSE))
+      output$tableBehaParam <- renderExcel(excelTable(
+        data = cbind(globalVariable$paraSelection$Parameter,
+                     globalVariable$dataPlotVariableNumber$ppuParaRange),
+        columns = columnsTableBehaParam,
+        editable = FALSE,
+        allowInsertRow = FALSE,
+        allowInsertColumn = FALSE,
+        allowDeleteColumn = FALSE,
+        allowDeleteRow = FALSE,
+        rowDrag = FALSE,
+        columnResize = FALSE,
+        wordWrap = FALSE
+        ))
+
       # Show p- and r-factor
       output$printPandRFactor <- renderText(
         paste("p-factor = ", globalVariable$dataPlotVariableNumber$prFactor[1],
@@ -1644,10 +1656,12 @@ print(sensCaliObject)[]")
         ),
 
         # User defined setting for figure width
-        numericInput("savePlotVariableNumberWidth", "Width in cm", 10, min = 1, max = 100),
+        numericInput("savePlotVariableNumberWidth", "Width in cm", 10,
+                     min = 1, max = 100),
 
         # User defined setting for figure height
-        numericInput("savePlotVariableNumberHeight", "Height in cm", 10, min = 1, max = 100),
+        numericInput("savePlotVariableNumberHeight", "Height in cm", 10,
+                     min = 1, max = 100),
 
         # Display instruction
         span('Press OK to save plot as .pdf file in the working folder'),
@@ -1733,7 +1747,8 @@ print(sensCaliObject)[]")
     req(input$observedFile)
 
     # Read observed data
-    globalVariable$visualObserveData <<- read.table(input$observedFile$datapath, header = TRUE, sep = "")
+    globalVariable$visualObserveData <<- read.table(input$observedFile$datapath,
+                                                    header = TRUE, sep = "")
 
     # Display header of observed data
     updateSelectizeInput(session, "selectColObs",
@@ -1994,7 +2009,8 @@ print(sensCaliObject)[]")
         output$hruPlotTitle <- renderText(outputText)
 
         # Set min-max range for color of the plot
-        displayOutput$plotHruValues <<- hruShpValue(hruPlotData, displayOutput$hruPlotDate)
+        displayOutput$plotHruValues <<- hruShpValue(hruPlotData,
+                                                    displayOutput$hruPlotDate)
 
         minVal <- min(displayOutput$plotHruValues)
         maxVal <- max(displayOutput$plotHruValues)
@@ -2035,8 +2051,10 @@ print(sensCaliObject)[]")
     if(displayOutput$plotHru){
       # Update plot range
       plotValues <- displayOutput$plotHruValues
-      plotValues <- replace(plotValues, plotValues <  input$hruPlotRange[1], input$hruPlotRange[1])
-      plotValues <- replace(plotValues, plotValues > input$hruPlotRange[2], input$hruPlotRange[2])
+      plotValues <- replace(plotValues, plotValues <  input$hruPlotRange[1],
+                            input$hruPlotRange[1])
+      plotValues <- replace(plotValues, plotValues > input$hruPlotRange[2],
+                            input$hruPlotRange[2])
 
       # Now display the hru plot
       output$hruPlotHRU <- renderPlot(ggplotHruPolygon(displayOutput$hruShp,
@@ -2406,8 +2424,10 @@ print(sensCaliObject)[]")
 
       # Update plot range
       plotValues <- displayOutput$plotSubValues
-      plotValues <- replace(plotValues, plotValues <  input$subPlotRange[1], input$subPlotRange[1])
-      plotValues <- replace(plotValues, plotValues > input$subPlotRange[2], input$subPlotRange[2])
+      plotValues <- replace(plotValues, plotValues <  input$subPlotRange[1],
+                            input$subPlotRange[1])
+      plotValues <- replace(plotValues, plotValues > input$subPlotRange[2],
+                            input$subPlotRange[2])
 
       # Display the plot
       output$subPlotSub <- renderPlot({
