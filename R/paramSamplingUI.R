@@ -17,7 +17,7 @@ paramSamplingUI <- function(id) {
       #-------------------------------------------------------------------------
       column(width = 10,
              HTML("<b>","1. Select SWAT parameters for calibration and/or 
-                  sensitivity analyis","</b>"),
+                  sensitivity analysis","</b>"),
       ),
       
       column(width = 10,
