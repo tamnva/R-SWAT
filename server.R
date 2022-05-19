@@ -902,6 +902,9 @@ print(sensCaliObject)[]")
 
             }
 
+            # Remove output variables
+            removeOutputFiles(globalVariable$workingFolder, globalVariable$ncores, globalVariable$nOutputVar)
+            
             # Run SWAT in parallel
             runSWATpar(globalVariable$workingFolder,
                        globalVariable$TxtInOutFolder,
@@ -924,6 +927,7 @@ print(sensCaliObject)[]")
                                    globalVariable$observedData,
                                    globalVariable$workingFolder,
                                    globalVariable$objFunction)
+
 
             # Save iteration result
             saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,newPar)
@@ -957,6 +961,10 @@ print(sensCaliObject)[]")
           globalVariable$perCriteria <<- saveIterationResult$perCriteria
           globalVariable$simData <<- saveIterationResult$simData
           globalVariable$parameterValue[,1] <<- c(1:nrow(globalVariable$parameterValue))
+          
+          #Save output to text file
+          writeOutputFiles(globalVariable$workingFolder, globalVariable$ncores, 
+                           globalVariable$nOutputVar, globalVariable$simData)
         }
 
         # Update numeric input (threshold objective function)
@@ -1534,17 +1542,22 @@ print(sensCaliObject)[]")
     # Check if the user-defined behavioral threshold is in a valid range
     if(!is.null(input$behThreshold)){
       if(!is.null(globalVariable$objValue)){
-        if (input$behThreshold > max(globalVariable$objValue)){
-
-          # Display check message
-          output$printMaxBehThreshold <- renderText(paste("The selected value is ",
-                                                          "greater than the maximum value ",
-                                                          max(globalVariable$objValue),
-                                                          sep =""))
+        
+        if (!is.numeric(input$behThreshold)){
+          output$printMaxBehThreshold <- renderText("please input numeric value")
         } else {
-          # Display check message
-          globalVariable$isBehThresholdValid <<- TRUE
-          output$printMaxBehThreshold <- renderText("check threshold value OK")
+          if (input$behThreshold > max(globalVariable$objValue)){
+            
+            # Display check message
+            output$printMaxBehThreshold <- renderText(paste("The selected value is ",
+                                                            "greater than the maximum value ",
+                                                            max(globalVariable$objValue),
+                                                            sep =""))
+          } else {
+            # Display check message
+            globalVariable$isBehThresholdValid <<- TRUE
+            output$printMaxBehThreshold <- renderText("check threshold value OK")
+          }         
         }
       } else {
         output$printMaxBehThreshold <- NULL

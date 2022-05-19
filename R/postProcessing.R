@@ -307,3 +307,41 @@ bindList <- function(toList, inList){
   }
   return(toList)
 }
+
+#------------------------------------------------------------------------------- 
+# Remove output files
+# ------------------------------------------------------------------------------
+removeOutputFiles <- function(workingFolder, ncores, nOutputVar){
+  for (i in 1:ncores){
+    for (j in 1:nOutputVar){
+      removeFileName <- paste(workingFolder, "/Output/Core_", i, "/Output_Variable_", j, ".txt", sep ="")
+      file.remove(removeFileName)
+    }
+  }
+}
+
+#------------------------------------------------------------------------------- 
+# Write output files
+# ------------------------------------------------------------------------------
+writeOutputFiles <- function(workingFolder, ncores, nOutputVar, simData){
+  for (i in 1:ncores){
+    for (j in 1:nOutputVar){
+      fileName <- paste(workingFolder, "/Output/Core_", i, "/Output_Variable_", 
+                        j, ".txt", sep ="")
+      
+      # Remove file
+      file.remove(fileName)
+      
+      # Check which core and which simulation
+      sim <- seq(from = i, to = length(simData[[nOutputVar]]), ncores)
+      
+      # Write simulation data
+      for (k in 1:length(sim)){
+        write.table(as.character(sim[k]), fileName, col.names = FALSE, 
+                    row.names = FALSE, append = TRUE)
+        write.table(simData[[j]][[sim[k]]], fileName, col.names = FALSE, 
+                    row.names = FALSE, append = TRUE)
+      }
+    }
+  }
+}
