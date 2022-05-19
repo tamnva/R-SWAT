@@ -32,8 +32,8 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   ppuSimData <- matrix(rep(NA, 4*nrow), ncol = 4)
 
   if (samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
-    # If GLUE then use different approach
-    # Normalized the likelikhood
+
+    # If GLUE then use different approach, normalized the likelikhood
     normalizedLik <- which(objValue >= behThreshold)
     normalizedLik <- normalizedLik/sum(normalizedLik)
     for (i in 1:nrow){
@@ -104,29 +104,37 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
 prFactor <- function(obs, low, up){
   
   naIndex <- which(is.na(obs))
+  
   if (length(naIndex) > 0){
     obs <- obs[-c(naIndex)]
     low <- low[-c(naIndex)]
     up <- up[-c(naIndex)]    
   }
   
-  pfactor <- 0
-  count <- 0
-  count_all <- 0
-  rfactor <- 0
-  
-  for (i in 1:length(obs)){
-    count_all <- count_all + 1
-    rfactor <- rfactor + up[i] - low[i]
-    if(obs[i] >= low[i]){
-      if(obs[i] <= up[i]){
-        count <- count + 1
+  #If all no single value in the observed data
+  if (length(obs) == 0){
+    pfactor <- NA
+    rfactor <- NA
+    
+  } else {
+    pfactor <- 0
+    count <- 0
+    count_all <- 0
+    rfactor <- 0
+    
+    for (i in 1:length(obs)){
+      count_all <- count_all + 1
+      rfactor <- rfactor + up[i] - low[i]
+      if(obs[i] >= low[i]){
+        if(obs[i] <= up[i]){
+          count <- count + 1
+        }
       }
     }
+    
+    pfactor <- count/count_all
+    rfactor <- rfactor/(count_all * sd(obs))    
   }
-  
-  pfactor = count/count_all
-  rfactor <- rfactor/(count_all * sd(obs))
   
   return(c(pfactor, rfactor))
 }
@@ -233,7 +241,11 @@ calObjFunction <- function(parameterValue, ncores,
           simData[[j]][[counter[j]]] <- tempSimData[(sIndex + 1):eIndex, 1]
           output$simData[[j]][[counter[j]]] <- simData[[j]][[counter[j]]]
           
-          if (index != 'userObjFunction'){
+          # check if observed variables has no data, all are missing
+          missingValue <- which(is.na(observedData[[j]][,2]))
+          
+          if ((index != 'userObjFunction') & 
+              (length(missingValue) != length(observedData[[j]][,2]))){
             
             output$perCriteria[[j]][[counter[j]]] <- perCriteria(observedData[[j]][,2],
                                                                  simData[[j]][[counter[j]]])

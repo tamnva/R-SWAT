@@ -1228,11 +1228,14 @@ print(sensCaliObject)[]")
 
             } else {
 
-              if (is.numeric(temp$V2)){
+              if (is.numeric(temp$V2) |
+                  length(which(is.na(temp$V2))) == length(temp$V2)){
+                
                 globalVariable$observedData[[i]] <<- temp
                 colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
 
               } else {
+                
                 checkGetObservedDataFileMessage <- paste("Error: Data in the second column are not numeric values: ",
                                                          globalVariable$observedDataFile[i],
                                                          sep = "")
@@ -1596,7 +1599,7 @@ print(sensCaliObject)[]")
       # Give column names for the 95PPU table
       colnames(tempVar) <- c("date", "lower", "median", "upper", "best", "observed")
       globalVariable$PlotVariableNumber <<- plotSimulated(tempVar)
-
+      
       # Plot the 95PPU
       output$PlotVariableNumber <- renderPlotly(
         ggplotly(globalVariable$PlotVariableNumber +
