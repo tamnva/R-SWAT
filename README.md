@@ -1,4 +1,4 @@
-## _R-SWAT_
+## <img src="data/figures/R-SWAT_logo.svg" width=10% >
 
 [![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/tamnva/R-SWAT/blob/master/LICENSE) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases)
 
