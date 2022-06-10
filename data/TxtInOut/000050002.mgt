@@ -8,7 +8,7 @@ Initial Plant Growth Parameters
             0.00    | PHU_PLT: Number of heat units to bring plant to maturity (IGRO = 1)
 General Management Parameters
             0.20    | BIOMIX: Biological mixing efficiency
-           70.00    | CN2: Initial SCS CN II value
+           76.46    | CN2: Initial SCS CN II value
             1.00    | USLE_P: USLE support practice factor
             0.00    | BIO_MIN: Minimum biomass for grazing (kg/ha)
            0.000    | FILTERW: width of edge of field filter strip (m)

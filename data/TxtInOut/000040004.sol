@@ -7,8 +7,8 @@
  Texture 1                : CLAY
  Depth                [mm]:      300.00     1000.00
  Bulk Density Moist [g/cc]:        1.20        1.20
- Ave. AW Incl. Rock Frag  :        0.16        0.16
- Ksat. (est.)      [mm/hr]:       15.31       14.48
+ Ave. AW Incl. Rock Frag  :        0.18        0.18
+ Ksat. (est.)      [mm/hr]:       15.17       14.35
  Organic Carbon [weight %]:        1.50        0.50
  Clay           [weight %]:       40.00       49.00
  Silt           [weight %]:       20.00       19.00

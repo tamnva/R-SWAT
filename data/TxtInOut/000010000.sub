@@ -26,7 +26,7 @@ Tributary Channels
            0.020    | CH_S1 : Average slope of tributary channel [m/m]
           22.233    | CH_W1 : Average width of tributary channel [m]
            0.000    | CH_K1 : Effective hydraulic conductivity in tributary channel [mm/hr]
-           0.014    | CH_N1 : Manning's "n" value for the tributary channels
+           0.030    | CH_N1 : Manning's "n" value for the tributary channels
 Impoundments
 000010000.pnd       | PNDFILE: name of subbasin impoundment file
 Consumptive Water Use

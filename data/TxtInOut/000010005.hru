@@ -2,13 +2,13 @@
        0.0001819    | HRU_FR : Fraction of subbasin area contained in HRU
           15.244    | SLSUBBSN : Average slope length [m]
            0.210    | HRU_SLP : Average slope stepness [m/m]
-           0.010    | OV_N : Manning's "n" value for overland flow
+           0.289    | OV_N : Manning's "n" value for overland flow
            0.000    | LAT_TTIME : Lateral flow travel time [days]
            0.000    | LAT_SED : Sediment concentration in lateral flow and groundwater flow [mg/l]
            0.000    | SLSOIL : Slope length for lateral subsurface flow [m]
            0.000    | CANMX : Maximum canopy storage [mm]
            0.950    | ESCO : Soil evaporation compensation factor
-           1.000    | EPCO : Plant uptake compensation factor
+           0.107    | EPCO : Plant uptake compensation factor
            0.000    | RSDIN : Initial residue cover [kg/ha]
            0.000    | ERORGN : Organic N enrichment ratio
            0.000    | ERORGP : Organic P enrichment ratio

@@ -17,7 +17,7 @@ Water Balance:
 Surface Runoff:
                0    | IEVENT: rainfall/runoff code: 0=daily rainfall/CN
                0    | ICRK: crack flow code: 1=model crack flow in soil
-           4.000    | SURLAG : Surface runoff lag time [days]
+           7.490    | SURLAG : Surface runoff lag time [days]
            1.000    | ADJ_PKR : Peak rate adjustment factor for sediment routing in the subbasin (tributary channels)
            1.000    | PRF_BSN : Peak rate adjustment factor for sediment routing in the main channel
           0.0001    | SPCON : Linear parameter for calculating the maximum amount of sediment that can be reentrained during channel sediment routing

@@ -3,8 +3,8 @@
          0.867    | CHD : Main channel depth [m]
        0.00838    | CH_S2 : Main channel slope [m/m]
         25.186    | CH_L2 : Main channel length [km]
-         0.014    | CH_N2 : Manning's nvalue for main channel
-         0.000    | CH_K2 : Effective hydraulic conductivity [mm/hr]
+         0.048    | CH_N2 : Manning's nvalue for main channel
+         5.145    | CH_K2 : Effective hydraulic conductivity [mm/hr]
          0.000    | CH_COV1: Channel erodibility factor
          0.000    | CH_COV2 : Channel cover factor
         25.632    | CH_WDR : Channel width:depth ratio [m/m]
