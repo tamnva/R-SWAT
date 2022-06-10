@@ -1,6 +1,6 @@
 ## <img src="data/figures/R-SWAT_logo.svg" width=20% >
 
-In this branch, we check if R-SWAT correctly updates SWAT input files with a given parameter sets. The parameter that are needed to be updated and their values are listed as follows:
+In this branch, we demonstrate that R-SWAT correctly updates SWAT input files with a given parameter sets. The parameter that are needed to be updated and their values are listed as follows:
 
 | Parameter   | Value    | Change   |
 | ----------- | -------- | -------- |
