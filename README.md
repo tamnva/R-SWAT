@@ -1,6 +1,6 @@
 ## <img src="data/figures/R-SWAT_logo.svg" width=20% >
 
-In this branch, we checked if R-SWAT correctly update SWAT input files with a given parameter sets. The parameter that are needed to be update and their values are listed as follows:
+In this branch, we check if R-SWAT correctly updates SWAT input files with a given parameter sets. The parameter that are needed to be updated and their values are listed as follows:
 
 | Parameter   | Value    | Change   |
 | ----------- | -------- | -------- |
@@ -19,4 +19,4 @@ In this branch, we checked if R-SWAT correctly update SWAT input files with a gi
 | SOL_K.sol   | -0.00925 | relative |
 | CH_N1.sub   | 0.042137 | replace  |
 
-To compare the updated SWAT input files with original files, please click "commit history" and then "view commit details". Please also check the lower and upper ranges of SWAT parameters defined in the the file swatParam.txt in the /data/TxtInOut folder in this branch.
+To compare the updated SWAT input files with original files, please [click here](https://github.com/tamnva/R-SWAT/commit/34acfaec3cf980124d500253ba1d570a93d6dce8). Please also check the lower and upper ranges of SWAT parameters defined in the the [swatParam.txt file](https://github.com/tamnva/R-SWAT/blob/check_R_SWAT_TxtInOut_Edit_Function/data/TxtInOut/swatParam.txt).
