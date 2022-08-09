@@ -393,7 +393,8 @@
 	        }
 	      } else if (fileType %in% resFile){
 	        if ("All" %in% selectCriteria$sub) { 
-	          files <- list.files(TxtInOutFolder,'.res') 
+	          selectCriteria$sub <- substring(list.files(TxtInOutFolder,'.res'), 1, 
+	                             nchar(list.files(TxtInOutFolder,'.res') ) - 8)
 	        } else {
 	          selectCriteria$sub <- as.numeric(selectCriteria$sub)
 	        }
