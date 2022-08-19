@@ -138,6 +138,7 @@ saveOutput <- function(workingDirectory,
                                    as.numeric(strsplit(colNumber[i],split = ",")[[1]]), 
                                    fileCioInfo,
                                    output)
+
     } else if (fileType[i] == "output.rch" |
                fileType[i] == "output.sub" |
                fileType[i] == "output.hru" ){
@@ -167,13 +168,16 @@ saveOutput <- function(workingDirectory,
   if(!dir.exists(outputDirectory)) dir.create(outputDirectory)
   
   for (i in 1:length(output)){
-    OutputFileName <- paste(outputDirectory, '/Output_Variable_', i, 
+    OutputFileName <- paste(outputDirectory, '/out_var_', i, 
                             '.txt', sep ='')
     
       if (firstRun){file.create(OutputFileName)}
 
+      # write simulation number
       write.table(as.character(simulationNumber), OutputFileName, append = TRUE,
                   row.names = FALSE, col.names = FALSE)
+
+      # write simulated data
       write.table(output[[i]], OutputFileName, append = TRUE,sep = '\t', 
                   row.names = FALSE, col.names = FALSE)      
 

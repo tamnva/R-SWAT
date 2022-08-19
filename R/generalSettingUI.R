@@ -17,7 +17,7 @@ generalSettingUI <- function(id) {
       column(width = 10,
              textInput("workingFolder",
                        "1. Working folder",
-                       "C:/workingFolder",
+                       "C:/RSWAT_demo/workingFolder",
                        width = "100%"
              ),
              textOutput("checkWorkingFolder"),
@@ -25,7 +25,7 @@ generalSettingUI <- function(id) {
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   All files created by this tool are saved in this folder
+                   All files created by R-SWAT will be saved in this folder
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
@@ -38,7 +38,7 @@ generalSettingUI <- function(id) {
       column(width = 10,
              textInput("TxtInOutFolder",
                        "2. TxtInOut folder",
-                       "C:/Scenarios/Default/TxtInOut",
+                       "C:/RSWAT_demo/R-SWAT-master/data/TxtInOut",
                        width = "100%"
              ),
              textOutput("checkTxtInOutFolder"),

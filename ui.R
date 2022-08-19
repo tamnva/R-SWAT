@@ -4,9 +4,10 @@ ui <- dashboardPage(
   
   # ----------------------------------------------------------------------Header
   dashboardHeader(
+    # Name of the app
     title = "R-SWAT", 
     
-    
+    # Add two buttons in the header for saving and loading project
     tags$li(class = "dropdown", 
             
             # Save project button
@@ -16,7 +17,7 @@ ui <- dashboardPage(
                          style="background-color: #b1fa87; border-color: #b1fa87; 
                          float:left; padding-top:13px; padding-bottom:13px;"),
             
-            # Load project buttom
+            # Load project button
             shinyFilesButton("loadProject", "Load project" , 
                              title = "Load project: Please select the 'RSWATproject.rds' file",
                              multiple = FALSE,
@@ -105,7 +106,7 @@ ui <- dashboardPage(
                             }
                             '))), 
     
-    # Tab item for General Setting
+    # Link tab names with their codes
     tabItems(
 
       tabItem(tabName = "intro",
