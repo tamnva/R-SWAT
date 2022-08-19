@@ -73,11 +73,13 @@ server <- function(input, output, session) {
     if (is.null(globalVariable$simData)){
       globalVariable$simData <<- temp$simData
       globalVariable$objValueCali <<- temp$objValueCali
+      globalVariable$objValueValid <<- temp$objValueValid
 
     # If this is not the first run, then combine result to the existing data
     } else {
       globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
       globalVariable$objValueCali <<- c(globalVariable$objValueCali, temp$objValueCali)
+      globalVariable$objValueValid <<- c(globalVariable$objValueCali, temp$objValueValid)
     }
 
    # Next run, don't need to copy unchanged SWAT input files
