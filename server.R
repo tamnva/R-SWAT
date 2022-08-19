@@ -1311,7 +1311,7 @@ print(sensCaliObject)[]")
           # If there is error in the observed data, display an error message
           if(temp$error) output$printCalObjFunction <- renderText("ERROR in input data - please see R console")
 
-          # Assign the intermidate objective function values to the global variable
+          # Assign the intermediate objective function values to the global variable
           globalVariable$objValueCali <<- temp$objValueCali
           globalVariable$perCriteriaCali <<- temp$perCriteriaCali
           globalVariable$objValueValid <<- temp$objValueValid
@@ -1320,7 +1320,7 @@ print(sensCaliObject)[]")
 
           # Update numeric input (threshold objective function)
           minObjValue <- min(globalVariable$objValueCali)
-          maxObjValue <- max(globalVariable$objValueCali)
+          maxObjValue <- max(globalVariable$objValueValid)
 
           updateNumericInput(session = session, "behThreshold",
                              label = "1. Input behavioral threshold",
