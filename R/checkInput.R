@@ -199,3 +199,27 @@ checkSwatParameterName <- function(paraSelection, SWATParam, HRUinfo){
     return(output)
   }
   
+# ------------------------------------------------------------------------------
+# Check input observed data file
+# ------------------------------------------------------------------------------
+  checkObservedData <- function(observedData){
+    
+    # Check number of column
+    if (ncol(observedData) != 4){
+      outMessage <- paste("Number of columns in the observed data", 
+                          " file should be 4, please see example", 
+                          " ./data/obs_var_1.txt", sep = "")
+      
+    # Check if the data column is numeric
+    } else if (!is.numeric(observedData[,3])){
+      outMessage <- "3rd column should be data (numbers), not character"
+      
+    } else {
+      outMessage <- ""
+    }
+    
+    # Return output message
+    return(outMessage)
+  }
+
+  

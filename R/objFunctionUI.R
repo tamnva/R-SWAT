@@ -58,15 +58,22 @@ objFunctionUI <- function(id) {
       #------------------------------------------------------------------------- 
       
       column(width = 10,
-             HTML("<b>","2. Get observed data files","</b>"),
+             HTML("<b>","2. Get observed data files (IMPORTANT CHANGES: Please read 'Help')","</b>"),
       ),
       
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Load observed data, single file for each variable. 
-                   Files should be in ASCII format with two columns and header,
-                   the first column is the date (format yyyy-mm-dd) and 
-                   the second column is the data. Use NA for missing values. 
+                   Files should be in ASCII format with 4 columns and header,
+                   <br />
+                   IMPORTANT: From version 2.0.0, the 1st column is the
+                   date (format yyyy-mm-dd), 2nd column is the time (format hh:mm),
+                   3rd column is the data, and 4th column is the Flag for  
+                   calibration please write C and validation write please write V.
+                   If there are missing data, please write NA, if data are not used for
+                   calibration and validation, also write NA in the 4th column. 
+                   See ./data/obs_var_1.txt as an example.
+                   <br />
                    File name MUST be followed then name shown in 3.Run SWAT => 
                    Display corresponding observed file names
                    <span>", 

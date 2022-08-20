@@ -41,9 +41,9 @@ mergeDataFrameDiffRow <- function(inputDataFrameList){
     
     for (i in 1:length(inputDataFrameList)){
       if (nrow(inputDataFrameList[[i]]) < maxVal){
-        temp <- matrix(rep(NA,(maxVal - nrow(inputDataFrameList[[i]]))*2), 
-                       ncol = 2)
-        colnames(temp) <- c("Date", "Value")
+        temp <- matrix(rep(NA,(maxVal - nrow(inputDataFrameList[[i]]))*3), 
+                       ncol = 3)
+        colnames(temp) <- c("Date", "Value", "Flag")
         inputDataFrameList[[i]] <- rbind(inputDataFrameList[[i]], temp) 
       }
       if (i == 1) {
@@ -212,7 +212,6 @@ printVariableNameObservedFiles <- function(outputExtraction){
 # Plot function for simulated values, observed and 95 PPU
 # ------------------------------------------------------------------------------
 plotSimulated <- function(inputDataFrame){
-  inputDataFrame$date <- as.Date(inputDataFrame$date, "%Y-%m-%d")
   
   if(length(which(is.na(inputDataFrame$observed))) == nrow(inputDataFrame)){
     myplot <- ggplot(inputDataFrame) + 
@@ -247,7 +246,6 @@ plotSimulated <- function(inputDataFrame){
                                              "Observed" = "darkblue")) +
       # Axis name
       labs(x ="  ", y = " ") +
-      scale_x_date(date_labels = "%m-%Y") +
       theme_bw()    
   }
 
@@ -278,7 +276,7 @@ plotSensitivity <- function(xval, yval, para){
 plotObjFuncParaValue <- function(globalVariable){
   nIter <- nrow(globalVariable$parameterValue)
   nPara <- nrow(globalVariable$paraSelection)
-  Objective_function <- rep(globalVariable$objValue, nPara)
+  Objective_function <- rep(globalVariable$objValueCali, nPara)
   Parameter_Value <- c()
   Parameter <- c()
   

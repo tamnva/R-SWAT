@@ -8,12 +8,12 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   # Global variables (use <<- for saving globalVariable inside observe)
   #-----------------------------------------------------------------------------
-  globalVariable <- list()
-  displayOutput <- list()
-  displayOutput$plotHru <- FALSE
-  displayOutput$plotSub <- FALSE
-  globalVariable$checkSimComplete <- FALSE
-  globalVariable$loadProject <- FALSE
+  globalVariable <<- list()
+  displayOutput <<- list()
+  displayOutput$plotHru <<- FALSE
+  displayOutput$plotSub <<- FALSE
+  globalVariable$checkSimComplete <<- FALSE
+  globalVariable$loadProject <<- FALSE
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
@@ -40,9 +40,9 @@ server <- function(input, output, session) {
 
     # Save parameter value to the globalVariable
     globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
-
+    
     # Number of parallel runs cannot be higher than number of input parameter sets
-    globalVariable$ncores <- min(globalVariable$ncores, nrow(parameterValue))
+    globalVariable$ncores <<- min(globalVariable$ncores, nrow(parameterValue))
 
     # Convert input parameter to matrix
     parameterValue <- as.matrix(parameterValue)
@@ -72,12 +72,14 @@ server <- function(input, output, session) {
     # If this is a first run
     if (is.null(globalVariable$simData)){
       globalVariable$simData <<- temp$simData
-      globalVariable$objValue <<- temp$objValue
+      globalVariable$objValueCali <<- temp$objValueCali
+      globalVariable$objValueValid <<- temp$objValueValid
 
     # If this is not the first run, then combine result to the existing data
     } else {
       globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
-      globalVariable$objValue <<- c(globalVariable$objValue, temp$objValue)
+      globalVariable$objValueCali <<- c(globalVariable$objValueCali, temp$objValueCali)
+      globalVariable$objValueValid <<- c(globalVariable$objValueValid, temp$objValueValid)
     }
 
    # Next run, don't need to copy unchanged SWAT input files
@@ -85,9 +87,9 @@ server <- function(input, output, session) {
 
    # Parameter optimization: convert to the minimize problem, regardless of input
    if (globalVariable$minOrmax == "Minimize"){
-     output <- temp$objValue
+     output <- temp$objValueCali
    } else {
-     output <- - temp$objValue
+     output <- - temp$objValueCali
    }
 
    # Return output
@@ -142,7 +144,7 @@ server <- function(input, output, session) {
       globalVariable <<- readRDS(RSWATProjectFile$datapath)
 
       # Now the load project is true (because the RSWATproject.rds was given)
-      globalVariable$loadProject <- TRUE
+      globalVariable$loadProject <<- TRUE
 
       #-------------------------------------------------------------------------
       # Update Tab 1: General Setting
@@ -159,20 +161,20 @@ server <- function(input, output, session) {
 
 
       # Update Select executable SWAT file Help
-      output$printSWATexe <- renderText(globalVariable$SWATexeFile)
+      output$printSWATexe <<- renderText(globalVariable$SWATexeFile)
 
       # Update Files with list of all SWAT parameters
-      output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
+      output$printSWATParamFile <<- renderText(globalVariable$SWATParamFile)
 
       # Update display content of the SWAT parameter file
-      output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
+      output$tableSWATParam <<- renderDataTable(globalVariable$SWATParam)
 
       #-------------------------------------------------------------------------
       # Update Tab 2: Parameter sampling
       #-------------------------------------------------------------------------
 
       # Update Select SWAT parameters for calibration and/or sensitivity analysis
-      output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection,
+      output$tableParaSelection <<- renderExcel(excelTable(data = globalVariable$paraSelection,
                                                           columns = columnsParaSelection,
                                                           editable = TRUE,
                                                           allowInsertRow = TRUE,
@@ -205,7 +207,7 @@ server <- function(input, output, session) {
                           globalVariable$sensCaliCommand)
 
       # Update define model output for extraction
-      output$tableOutputExtraction <- renderExcel(excelTable(data = globalVariable$outputExtraction,
+      output$tableOutputExtraction <<- renderExcel(excelTable(data = globalVariable$outputExtraction,
                                                              columns = columnsOutputExtraction,
                                                              editable = TRUE,
                                                              allowInsertRow = TRUE,
@@ -216,7 +218,7 @@ server <- function(input, output, session) {
                                                              columnResize = FALSE,
                                                              wordWrap = TRUE))
       # Update display corresponding observed file names
-      output$tableOutputExtractionDisplayOnly <- renderDataTable(
+      output$tableOutputExtractionDisplayOnly <<- renderDataTable(
         printVariableNameObservedFiles(globalVariable$outputExtraction))
 
       # Update select date range
@@ -224,7 +226,7 @@ server <- function(input, output, session) {
                            "dateRangeCali",
                            "2. Select date range",
                            start = globalVariable$dateRangeCali[1],
-                           end   = globalVariable$dateRangeCali[1])
+                           end   = globalVariable$dateRangeCali[2])
 
       # Update number of parallel runs
       updateSliderInput(session,
@@ -243,7 +245,7 @@ server <- function(input, output, session) {
                         selected = globalVariable$objFunction)
 
       # Update get observed data files
-      output$printObservedDataFile <- renderText(globalVariable$observedDataFile)
+      output$printObservedDataFile <<- renderText(globalVariable$observedDataFile)
 
       # Show meesage
       showNotification("All project settings were loaded", type = "message", duration = 10)
@@ -784,6 +786,7 @@ print(sensCaliObject)[]")
                    globalVariable$fileCioInfo,
                    globalVariable$dateRangeCali,
                    firstRun)
+        
       } else if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)') {
 
         if(is.null(globalVariable$observedData)){
@@ -841,16 +844,16 @@ print(sensCaliObject)[]")
           # Set the best objective and parameter values
           best <- list()
           if(parallelMode == 1){
-            best$objValue <- temp$objValue
-            best$perCriteria <- temp$perCriteria
+            best$objValueCali <- temp$objValueCali
+            best$perCriteriaCali <- temp$perCriteriaCali
             best$simData <- temp$simData
           } else {
-            idBest <- which(temp$objValue == max(temp$objValue))
+            idBest <- which(temp$objValueCali == max(temp$objValueCali))
             if (length(idBest) > 1) {idBest = idBest[1]}
 
             # Take the better parameter value and objective function values
             best$parameterValue <- best$parameterValue[idBest, ]
-            best$objValue <- temp$objValue[idBest]
+            best$objValueCali <- temp$objValueCali[idBest]
           }
 
           # Loop over number of iteration
@@ -859,21 +862,21 @@ print(sensCaliObject)[]")
             if (i == 1){
               # Save iteration result
               saveIterationResult$parameterValue <- globalVariable$parameterValue
-              saveIterationResult$objValue <- temp$objValue
-              saveIterationResult$perCriteria <- temp$perCriteria
+              saveIterationResult$objValueCali <- temp$objValueCali
+              saveIterationResult$perCriteriaCali <- temp$perCriteriaCali
               saveIterationResult$simData <- temp$simData
               print("Iteration - Best objective function value (from the respective core if parallel mode = 1)")
             }
 
-            print(c(i-1, round(best$objValue, digits = 3)))
+            print(c(i-1, round(best$objValueCali, digits = 3)))
 
             # Take better parameter + Generate new parameter set with DDS
             if (parallelMode == 1) {
               # Take the better parameter set/data if exist
               for (j in 1:nrow(newPar)){
-                if(temp$objValue[j] > best$objValue[j]){
+                if(temp$objValueCali[j] > best$objValueCali[j]){
                   globalVariable$parameterValue[j, ] <<- newPar[j, ]
-                  best$objValue[j] <- temp$objValue[j]
+                  best$objValueCali[j] <- temp$objValueCali[j]
                 }
               }
 
@@ -886,12 +889,12 @@ print(sensCaliObject)[]")
 
             } else {
 
-              idBest <- which(temp$objValue == max(temp$objValue))
+              idBest <- which(temp$objValueCali == max(temp$objValueCali))
               if (length(idBest) > 1) {idBest = idBest[1]}
 
-              if(temp$objValue[idBest] > best$objValue){
+              if(temp$objValueCali[idBest] > best$objValueCali){
                 globalVariable$parameterValue <<- newPar[idBest, ]
-                best$objValue <- temp$objValue[idBest]
+                best$objValueCali <- temp$objValueCali[idBest]
               }
               # Generate new parameter set
               newPar <- data.frame(min = as.numeric(globalVariable$paraSelection$Min),
@@ -931,34 +934,34 @@ print(sensCaliObject)[]")
 
             # Save iteration result
             saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,newPar)
-            saveIterationResult$objValue <- c(saveIterationResult$objValue, temp$objValue)
-            saveIterationResult$perCriteria <- bindList(saveIterationResult$perCriteria,temp$perCriteria)
+            saveIterationResult$objValueCali <- c(saveIterationResult$objValueCali, temp$objValueCali)
+            saveIterationResult$perCriteriaCali <- bindList(saveIterationResult$perCriteriaCali,temp$perCriteriaCali)
             saveIterationResult$simData <- bindList(saveIterationResult$simData,temp$simData)
           }
 
           if (parallelMode == 1) {
             # Take the better parameter set/data if exists
             for (j in 1:nrow(newPar)){
-              if(temp$objValue[j] > best$objValue[j]){
-                best$objValue[j] <- temp$objValue[j]
+              if(temp$objValueCali[j] > best$objValueCali[j]){
+                best$objValueCali[j] <- temp$objValueCali[j]
               }
             }
           } else {
-            idBest <- which(temp$objValue == max(temp$objValue))
+            idBest <- which(temp$objValueCali == max(temp$objValueCali))
             if (length(idBest) > 1) {idBest = idBest[1]}
 
-            if(temp$objValue[idBest] > best$objValue){
-              best$objValue <- temp$objValue[idBest]
+            if(temp$objValueCali[idBest] > best$objValueCali){
+              best$objValueCali <- temp$objValueCali[idBest]
             }
           }
 
           # print out intermediate results
-          print(c(i, round(best$objValue, digits = 3)))
+          print(c(i, round(best$objValueCali, digits = 3)))
 
           # Assign back to global variables
           globalVariable$parameterValue <<- saveIterationResult$parameterValue
-          globalVariable$objValue <<- saveIterationResult$objValue
-          globalVariable$perCriteria <<- saveIterationResult$perCriteria
+          globalVariable$objValueCali <<- saveIterationResult$objValueCali
+          globalVariable$perCriteriaCali <<- saveIterationResult$perCriteriaCali
           globalVariable$simData <<- saveIterationResult$simData
           globalVariable$parameterValue[,1] <<- c(1:nrow(globalVariable$parameterValue))
           
@@ -968,8 +971,8 @@ print(sensCaliObject)[]")
         }
 
         # Update numeric input (threshold objective function)
-        minObjValue <- min(globalVariable$objValue)
-        maxObjValue <- max(globalVariable$objValue)
+        minObjValue <- min(globalVariable$objValueCali)
+        maxObjValue <- max(globalVariable$objValueCali)
         updateNumericInput(session = session, "behThreshold",
                            label = "1. Input behavioral threshold",
                            value = minObjValue,
@@ -1006,7 +1009,7 @@ print(sensCaliObject)[]")
         } else {
           # There is no simulated data and obj function values when the model has not been run
           globalVariable$simData <<- NULL
-          globalVariable$objValue <<- NULL
+          globalVariable$objValueCali <<- NULL
 
           # First run is true
           globalVariable$copyUnchangeFiles <<- TRUE
@@ -1016,11 +1019,11 @@ print(sensCaliObject)[]")
 
           # Print output to screen
            print(globalVariable$sensCaliObject)
-           print(globalVariable$objValue)
+           print(globalVariable$objValueCali)
 
            # Update numeric input (threshold objective function)
-           minObjValue <- min(globalVariable$objValue)
-           maxObjValue <- max(globalVariable$objValue)
+           minObjValue <- min(globalVariable$objValueCali)
+           maxObjValue <- max(globalVariable$objValueCali)
            updateNumericInput(session = session, "behThreshold",
                               label = "1. Input behavioral threshold",
                               value = minObjValue,
@@ -1211,47 +1214,43 @@ print(sensCaliObject)[]")
 
         } else {
 
-        # Get concent of observed data files
+        # Get content of observed data files
         for (i in 1:length(globalVariable$observedDataFile)){
 
-          if (!grepl(paste("obs_var_", i, ".txt", sep =""), globalVariable$observedDataFile[i], fixed = TRUE)){
+          if (!grepl(paste("obs_var_", i, ".txt", sep =""), 
+                     globalVariable$observedDataFile[i], fixed = TRUE)){
+            
             checkGetObservedDataFileMessage <- paste("Error: change file name ",
-                                                     globalVariable$observedDataFile[i]," to ",
-                                                     paste("obs_var_", i, ".txt", sep =""), sep = "")
+                                                     globalVariable$observedDataFile[i],
+                                                     " to ",
+                                                     paste("obs_var_", i, ".txt", 
+                                                           sep =""), sep = "")
           } else {
+    
+            # Read observed data
             temp <- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
-            if (ncol(temp) != 2){
-              checkGetObservedDataFileMessage <- paste("Error: Observed data",
-                                                       globalVariable$observedDataFile[i],
-                                                       " shoud have two columns",
-                                                       sep = "")
-
-            } else {
-
-              if (is.numeric(temp$V2) |
-                  length(which(is.na(temp$V2))) == length(temp$V2)){
-                
-                globalVariable$observedData[[i]] <<- temp
-                colnames(globalVariable$observedData[[i]]) <<- c("Date", "Value")
-
-              } else {
-                
-                checkGetObservedDataFileMessage <- paste("Error: Data in the second column are not numeric values: ",
-                                                         globalVariable$observedDataFile[i],
-                                                         sep = "")
-              }
-
-
-            }
-
+            
+            # check observed data
+            checkGetObservedDataFileMessage <- checkObservedData(temp)
+            
+            if (checkGetObservedDataFileMessage == ""){
+              # Store observed data in the global variables
+              temp <- data.frame(Date = as.POSIXct(paste(temp[,1], temp[,2], sep = " "), 
+                                                   format = "%Y-%m-%d %H:%M", tz = ""),
+                                 Value = temp[,3],
+                                 Flag = temp[,4])
+              
+              # Assign back observed data to global variable
+              globalVariable$observedData[[i]] <<- temp              
+            }   
           }
         }
-      }
+    }
 
       # Display check message
       output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
 
-      # Save observed data to globalVariables
+      # Save observed data to globalVariable
       saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
     }
   })
@@ -1315,14 +1314,16 @@ print(sensCaliObject)[]")
           # If there is error in the observed data, display an error message
           if(temp$error) output$printCalObjFunction <- renderText("ERROR in input data - please see R console")
 
-          # Assign the intermidate objective function values to the global variable
-          globalVariable$objValue <<- temp$objValue
-          globalVariable$perCriteria <<- temp$perCriteria
+          # Assign the intermediate objective function values to the global variable
+          globalVariable$objValueCali <<- temp$objValueCali
+          globalVariable$perCriteriaCali <<- temp$perCriteriaCali
+          globalVariable$objValueValid <<- temp$objValueValid
+          globalVariable$perCriteriaValid <<- temp$perCriteriaValid
           globalVariable$simData <<- temp$simData
 
           # Update numeric input (threshold objective function)
-          minObjValue <- min(globalVariable$objValue)
-          maxObjValue <- max(globalVariable$objValue)
+          minObjValue <- min(globalVariable$objValueCali)
+          maxObjValue <- max(globalVariable$objValueValid)
 
           updateNumericInput(session = session, "behThreshold",
                              label = "1. Input behavioral threshold",
@@ -1374,7 +1375,7 @@ print(sensCaliObject)[]")
     req(input$checkDisplayObjFunctionPlot)
 
     # Plot parameter values and objective function
-    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
+    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValueCali)){
       output$plotObjFunction <- renderPlotly(plotObjFuncParaValue(globalVariable))
     } else {
       output$plotObjFunction <- NULL
@@ -1388,14 +1389,15 @@ print(sensCaliObject)[]")
     req(input$checkDisplayObjFunction)
     # Get parameter values
 
-    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValue)){
+    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValueCali)){
       tableParaObj <- globalVariable$parameterValue
 
       # Replace the first row as it is the simulation number with the obj function value
-      tableParaObj[,1] <- globalVariable$objValue
+      tableParaObj <- cbind(tableParaObj[,1], globalVariable$objValueCali, 
+                            globalVariable$objValueValid, tableParaObj[,-c(1)])
       tableParaObj <- as.data.frame(tableParaObj)
 
-      colnames(tableParaObj) <- c("objectiveFunction", globalVariable$paraSelection$Parameter)
+      colnames(tableParaObj) <- c("SimNr", "objCalibration", "objValidation", globalVariable$paraSelection$Parameter)
 
       # round up to 3 decimal digits
       is.num <- sapply(tableParaObj, is.numeric)
@@ -1430,7 +1432,7 @@ print(sensCaliObject)[]")
   observeEvent(input$calSensitivity, {
 
     # check if all simluations are finised
-    if (globalVariable$checkSimComplete & !is.null(globalVariable$objValue)){
+    if (globalVariable$checkSimComplete & !is.null(globalVariable$objValueCali)){
 
       # Check which parameter sampling approach is used
       if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
@@ -1439,7 +1441,7 @@ print(sensCaliObject)[]")
 
           # Table with parameter and objective function values
           tableSensitivity <- globalVariable$parameterValue
-          tableSensitivity[,1] <- globalVariable$objValue
+          tableSensitivity[,1] <- globalVariable$objValueCali
 
           # Column names
           colnames(tableSensitivity) <- c("objFunction", globalVariable$paraSelection[,1])
@@ -1544,17 +1546,17 @@ print(sensCaliObject)[]")
 
     # Check if the user-defined behavioral threshold is in a valid range
     if(!is.null(input$behThreshold)){
-      if(!is.null(globalVariable$objValue)){
+      if(!is.null(globalVariable$objValueCali)){
         
         if (!is.numeric(input$behThreshold)){
           output$printMaxBehThreshold <- renderText("please input numeric value")
         } else {
-          if (input$behThreshold > max(globalVariable$objValue)){
+          if (input$behThreshold > max(globalVariable$objValueCali)){
             
             # Display check message
             output$printMaxBehThreshold <- renderText(paste("The selected value is ",
                                                             "greater than the maximum value ",
-                                                            max(globalVariable$objValue),
+                                                            max(globalVariable$objValueCali),
                                                             sep =""))
           } else {
             # Display check message
@@ -1581,7 +1583,7 @@ print(sensCaliObject)[]")
 
       # Find behavioral simulations - 95PPU
       globalVariable$dataPlotVariableNumber <<- behaSimulation(
-        globalVariable$objValue,
+        globalVariable$objValueCali,
         globalVariable$simData,
         globalVariable$parameterValue,
         input$behThreshold,
@@ -1651,8 +1653,14 @@ print(sensCaliObject)[]")
 
       # Show p- and r-factor
       output$printPandRFactor <- renderText(
-        paste("p-factor = ", globalVariable$dataPlotVariableNumber$prFactor[1],
-              " r-factor = ", globalVariable$dataPlotVariableNumber$prFactor[2],
+        paste("p-factor-cali(valid) = ", round(globalVariable$dataPlotVariableNumber$prFactorCali[1], 2),
+                                         " (", 
+                                         round(globalVariable$dataPlotVariableNumber$prFactorValid[1], 2),
+                                         ");",
+              " r-factor-cali(valid) = ", round(globalVariable$dataPlotVariableNumber$prFactorCali[2], 2),
+                                         " (",
+                                         round(globalVariable$dataPlotVariableNumber$prFactorValid[2], 2),
+                                         ")",
               sep =""))
     }
 
