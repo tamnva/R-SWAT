@@ -5,7 +5,7 @@ ui <- dashboardPage(
   # ----------------------------------------------------------------------Header
   dashboardHeader(
     # Name of the app
-    title = "R-SWAT", 
+    title = "R-SWAT (v2.0.0)", 
     
     # Add two buttons in the header for saving and loading project
     tags$li(class = "dropdown", 
