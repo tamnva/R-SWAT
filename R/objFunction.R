@@ -422,3 +422,4 @@ writeOutputFiles <- function(workingFolder, ncores, nOutputVar, simData){
     }
   }
 }
+

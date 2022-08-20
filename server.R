@@ -8,12 +8,12 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   # Global variables (use <<- for saving globalVariable inside observe)
   #-----------------------------------------------------------------------------
-  globalVariable <- list()
-  displayOutput <- list()
-  displayOutput$plotHru <- FALSE
-  displayOutput$plotSub <- FALSE
-  globalVariable$checkSimComplete <- FALSE
-  globalVariable$loadProject <- FALSE
+  globalVariable <<- list()
+  displayOutput <<- list()
+  displayOutput$plotHru <<- FALSE
+  displayOutput$plotSub <<- FALSE
+  globalVariable$checkSimComplete <<- FALSE
+  globalVariable$loadProject <<- FALSE
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
@@ -40,9 +40,9 @@ server <- function(input, output, session) {
 
     # Save parameter value to the globalVariable
     globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
-
+    
     # Number of parallel runs cannot be higher than number of input parameter sets
-    globalVariable$ncores <- min(globalVariable$ncores, nrow(parameterValue))
+    globalVariable$ncores <<- min(globalVariable$ncores, nrow(parameterValue))
 
     # Convert input parameter to matrix
     parameterValue <- as.matrix(parameterValue)
@@ -144,7 +144,7 @@ server <- function(input, output, session) {
       globalVariable <<- readRDS(RSWATProjectFile$datapath)
 
       # Now the load project is true (because the RSWATproject.rds was given)
-      globalVariable$loadProject <- TRUE
+      globalVariable$loadProject <<- TRUE
 
       #-------------------------------------------------------------------------
       # Update Tab 1: General Setting
@@ -161,20 +161,20 @@ server <- function(input, output, session) {
 
 
       # Update Select executable SWAT file Help
-      output$printSWATexe <- renderText(globalVariable$SWATexeFile)
+      output$printSWATexe <<- renderText(globalVariable$SWATexeFile)
 
       # Update Files with list of all SWAT parameters
-      output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
+      output$printSWATParamFile <<- renderText(globalVariable$SWATParamFile)
 
       # Update display content of the SWAT parameter file
-      output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
+      output$tableSWATParam <<- renderDataTable(globalVariable$SWATParam)
 
       #-------------------------------------------------------------------------
       # Update Tab 2: Parameter sampling
       #-------------------------------------------------------------------------
 
       # Update Select SWAT parameters for calibration and/or sensitivity analysis
-      output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection,
+      output$tableParaSelection <<- renderExcel(excelTable(data = globalVariable$paraSelection,
                                                           columns = columnsParaSelection,
                                                           editable = TRUE,
                                                           allowInsertRow = TRUE,
@@ -207,7 +207,7 @@ server <- function(input, output, session) {
                           globalVariable$sensCaliCommand)
 
       # Update define model output for extraction
-      output$tableOutputExtraction <- renderExcel(excelTable(data = globalVariable$outputExtraction,
+      output$tableOutputExtraction <<- renderExcel(excelTable(data = globalVariable$outputExtraction,
                                                              columns = columnsOutputExtraction,
                                                              editable = TRUE,
                                                              allowInsertRow = TRUE,
@@ -218,7 +218,7 @@ server <- function(input, output, session) {
                                                              columnResize = FALSE,
                                                              wordWrap = TRUE))
       # Update display corresponding observed file names
-      output$tableOutputExtractionDisplayOnly <- renderDataTable(
+      output$tableOutputExtractionDisplayOnly <<- renderDataTable(
         printVariableNameObservedFiles(globalVariable$outputExtraction))
 
       # Update select date range
@@ -226,7 +226,7 @@ server <- function(input, output, session) {
                            "dateRangeCali",
                            "2. Select date range",
                            start = globalVariable$dateRangeCali[1],
-                           end   = globalVariable$dateRangeCali[1])
+                           end   = globalVariable$dateRangeCali[2])
 
       # Update number of parallel runs
       updateSliderInput(session,
@@ -245,7 +245,7 @@ server <- function(input, output, session) {
                         selected = globalVariable$objFunction)
 
       # Update get observed data files
-      output$printObservedDataFile <- renderText(globalVariable$observedDataFile)
+      output$printObservedDataFile <<- renderText(globalVariable$observedDataFile)
 
       # Show meesage
       showNotification("All project settings were loaded", type = "message", duration = 10)
@@ -786,6 +786,7 @@ print(sensCaliObject)[]")
                    globalVariable$fileCioInfo,
                    globalVariable$dateRangeCali,
                    firstRun)
+        
       } else if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)') {
 
         if(is.null(globalVariable$observedData)){
