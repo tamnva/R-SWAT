@@ -79,7 +79,7 @@ server <- function(input, output, session) {
     } else {
       globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
       globalVariable$objValueCali <<- c(globalVariable$objValueCali, temp$objValueCali)
-      globalVariable$objValueValid <<- c(globalVariable$objValueCali, temp$objValueValid)
+      globalVariable$objValueValid <<- c(globalVariable$objValueValid, temp$objValueValid)
     }
 
    # Next run, don't need to copy unchanged SWAT input files
