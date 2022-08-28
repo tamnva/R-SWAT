@@ -25,65 +25,95 @@ checkDirFileExist <- function(InputDir, fileName, fileExtention){
 # ------------------------------------------------------------------------------
 # Check SWAT parameter table for calibration
 # ------------------------------------------------------------------------------
-checkSwatParameterName <- function(paraSelection, SWATParam, HRUinfo){
+checkSwatParameterName <- function(paraSelection, SWATParam, HRUinfo, SWATProject){
 
   check <- TRUE
   checkMessage <- "Error: "
   
-  if (is.null(paraSelection)) {
-    checkMessage <- paste(checkMessage, "Cannot find the parameter table that ",
-                          "needs to be check, please add/modify something ", 
-                          "in the table. ", 
-                          sep ="")
-    check <- check & FALSE
-  }
-
-  if (is.null(SWATParam)) {
-    checkMessage <- paste(checkMessage, "Cannot find the SWAT parameter file, ",
-                          "please go to General Setting and select the file. ", 
-                          sep ="")
-    check <- check & FALSE
-  }
-
-  if (check) {
+  if(SWATProject){
     
-    for (i in 1:length(paraSelection$Parameter)){
+    if (is.null(paraSelection)) {
+      checkMessage <- paste(checkMessage, "Cannot find the parameter table that ",
+                            "needs to be check, please add/modify something ", 
+                            "in the table. ", 
+                            sep ="")
+      check <- check & FALSE
+    }
+    
+    if (is.null(SWATParam)) {
+      checkMessage <- paste(checkMessage, "Cannot find the SWAT parameter file, ",
+                            "please go to General Setting and select the file. ", 
+                            sep ="")
+      check <- check & FALSE
+    }
+    
+    if (check) {
       
-      if (!(paraSelection$Parameter[i] %in%  SWATParam$parameter)){
-        checkMessage <- paste(checkMessage, "Cannot find parameter ",
-                              paraSelection$Parameter[i], 
-                              " in the list of SWAT parameter. ", 
+      for (i in 1:length(paraSelection$Parameter)){
+        
+        if (!(paraSelection$Parameter[i] %in%  SWATParam$parameter)){
+          checkMessage <- paste(checkMessage, "Cannot find parameter ",
+                                paraSelection$Parameter[i], 
+                                " in the list of SWAT parameter. ", 
+                                sep = "")
+          check <- check & FALSE
+        }
+      }
+      
+      #----------------------
+      if (min(as.numeric(paraSelection$Max) - as.numeric(paraSelection$Min)) < 0.0){
+        checkMessage <- paste(checkMessage, "Maximum value must be >= Min", 
                               sep = "")
         check <- check & FALSE
       }
+      #----------------------    
+      # check subbasin land use, soil, slope combination produce zero?
+      
+      if(is.null(HRUinfo)){
+        checkMessage <- paste(checkMessage, "Cannot find HRU information (subbasin,",
+                              " land use, soil, slope,for checking. Please go back", 
+                              " to General Setting using input TxtInOut folder. "
+                              , sep = "")
+        check <- check & FALSE
+      } else {
+        
+        tempCheck <- checkHRUCombination(paraSelection, SWATParam, HRUinfo)
+        if (!tempCheck$check){
+          checkMessage <- paste(checkMessage, tempCheck$checkMessage, sep = "")
+          check <- check & FALSE        
+        }
+        
+      }
+    }
+  
+  # SWAT+ project
+  } else {
+    # Get the selected parameter name
+    selectedParam <- strsplit(paraSelection[,1], '[.]')
+    
+    # Remove the parameter extension e.g., .hru
+    temp <- c()
+    for (i in 1:length(selectedParam)){
+      temp <- c(temp, selectedParam[[i]][1])
     }
     
-    #----------------------
-    if (min(as.numeric(paraSelection$Max) - as.numeric(paraSelection$Min)) < 0.0){
-      checkMessage <- paste(checkMessage, "Maximum value must be smaller or ", 
-                            "equal with minimum value. ", 
+    # Check if the selected parameter in the SWATParam
+    check <- check & all(temp %in% SWATParam[,1])
+    
+    # Display message if check is not true
+    if (!check){
+      checkMessage <- paste(checkMessage, " Cannot find the selected parameter", 
+                            " in the cal_parms.cal file", sep = "")
+    }
+    
+    # Check if max > min
+    if (!all(as.numeric(paraSelection[,4]) >= as.numeric(paraSelection[,3]))){
+      checkMessage <- paste(checkMessage, "Maximum value must be >= Min", 
                             sep = "")
       check <- check & FALSE
     }
-    #----------------------    
-    # check subbasin land use, soil, slope combination produce zero?
-    
-    if(is.null(HRUinfo)){
-      checkMessage <- paste(checkMessage, "Cannot find HRU information (subbasin,",
-                            " land use, soil, slope,for checking. Please go back", 
-                            " to General Setting using input TxtInOut folder. "
-                            , sep = "")
-      check <- check & FALSE
-    } else {
-      
-      tempCheck <- checkHRUCombination(paraSelection, SWATParam, HRUinfo)
-      if (!tempCheck$check){
-        checkMessage <- paste(checkMessage, tempCheck$checkMessage, sep = "")
-        check <- check & FALSE        
-      }
-      
-    }
   }
+
   
   output <- list()
   
@@ -222,4 +252,29 @@ checkSwatParameterName <- function(paraSelection, SWATParam, HRUinfo){
     return(outMessage)
   }
 
-  
+# ------------------------------------------------------------------------------
+# Check TxtInOut folder is SWAT or SWAT plus
+# ------------------------------------------------------------------------------
+  checkSWATorSWATplus <- function(TxtInOutFolder){
+    
+    # List all files in the TxtInOut folder
+    files <- list.files(TxtInOutFolder)
+    
+    # If there is two files (codes.bsn and parameter.bsn) => this is SWAT+ project
+    if(length(files[files %in% c("codes.bsn", "parameters.bsn")]) == 2){
+      SWATPlus <- TRUE
+      SWAT <- FALSE
+      
+    # Else this is SWAT project
+    } else {
+      SWATPlus <- FALSE
+      SWAT <- TRUE      
+    }
+    
+    # Output is list object
+    output <- list()
+    output$SWATPlus <- SWATPlus
+    output$SWAT <- SWAT
+    
+    return(output)
+  }

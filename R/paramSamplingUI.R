@@ -68,7 +68,7 @@ paramSamplingUI <- function(id) {
                    theme = "translucent"),
       ),
       
-
+      
       column(width = 10,
              actionButton("checkParameterTableButton", 
                           "Click here to check the input table (IMPORTANT)",

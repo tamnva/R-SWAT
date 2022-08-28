@@ -7,6 +7,8 @@ server <- function(input, output, session) {
 
   #-----------------------------------------------------------------------------
   # Global variables (use <<- for saving globalVariable inside observe)
+  # These variables are set by default, when opening the tool, will be updated
+  # according the user define in later steps
   #-----------------------------------------------------------------------------
   globalVariable <<- list()
   displayOutput <<- list()
@@ -14,6 +16,10 @@ server <- function(input, output, session) {
   displayOutput$plotSub <<- FALSE
   globalVariable$checkSimComplete <<- FALSE
   globalVariable$loadProject <<- FALSE
+  globalVariable$TxtInOutSWAT <<- FALSE
+  globalVariable$TxtInOutSWATPlus <<- FALSE
+  globalVariable$SWATProject <<- TRUE
+  globalVariable$paraSelection <<- dataParaSelectionSWAT 
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
@@ -54,6 +60,7 @@ server <- function(input, output, session) {
                globalVariable$ncores,
                globalVariable$SWATexeFile,
                parameterValue,
+               globalVariable$paraSelection,
                globalVariable$caliParam,
                globalVariable$copyUnchangeFiles,
                globalVariable$fileCioInfo,
@@ -102,14 +109,14 @@ server <- function(input, output, session) {
   observeEvent(input$saveProject, {
 
     # Check if working directory exists
-    if(dir.exists(input$workingFolder)){
+    if(dir.exists(globalVariable$workingFolder)){
 
       # Display message that save was done
       showNotification("Project settings were saved as 'RSWATproject.rds'
       in the working folder", type = "message", duration = 10)
 
       # Save project setting
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/',
+      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/',
                                            'RSWATproject.rds', sep =''))
 
     } else {
@@ -149,6 +156,23 @@ server <- function(input, output, session) {
       #-------------------------------------------------------------------------
       # Update Tab 1: General Setting
       #-------------------------------------------------------------------------
+      
+      # Update select SWAT project
+      if(globalVariable$SWATProject){
+        updateSelectInput(session,
+                          "SWATorSWATplus",
+                          label = "1. SWAT or SWAT+ project", 
+                          choices = c('SWAT', 'SWAT+'),
+                          selected = "SWAT")        
+      } else {
+        updateSelectInput(session,
+                          "SWATorSWATplus",
+                          label = "1. SWAT or SWAT+ project", 
+                          choices = c('SWAT', 'SWAT+'),
+                          selected = "SWAT+")
+      }
+
+      
       # Update working folder
       updateTextInput(session, "workingFolder",
                       label = "1. Working folder",
@@ -161,29 +185,43 @@ server <- function(input, output, session) {
 
 
       # Update Select executable SWAT file Help
-      output$printSWATexe <<- renderText(globalVariable$SWATexeFile)
+      output$printSWATexe <- renderText(globalVariable$SWATexeFile)
 
       # Update Files with list of all SWAT parameters
-      output$printSWATParamFile <<- renderText(globalVariable$SWATParamFile)
+      output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
 
       # Update display content of the SWAT parameter file
-      output$tableSWATParam <<- renderDataTable(globalVariable$SWATParam)
+      output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
 
       #-------------------------------------------------------------------------
       # Update Tab 2: Parameter sampling
       #-------------------------------------------------------------------------
 
       # Update Select SWAT parameters for calibration and/or sensitivity analysis
-      output$tableParaSelection <<- renderExcel(excelTable(data = globalVariable$paraSelection,
-                                                          columns = columnsParaSelection,
-                                                          editable = TRUE,
-                                                          allowInsertRow = TRUE,
-                                                          allowInsertColumn = TRUE,
-                                                          allowDeleteColumn = TRUE,
-                                                          allowDeleteRow = TRUE,
-                                                          rowDrag = TRUE,
-                                                          columnResize = FALSE,
-                                                          wordWrap = TRUE))
+      if(globalVariable$SWATProject){
+        output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection,
+                                                            columns = columnsParaSelectionSWAT,
+                                                            editable = TRUE,
+                                                            allowInsertRow = TRUE,
+                                                            allowInsertColumn = TRUE,
+                                                            allowDeleteColumn = TRUE,
+                                                            allowDeleteRow = TRUE,
+                                                            rowDrag = TRUE,
+                                                            columnResize = FALSE,
+                                                            wordWrap = TRUE))       
+      } else {
+        output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection,
+                                                            columns = columnsParaSelectionSWATPlus,
+                                                            editable = TRUE,
+                                                            allowInsertRow = TRUE,
+                                                            allowInsertColumn = TRUE,
+                                                            allowDeleteColumn = TRUE,
+                                                            allowDeleteRow = TRUE,
+                                                            rowDrag = TRUE,
+                                                            columnResize = FALSE,
+                                                            wordWrap = TRUE))        
+      }
+
       # Update Select sensitivity or calibration approach
       updateSelectInput(session,
                         "samplingApproach",
@@ -207,18 +245,34 @@ server <- function(input, output, session) {
                           globalVariable$sensCaliCommand)
 
       # Update define model output for extraction
-      output$tableOutputExtraction <<- renderExcel(excelTable(data = globalVariable$outputExtraction,
-                                                             columns = columnsOutputExtraction,
-                                                             editable = TRUE,
-                                                             allowInsertRow = TRUE,
-                                                             allowInsertColumn = FALSE,
-                                                             allowDeleteColumn = FALSE,
-                                                             allowDeleteRow = TRUE,
-                                                             rowDrag = FALSE,
-                                                             columnResize = FALSE,
-                                                             wordWrap = TRUE))
+      if (globalVariable$SWATProject){
+        output$tableOutputExtraction <- 
+          renderExcel(excelTable(data = globalVariable$outputExtraction,
+                                 columns = columnsOutputExtractionSWAT,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = FALSE,
+                                 allowDeleteColumn = FALSE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = FALSE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE)) 
+      } else {
+        output$tableOutputExtraction <- 
+          renderExcel(excelTable(data = globalVariable$outputExtraction,
+                                 columns = columnsOutputExtractionSWATPlus,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = FALSE,
+                                 allowDeleteColumn = FALSE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = FALSE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE))
+      }
+
       # Update display corresponding observed file names
-      output$tableOutputExtractionDisplayOnly <<- renderDataTable(
+      output$tableOutputExtractionDisplayOnly <- renderDataTable(
         printVariableNameObservedFiles(globalVariable$outputExtraction))
 
       # Update select date range
@@ -260,19 +314,121 @@ server <- function(input, output, session) {
   # Tab 1. General Setting
   #-----------------------------------------------------------------------------
   # ****************************************************************************
+  # Check SWAT or SWAT+ project
+  # ****************************************************************************  
+  observe({
+    req(input$SWATorSWATplus)
+    
+    # Check SWAT or SWAT+ project
+    if (input$SWATorSWATplus == "SWAT"){
+      globalVariable$SWATProject <<- TRUE
+      globalVariable$SWATPlusProject <<- FALSE
+    } else {
+      globalVariable$SWATProject <<- FALSE
+      globalVariable$SWATPlusProject <<- TRUE      
+    }
+    
+    # Check if the TxtInOut matches the SWAT project
+    if (globalVariable$TxtInOutSWAT & globalVariable$SWATPlusProject){
+      output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT ") 
+    } else if (globalVariable$TxtInOutSWAT & globalVariable$SWATProject){
+      output$checkTxtInOutFolder <- renderText(" ") 
+    } else {
+      
+    }
+
+    # Check if the TxtInOut matches the SWAT+ project    
+    if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATProject){
+      output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT+ ") 
+    } else if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATPlusProject){
+      output$checkTxtInOutFolder <- renderText(" ") 
+    } else {
+      
+    }
+
+    # ****************************************************************************
+    # Select SWAT parameters to calibration and/or sensitivity: Default setting
+    # ****************************************************************************
+    if (!globalVariable$loadProject){
+      
+      # Update template for parameter and output extraction according to the SWAT project
+      if (globalVariable$SWATProject){
+        
+        # Example of parameter selection for SWAT project
+        output$tableParaSelection <-
+          renderExcel(excelTable(data = dataParaSelectionSWAT,
+                                 columns = columnsParaSelectionSWAT,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = TRUE,
+                                 allowDeleteColumn = TRUE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = TRUE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE))   
+        
+        # Example of output extraction for SWAT project
+        output$tableOutputExtraction <- 
+          renderExcel(excelTable(data = dataOutputExtractionSWAT,
+                                 columns = columnsOutputExtractionSWAT,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = FALSE,
+                                 allowDeleteColumn = FALSE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = FALSE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE)) 
+        
+      # If this is SWAT+ project
+      } else {
+        
+        # Example of parameter selection for SWAT+ project
+        output$tableParaSelection <- 
+          renderExcel(excelTable(data = dataParaSelectionSWATPlus,
+                                 columns = columnsParaSelectionSWATPlus,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = TRUE,
+                                 allowDeleteColumn = TRUE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = TRUE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE))     
+        
+        # Example of output extraction for SWAT+ project
+        output$tableOutputExtraction <- 
+          renderExcel(excelTable(data = dataOutputExtractionSWATPlus,
+                                 columns = columnsOutputExtractionSWATPlus,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = FALSE,
+                                 allowDeleteColumn = FALSE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = FALSE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE)) 
+      }
+      
+    }
+    
+  })
+  
+  # ****************************************************************************
   # Get working folder
   # ****************************************************************************
   observe({
-
+    req(input$workingFolder)
+    
     # Save working directory in the global variable
-    globalVariable$workingFolder <<- input$workingFolder
+    globalVariable$workingFolder <<- trimws(input$workingFolder)
 
     # Save link to the simulation report log file to the global variable
-    globalVariable$CurrentSimulationReportFile <<- paste(input$workingFolder,
+    globalVariable$CurrentSimulationReportFile <<- paste(globalVariable$workingFolder,
                                                          '/Output/CurrentSimulationReport.log',
                                                          sep ='')
     # Check if working folder exists
-    if(!dir.exists(input$workingFolder)){
+    if(!dir.exists(globalVariable$workingFolder)){
 
       # Print out message if working dir does not exist
       output$checkWorkingFolder <- renderText("Input folder does not exist")
@@ -281,64 +437,95 @@ server <- function(input, output, session) {
       # If exists, does not display anything
       output$checkWorkingFolder <- renderText(" ")
     }
-
+    
   })
 
   # ****************************************************************************
   # TxtInOut folder: Display HRU info from TxtInOut folder
   # ****************************************************************************
-
   observe({
     req(input$TxtInOutFolder)
-
+    
     # Check if TxtInOut folder exists
-    if(!dir.exists(input$TxtInOutFolder)){
+    if(!dir.exists(trimws(input$TxtInOutFolder))){
       output$checkTxtInOutFolder <- renderText("Input folder does not exist")
     } else {
       output$checkTxtInOutFolder <- renderText(" ")
     }
 
     # Check if .hru files exist in this folder
-    if (checkDirFileExist(input$TxtInOutFolder, "", ".hru")){
+    if (checkDirFileExist(trimws(input$TxtInOutFolder), "", ".cio")){
 
-      # Get HRU information (land use, slope, soil, sub)
-      globalVariable$HRUinfo <<- getHruInfo(input$TxtInOutFolder)
+      # Is this TxtInOut of SWAT or SWAT plus
+      globalVariable$TxtInOutSWAT <<- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWAT
+      globalVariable$TxtInOutSWATPlus <<- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWATPlus
+      
+      # check if the TxtInOut is correct
+      if (globalVariable$TxtInOutSWAT & globalVariable$SWATPlusProject){
+        output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT ") 
+      }
+
+      if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATProject){
+        output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT+ ") 
+      }   
 
       # Save link to TxtInout Folder to the global variable
-      globalVariable$TxtInOutFolder <<- input$TxtInOutFolder
-
-      # Get unique soil, land use, slope, max number of subbasins
-      uniqueSoil <- unique(globalVariable$HRUinfo$soil)
-      uniqueLandUse <- unique(globalVariable$HRUinfo$lu)
-      uniqueSlope <- unique(globalVariable$HRUinfo$slope)
-      minMaxSubbasin <- range(globalVariable$HRUinfo$sub)
-
-      # Number of soil, land use, slope
-      nSoil <- length(uniqueSoil)
-      nLU <- length(uniqueLandUse)
-      nSlope <- length(uniqueSlope)
-
-      nRow <- max(nSoil, nLU, nSlope, 2)
-
+      globalVariable$TxtInOutFolder <<- trimws(input$TxtInOutFolder)
+      
+      # If this is a SWAT project
+      if (globalVariable$SWATProject & globalVariable$TxtInOutSWAT){
+        # Get HRU information (land use, slope, soil, sub)
+        globalVariable$HRUinfo <<- getHruInfo(globalVariable$TxtInOutFolder)
+        
+        # Get unique soil, land use, slope, max number of subbasins
+        uniqueSoil <- unique(globalVariable$HRUinfo$soil)
+        uniqueLandUse <- unique(globalVariable$HRUinfo$lu)
+        uniqueSlope <- unique(globalVariable$HRUinfo$slope)
+        minMaxSubbasin <- range(globalVariable$HRUinfo$sub)
+        
+        # Number of soil, land use, slope
+        nSoil <- length(uniqueSoil)
+        nLU <- length(uniqueLandUse)
+        nSlope <- length(uniqueSlope)
+        
+        nRow <- max(nSoil, nLU, nSlope, 2)
+        
+        
+        # Display unique land use, soil, slope
+        displayOutput$uniqueHruProperties <<-
+          data.frame(minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
+                     Landuse = c(uniqueLandUse,rep(NA, nRow - nLU)),
+                     soilName = c(uniqueSoil,rep(NA, nRow - nSoil)),
+                     slopeClass = c(uniqueSlope,rep(NA, nRow - nSlope))
+          ) 
+        
+      # If this is a SWAT+ project
+      } else if (globalVariable$SWATPlusProject & globalVariable$TxtInOutSWATPlus){
+        displayOutput$uniqueHruProperties <<- NULL
+        globalVariable$HRUinfo <<- read.table(file = paste(globalVariable$TxtInOutFolder, 
+                                                           "/hru-data.hru", sep =""),
+                                              header = TRUE, skip = 1, sep = "")
+        # Find maximum number of HRU
+        
+        
+      } else {
+        displayOutput$uniqueHruProperties <<- NULL
+        globalVariable$HRUinfo <<- NULL
+      }
+      
       # Display table of HRU information (land use, soil, slope)
-      output$tableHRUinfo <- renderDataTable(globalVariable$HRUinfo)
+      output$tableHRUinfo <<- renderDataTable(globalVariable$HRUinfo)
 
-      # Display unique land use, soil, slope
-      displayOutput$uniqueHruProperties <<-
-        data.frame(minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
-                   Landuse = c(uniqueLandUse,rep(NA, nRow - nLU)),
-                   soilName = c(uniqueSoil,rep(NA, nRow - nSoil)),
-                   slopeClass = c(uniqueSlope,rep(NA, nRow - nSlope))
-        )
 
     } else {
 
       # If this is not TxtInOut folder, assign global variables to NULL
       globalVariable$HRUinfo <<- NULL
       globalVariable$TxtInOutFolder <<- NULL
-      output$tableHRUinfo <- NULL
+      output$tableHRUinfo <<- NULL
       displayOutput$uniqueHruProperties <<- NULL
     }
+    
   })
 
   # ****************************************************************************
@@ -367,36 +554,38 @@ server <- function(input, output, session) {
   # ****************************************************************************
   # Files with list of all SWAT parameters (get file) + display content of file
   # ****************************************************************************
-
   observe({
     # Get volumes
     volumes <- getVolumes()
 
     # Show shinyFileChoose window
-    shinyFileChoose(input, "getSWATParamFile",
-                    roots = volumes,
-                    filetypes=c('', 'txt'),
-                    session = session)
+    
+    if (input$SWATorSWATplus == "SWAT"){
+      shinyFileChoose(input, "getSWATParamFile",
+                      roots = volumes,
+                      filetypes=c('', 'txt'),
+                      session = session)     
+    } else {
+      shinyFileChoose(input, "getSWATParamFile",
+                      roots = volumes,
+                      filetypes=c('', 'cal'),
+                      session = session)
+    }
+
 
     # Get full path to SWAT parameter file
     SWATParamFile <- parseFilePaths(volumes, input$getSWATParamFile)
 
-    # Print out link to SWAT parameter file/save to global variable
-    output$printSWATParamFile <- NULL
-    globalVariable$SWATParamFile <<- NULL
-    globalVariable$SWATParam <<- NULL
-    output$tableSWATParam <- NULL
-
-
     if (length(SWATParamFile$datapath) == 1){
-      if (SWATParamFile$name == "swatParam.txt"){
+      if ((SWATParamFile$name == "swatParam.txt") ||
+          (SWATParamFile$name == "cal_parms.cal")){
+
         globalVariable$SWATParamFile <<- as.character(SWATParamFile$datapath)
         globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
         output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
         output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
-      }
+      } 
     }
-
   })
 
 
@@ -413,61 +602,67 @@ server <- function(input, output, session) {
     # Requirement for activation these command
     req(input$helpParameterSelection)
 
-    # Check if there is no input SWAT parameter file
-    if (is.null(globalVariable$SWATParam$parameter)){
-      output$tableHelpParameterSelection <-
-        renderDataTable(displayOutput$uniqueHruProperties)
-    } else {
-      SWATParamName <- globalVariable$SWATParam$parameter
-      nSWATParamName <- length(SWATParamName)
-
-      if(is.null(displayOutput$uniqueHruProperties)){
-        output$tableHelpParameterSelection <- NULL
+    # This first if command prevents the app crashed when no input is given
+    if (is.data.frame(globalVariable$SWATParam)){
+      # Check if there is no input SWAT parameter file
+      if (is.null(globalVariable$SWATParam$parameter)){
+        output$tableHelpParameterSelection <-
+          renderDataTable(displayOutput$uniqueHruProperties)
       } else {
-        nRowUniqueHRU <- nrow(displayOutput$uniqueHruProperties)
-        compareLength <- max(nRowUniqueHRU, nSWATParamName)
-        if (nRowUniqueHRU < compareLength){
-          newRow <- data.frame(matrix(rep(NA, (compareLength - nRowUniqueHRU)*4),
-                                      ncol = 4))
-          names(newRow) <- names(displayOutput$uniqueHruProperties)
-          tempUniqueHruProperties <- rbind(displayOutput$uniqueHruProperties,
-                                           newRow)
-
+        
+        SWATParamName <- globalVariable$SWATParam$parameter
+        nSWATParamName <- length(SWATParamName)
+        
+        if(is.null(displayOutput$uniqueHruProperties)){
+          output$tableHelpParameterSelection <- NULL
         } else {
-          SWATParamName <- c(SWATParamName, rep(NA, compareLength - nSWATParamName))
-        }
-
-        tempUniqueHruProperties <- cbind(SWATParamName,tempUniqueHruProperties)
-
-        output$tableHelpParameterSelection <- renderDataTable(tempUniqueHruProperties)
+          nRowUniqueHRU <- nrow(displayOutput$uniqueHruProperties)
+          compareLength <- max(nRowUniqueHRU, nSWATParamName)
+          if (nRowUniqueHRU < compareLength){
+            newRow <- data.frame(matrix(rep(NA, (compareLength - nRowUniqueHRU)*4),
+                                        ncol = 4))
+            names(newRow) <- names(displayOutput$uniqueHruProperties)
+            tempUniqueHruProperties <- rbind(displayOutput$uniqueHruProperties,
+                                             newRow)
+            
+          } else {
+            SWATParamName <- c(SWATParamName, rep(NA, compareLength - nSWATParamName))
+          }
+          
+          tempUniqueHruProperties <- cbind(SWATParamName,tempUniqueHruProperties)
+          
+          output$tableHelpParameterSelection <- renderDataTable(tempUniqueHruProperties)
+        }        
+        
+        
       }
+      
+      # If this is a SWAT+ project
+      if (ncol(globalVariable$SWATParam) != 7){
+        
+        # Get SWAT+ parameter name
+        temp <- paste(globalVariable$SWATParam[, 1], ".", globalVariable$SWATParam[, 2],
+                      sep = "")
+        # Display SWAT+ help table
+        output$tableHelpParameterSelection <-
+          renderDataTable(data.frame(Parameter = temp))
+      }      
+    } else {
+      # Display SWAT+ help table
+      output$tableHelpParameterSelection <- NULL
     }
   })
-
-  # ****************************************************************************
-  # Select SWAT parameters to calibration and/or sensitivity: Default setting
-  # ****************************************************************************
-  if (!globalVariable$loadProject){
-    output$tableParaSelection <- renderExcel(excelTable(data = dataParaSelection,
-                                                        columns = columnsParaSelection,
-                                                        editable = TRUE,
-                                                        allowInsertRow = TRUE,
-                                                        allowInsertColumn = TRUE,
-                                                        allowDeleteColumn = TRUE,
-                                                        allowDeleteRow = TRUE,
-                                                        rowDrag = TRUE,
-                                                        columnResize = FALSE,
-                                                        wordWrap = TRUE))
-    }
 
 
   # ****************************************************************************
   # Check input 'Select SWAT parameters for calibration'
   # ****************************************************************************
   observeEvent(input$checkParameterTableButton, {
+    
     checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection,
                                                   globalVariable$SWATParam,
-                                                  globalVariable$HRUinfo)
+                                                  globalVariable$HRUinfo,
+                                                  globalVariable$SWATProject)
     output$checkParameterTableTxtOuput <- renderText(checkParameterTable$checkMessage)
   })
 
@@ -476,9 +671,26 @@ server <- function(input, output, session) {
   # Save "SWAT parameters for calibration" to global variable
   # ****************************************************************************
   observe({
+    
+    req(input$tableParaSelection)
+    
+    # Parameter selection 
     paraSelection <-  excel_to_R(input$tableParaSelection)
-    if(is.null(paraSelection)) paraSelection <- dataParaSelection
+    
+    # Check if no input data 
+    if(is.null(paraSelection)) {
+      
+      # Check if this is SWAT or SWAT+ project
+      if(globalVariable$SWATProject){
+        paraSelection <- dataParaSelectionSWAT
+      } else {
+        paraSelection <- dataParaSelectionSWATPlus
+      }
+    }
+   
+    # Save parameter selection to the global variable
     globalVariable$paraSelection  <<- paraSelection
+    globalVariable$paraSelection[,1] <<- trimws(paraSelection[,1])
 
   })
 
@@ -599,16 +811,32 @@ print(sensCaliObject)[]")
   # Output extraction: Default setting
   # ****************************************************************************
   if(!globalVariable$loadProject){
-    output$tableOutputExtraction <- renderExcel(excelTable(data = dataOutputExtraction,
-                                                           columns = columnsOutputExtraction,
-                                                           editable = TRUE,
-                                                           allowInsertRow = TRUE,
-                                                           allowInsertColumn = FALSE,
-                                                           allowDeleteColumn = FALSE,
-                                                           allowDeleteRow = TRUE,
-                                                           rowDrag = FALSE,
-                                                           columnResize = FALSE,
-                                                           wordWrap = TRUE))
+    if (globalVariable$SWATProject){
+      output$tableOutputExtraction <- 
+        renderExcel(excelTable(data = dataOutputExtractionSWAT,
+                               columns = columnsOutputExtractionSWAT,
+                               editable = TRUE,
+                               allowInsertRow = TRUE,
+                               allowInsertColumn = FALSE,
+                               allowDeleteColumn = FALSE,
+                               allowDeleteRow = TRUE,
+                               rowDrag = FALSE,
+                               columnResize = FALSE,
+                               wordWrap = TRUE))      
+    } else {
+
+      output$tableOutputExtraction <- 
+        renderExcel(excelTable(data = dataOutputExtractionSWATPlus,
+                               columns = columnsOutputExtractionSWATPlus,
+                               editable = TRUE,
+                               allowInsertRow = TRUE,
+                               allowInsertColumn = FALSE,
+                               allowDeleteColumn = FALSE,
+                               allowDeleteRow = TRUE,
+                               rowDrag = FALSE,
+                               columnResize = FALSE,
+                               wordWrap = TRUE))      
+    }
   }
 
   # ****************************************************************************
@@ -620,7 +848,13 @@ print(sensCaliObject)[]")
     outputExtraction <- excel_to_R(input$tableOutputExtraction)
 
     # Check if there is not such a table, then take default table
-    if(is.null(outputExtraction)) outputExtraction <- dataOutputExtraction
+    if(is.null(outputExtraction)) {
+      if (globalVariable$SWATProject){
+        outputExtraction <- dataOutputExtractionSWAT
+      } else {
+        outputExtraction <- dataOutputExtractionSWATPlus
+      }
+    }
 
     # Save this table to the global variable
     globalVariable$outputExtraction <<- outputExtraction
@@ -649,21 +883,22 @@ print(sensCaliObject)[]")
     req(input$TxtInOutFolder)
 
     # Check if there is a file called file.cio in this TxtInOut
-    if (checkDirFileExist(input$TxtInOutFolder, "file.cio", "")){
-
+    if (checkDirFileExist(trimws(input$TxtInOutFolder), "file.cio", "")){
+      
       # Get simulation dates
-      myDate <- getFileCioInfo(input$TxtInOutFolder)
-
+      myDate <- getFileCioInfo(trimws(input$TxtInOutFolder))
+      
       # Assign simulation dates to the global variale
       globalVariable$fileCioInfo <<- myDate
-
+      
       # Update selected date range for calibration/sensitivity
       updateDateRangeInput(session, "dateRangeCali",
                            start = myDate$startEval,
                            end = myDate$endSim,
                            min = myDate$startEval,
                            max = myDate$endSim
-      )
+      )        
+      
     }
   })
 
@@ -680,7 +915,8 @@ print(sensCaliObject)[]")
   # Get user input number of cores
   # ****************************************************************************
   observe({
-    # Assing the number of selected cores to the global varialbes
+    req(input$ncores)
+    # Assign the number of selected cores to the global varialbes
     globalVariable$ncores <<- input$ncores
   })
 
@@ -691,7 +927,7 @@ print(sensCaliObject)[]")
 
     # Refresh the parameter values in case of loading the projects
     globalVariable$parameterValue <<- c()
-
+    
     # Display progress bar
     withProgress(message = 'Running SWAT...', {
 
@@ -708,7 +944,6 @@ print(sensCaliObject)[]")
     checkList <- checkList & !is.null(globalVariable$fileCioInfo)
     checkList <- checkList & !is.null(globalVariable$dateRangeCali)
 
-
     if (checkList){
 
       # Print out message when click Run SWAT
@@ -719,7 +954,7 @@ print(sensCaliObject)[]")
         easyClose = TRUE,
         size = "l"
       ))
-
+      
       # First get or generate parameter set
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
 
@@ -728,20 +963,19 @@ print(sensCaliObject)[]")
                                                    getParamRange(globalVariable$paraSelection))
       }
 
+      
       # Load all files that are going to be updated
       globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo,
-                                                              globalVariable$paraSelection,
-                                                              globalVariable$SWATParam,
-                                                              globalVariable$TxtInOutFolder)
-
+                                                        globalVariable$paraSelection,
+                                                        globalVariable$SWATParam,
+                                                        globalVariable$TxtInOutFolder)        
+      
       # Save global variables
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
-
+      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
+      
       # Copy unchanged file for the first simulation
       copyUnchangeFiles <- TRUE
       firstRun <- TRUE
-
-
 
       # Run SWAT for all iteration ---------------------------------------------
       if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)') |
@@ -750,9 +984,9 @@ print(sensCaliObject)[]")
 
         # Generate parameter values
         if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
-          globalVariable$parameterValue <<- lhsRange(as.numeric(input$inputInfo),
-                                                     getParamRange(globalVariable$paraSelection))
 
+          globalVariable$parameterValue <<- lhsRange(as.numeric(input$inputInfo), getParamRange(globalVariable$paraSelection))
+        
         } else if(input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
           globalVariable$parameterValue <<- runifSampling(as.numeric(input$inputInfo),
                                                           as.numeric(globalVariable$paraSelection$Min),
@@ -769,8 +1003,7 @@ print(sensCaliObject)[]")
         } else {
           globalVariable$parameterValue <<- NULL
         }
-
-
+        
         # Check max number of cores
         globalVariable$ncores <<- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
 
@@ -781,6 +1014,7 @@ print(sensCaliObject)[]")
                    globalVariable$ncores,
                    globalVariable$SWATexeFile,
                    globalVariable$parameterValue,
+                   globalVariable$paraSelection,
                    globalVariable$caliParam,
                    copyUnchangeFiles,
                    globalVariable$fileCioInfo,
@@ -810,6 +1044,7 @@ print(sensCaliObject)[]")
                      globalVariable$ncores,
                      globalVariable$SWATexeFile,
                      globalVariable$parameterValue,
+                     globalVariable$paraSelection,
                      globalVariable$caliParam,
                      copyUnchangeFiles,
                      globalVariable$fileCioInfo,
@@ -915,6 +1150,7 @@ print(sensCaliObject)[]")
                        globalVariable$ncores,
                        globalVariable$SWATexeFile,
                        newPar,
+                       globalVariable$paraSelection,
                        globalVariable$caliParam,
                        FALSE,
                        globalVariable$fileCioInfo,
@@ -1055,7 +1291,7 @@ print(sensCaliObject)[]")
       globalVariable$checkSimComplete <<- TRUE
 
       # Save all results as RSWAT project
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
+      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
 
     } else {
 
@@ -1191,10 +1427,10 @@ print(sensCaliObject)[]")
     observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile)
 
     # Get observed data
-    if(length(observedDataFile$datapath) > 0){
+    if(length(observedDataFile$datapath) == 1){
 
       # Display observed data file paths
-      output$printObservedDataFile <- renderText(observedDataFile$datapath)
+      output$printObservedDataFile <- renderText(as.character(observedDataFile$datapath))
 
       # Assign observed data file paths to the global variables
       globalVariable$observedDataFile <<- sortObservedDataFile(as.character(observedDataFile$datapath))
@@ -1251,7 +1487,7 @@ print(sensCaliObject)[]")
       output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
 
       # Save observed data to globalVariable
-      saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
+      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
     }
   })
 
@@ -1364,7 +1600,7 @@ print(sensCaliObject)[]")
     }
 
     #Save RSWATObject
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/', 'RSWATproject.rds', sep =''))
+    saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
   })
 
   # ****************************************************************************
@@ -1730,7 +1966,7 @@ print(sensCaliObject)[]")
     req(input$saveAllResults)
 
     # Save observed data to global variable
-    saveRDS(globalVariable, file = paste(input$workingFolder, '/',
+    saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/',
                                          'RSWATproject.rds',
                                          sep =''))
 
