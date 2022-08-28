@@ -1,9 +1,9 @@
 
 
 # ------------------------------------------------------------------------------
-# Default parameter change values
+# Default parameter change values for SWAT
 # ------------------------------------------------------------------------------
-dataParaSelection <- data.frame(Parameter = c('GW_DELAY.gw', 'CN2.mgt', 'SOL_K.sol', 
+dataParaSelectionSWAT <- data.frame(Parameter = c('GW_DELAY.gw', 'CN2.mgt', 'SOL_K.sol', 
                                              'ALPHA_BF.gw', 'ESCO.hru', 'SURLAG.hru', 
                                              'CH_K2.rte', 'SURLAG.bsn'),
                                Change = c('absolute', 'relative', 'relative', 
@@ -15,7 +15,7 @@ dataParaSelection <- data.frame(Parameter = c('GW_DELAY.gw', 'CN2.mgt', 'SOL_K.s
                                Soil = c('All','All', 'All', 'All', 'All', 'All', NA, NA),
                                Slope = c('All', 'All', 'All', 'All', 'All', 'All', NA, NA))
 
-columnsParaSelection <- data.frame(title= colnames(dataParaSelection),
+columnsParaSelectionSWAT <- data.frame(title= colnames(dataParaSelectionSWAT),
                                   source = I(list(NA ,
                                                   c('absolute', 'relative','replace'),
                                                   NA, 
@@ -43,41 +43,109 @@ columnsParaSelection <- data.frame(title= colnames(dataParaSelection),
                                   )
 
 # ------------------------------------------------------------------------------
+# Default parameter change values for SWAT + 
+# ------------------------------------------------------------------------------
+dataParaSelectionSWATPlus <- data.frame(Parameter = c('cn2.hru', 'canmx.hru', 'esco.hru', 
+                                              'k.sol', 'awc.sol', 'surlag.bsn',
+                                               'msk_co1.bsn', 'msk_co2.bsn', 'chk.rte'
+                                              , 'wd_rto.rt'),
+                                Change = c('relative', 'replace', 'replace', 
+                                           'replace', 'replace', 'replace', 
+                                           'replace', 'replace', 'replace', 
+                                           'replace'),
+                                Min = c(-0.25,1, 0, 0, 0.01, 0.05,0, 0, 3.0, 0.5),
+                                Max = c(0.25,10, 1, 20, 1, 10, 10, 10, 6.0, 20),
+                                Object = c("1:3,5,7:8",NA, NA, NA, NA, NA, NA, NA, NA, NA),
+                                Conditions = c("hgs=A,B,C; lyr1=1; lyr2=2; landuse = corn, past", NA, NA, NA, NA, NA, NA, NA, NA, NA))
+
+
+columnsParaSelectionSWATPlus <- data.frame(title= colnames(dataParaSelectionSWATPlus),
+                                   source = I(list(NA ,
+                                                   c('absolute', 'relative','replace'),
+                                                   NA, 
+                                                   NA, 
+                                                   NA, 
+                                                   NA)),
+                                   width= c(200, 
+                                            200, 
+                                            200, 
+                                            200, 
+                                            200, 
+                                            400
+                                            #200,
+                                            #200, 
+                                            #200, 
+                                            #200,
+                                            #200, 
+                                            #200
+                                            ),
+                                   type=c('text', 
+                                          'dropdown', 
+                                          'numeric',
+                                          'numeric', 
+                                          'text', 
+                                          'text')
+)
+# ------------------------------------------------------------------------------
+# Default output variables SWAT+
+# ------------------------------------------------------------------------------
+dataOutputExtractionSWATPlus <- data.frame(FileType = c('channel_sd_day.txt'),
+                                   FileName = c('channel_sd_day.txt'),
+                                   Column = c("53"),
+                                   Reach = c("1")
+)
+
+
+columnsOutputExtractionSWATPlus <- data.frame(title= colnames(dataOutputExtractionSWATPlus),
+                                      source = I(list(c('channel_sd_day.txt',
+                                                        'userReadSwatOutput'),
+                                                      NA,
+                                                      NA, 
+                                                      NA)),
+                                      width= c(300,
+                                               300,
+                                               300, 
+                                               300),
+                                      type=c('dropdown', 
+                                             'text',
+                                             'text',
+                                             'text'))
+
+# ------------------------------------------------------------------------------
 # Default output variables
 # ------------------------------------------------------------------------------
-dataOutputExtraction <- data.frame(FileType = c('watout.dat', 
+dataOutputExtractionSWAT <- data.frame(FileType = c('watout.dat', 
                                                 'output.rch',
                                                 'output.sub',
                                                 'output.hru',
                                                 'userReadSwatOutput'),
-                                  FileName = c('watout.dat', 
-                                               'output.rch',
-                                               'output.sub',
-                                               'output.hru',
-                                               NA),
-                                  Column = c("4", "7, 8 ", "8, 9", "3", "2"),
-                                  Reach = c(NA, "1, 2 * 1, 2, 3", "1 * 5, 6", "20", NA)
-                                  )
-                               
+                                   FileName = c('watout.dat', 
+                                                'output.rch',
+                                                'output.sub',
+                                                'output.hru',
+                                                NA),
+                                   Column = c("4", "7, 8 ", "8, 9", "3", "2"),
+                                   Reach = c(NA, "1, 2 * 1, 2, 3", "1 * 5, 6", "20", NA)
+)
 
-columnsOutputExtraction <- data.frame(title= colnames(dataOutputExtraction),
-                                  source = I(list(c('watout.dat', 
-                                                    'output.rch',
-                                                    'output.sub',
-                                                    'output.hru',
-                                                    'userReadSwatOutput'),
-                                                  NA,
-                                                  NA, 
-                                                  NA)),
-                                  width= c(300,
-                                           300,
-                                           300, 
-                                           300),
-                                  type=c('dropdown', 
-                                         'text',
-                                         'text',
-                                         'text'))
 
+columnsOutputExtractionSWAT <- data.frame(title= colnames(dataOutputExtractionSWAT),
+                                      source = I(list(c('watout.dat', 
+                                                        'output.rch',
+                                                        'output.sub',
+                                                        'output.hru',
+                                                        'userReadSwatOutput'),
+                                                      NA,
+                                                      NA, 
+                                                      NA)),
+                                      width= c(300,
+                                               300,
+                                               300, 
+                                               300),
+                                      type=c('dropdown', 
+                                             'text',
+                                             'text',
+                                             'text'))
 # ------------------------------------------------------------------------------
 # Default help text for step 2 Parameter sample
 # ------------------------------------------------------------------------------

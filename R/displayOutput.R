@@ -80,6 +80,7 @@ getNumberOutputVar <- function(outputExtraction){
       }
 
     } else if(outputExtraction[i,1] == "output.rch" |
+              outputExtraction[i,1] == "channel_sd_day.txt" |
               outputExtraction[i,1] == "output.hru" |
               outputExtraction[i,1] == "output.sub" |
               outputExtraction[i,1] == "output.rsv"){
@@ -317,3 +318,120 @@ plotSensiSobol <- function(paraSelection, tableSensitivity){
   return(myPlot)
 }
 
+# ------------------------------------------------------------------------------
+# Find soil group in SWAT+ project
+# ------------------------------------------------------------------------------
+findSoilGroupSWATPlus <- function(TxtInOut){
+  
+  # Soil file
+  soilsFile <- paste(TxtInOut, "/soils.sol", sep = "")
+  
+  # Check if file exists
+  if(file.exists(soilsFile)){
+    
+    # Read content of the file
+    soilsFile <- readLines(soilsFile)
+    
+    # Find all soil groups
+    soilGroup <- c()
+    for (i in 3:length(soilsFile)){
+      temp <- sum(is.na((suppressWarnings(as.numeric(strsplit(trimws(soilsFile[i]), " +")[[1]]))))) 
+      if(temp > 0){
+        soilGroup <- c(soilGroup, strsplit(trimws(soilsFile[i]), " +")[[1]][3])
+      }
+    }
+    
+    # Sort soil group alphabetically
+    soilGroup <- sort(unique(soilGroup))    
+    
+    # If there is no soil file, return NA
+  } else {
+    soilGroup <- NA
+  }
+  
+  # Find number of HRU object
+  hruFile <- paste(TxtInOut, "/hru-data.hru", sep = "")
+  
+  # Check if file exists
+  if(file.exists(hruFile)){
+    
+    # Read content of the file
+    hruFile <- read.table(hruFile, skip = 2, sep = "")
+    
+    # maximum number of HRUs
+    nhrus <- max(hruFile[,1])   
+    
+    # If there is no soil file, return NA
+  } else {
+    nhrus <- NA
+  }  
+
+  # Find number of aquifers object
+  aquFile <- paste(TxtInOut, "/aquifer.aqu", sep = "")
+  
+  # Check if file exists
+  if(file.exists(aquFile)){
+    
+    # Read content of the file
+    aquFile <- read.table(aquFile, skip = 2, sep = "")
+    
+    # maximum number of HRUs
+    naqu <- max(aquFile[,1])   
+    
+    # If there is no soil file, return NA
+  } else {
+    naqu <- NA
+  }
+
+  #-----------------------------------------------------------------------------
+  # Find number of channels object
+  chanFile <- paste(TxtInOut, "/channel-lte.cha", sep = "")
+  
+  # Check if file exists
+  if(file.exists(chanFile)){
+    
+    # Read content of the file
+    chanFile <- read.table(chanFile, skip = 2, sep = "")
+    
+    # maximum number of HRUs
+    ncha <- max(chanFile[,1])   
+    
+    # If there is no soil file, return NA
+  } else {
+    ncha <- NA
+  }
+
+  #-----------------------------------------------------------------------------
+  # Find plant tpye
+  plantFile <- paste(TxtInOut, "/plants.plt", sep = "")
+  
+  # Check if file exists
+  if(file.exists(plantFile)){
+    
+    # Read content of the file
+    plantFile <- read.table(plantFile, skip = 2, sep = "")
+    
+    # maximum number of HRUs
+    plant <- plantFile[,1]  
+    
+    # If there is no soil file, return NA
+  } else {
+    plant <- NA
+  }
+  
+  output <- list()
+  output$hgs <- soilGroup
+  output$plant <- plant
+  
+  
+  output$hru.plt.lyr.sol <- nhrus
+  output$aqu <- nhrus
+  output$cha.swq <- ncha
+  
+#  output$res <- res
+#  output$sdc.rte <- chandeg
+#  output$pcp <- pcpfiles
+#  output$tmp <- tmpfiles  
+  
+  return(soilGroup)
+}

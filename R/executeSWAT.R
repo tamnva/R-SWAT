@@ -4,7 +4,8 @@
   runSWATSequential <- function(coreNumber, 
                                 workingDirectory, 
                                 swatExe, 
-                                caliParam, 
+                                caliParam,
+                                paraSelection,
                                 subParameterSet, 
                                 outputExtraction, 
                                 fileCioInfo,
@@ -25,20 +26,25 @@
     # Number of parameter sets
     if(is.vector(subParameterSet)){
       subParameterSet <- matrix(subParameterSet, nrow = 1)
-      }
+    }
+    
+    # Number of parameters
     nParam <- ncol(subParameterSet)
     
     # Loop over number of parameter sets
     for (i in 1:nrow(subParameterSet)) {
-      # Assign parameter values to caliParam
-      caliParam$applyValue <- getParameterValue(caliParam$paramFlag, 
-                                                subParameterSet[i,2:nParam]
-                                                )
+      
+      # If this is SWAT project
+      if (isTRUE(caliParam$file[1] != "calibration.cal")){
+        
+        # Assign parameter values to caliParam
+        caliParam$applyValue <- getParameterValue(caliParam$paramFlag, 
+                                                  subParameterSet[i,2:nParam])
+      } 
+      
       # Update TxtInOut folder
-      updateMultiFile(toDir, 
-                      caliParam
-                      )
-  
+      updateMultiFile(toDir, caliParam, subParameterSet[i,2:nParam], paraSelection)        
+
       # Call swat.exe file
       exeFile <- strsplit(swatExe, split="/")[[1]]
       if(!file.exists(exeFile[length(exeFile)])) file.copy(swatExe, toDir)
@@ -92,6 +98,7 @@
                          ncores, 
                          swatExe, 
                          parameterValue,
+                         paraSelection,
                          caliParam,
                          copyUnchangeFiles,
                          fileCioInfo,
@@ -114,7 +121,8 @@
       runSWATSequential(1, 
                         workingDirectory, 
                         swatExe, 
-                        caliParam, 
+                        caliParam,
+                        paraSelection,
                         subParameterSet[[1]], 
                         outputExtraction, 
                         fileCioInfo,
@@ -135,6 +143,7 @@
                                                                           workingDirectory, 
                                                                           swatExe, 
                                                                           caliParam, 
+                                                                          paraSelection,
                                                                           subParameterSet[[i]], 
                                                                           outputExtraction, 
                                                                           fileCioInfo,
@@ -178,7 +187,7 @@
         dir.create(dir)        
       }
       
-      # Copy all unchange files
+      # Copy all unchanged files
       copyAllExcept(TxtInOut, dir, exceptFiles)
       
       # Check if exe exist then delete

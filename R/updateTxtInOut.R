@@ -123,21 +123,28 @@
 # Update multiple files in a folder
 # ------------------------------------------------------------------------------
 
-	updateMultiFile <-  function(toDir, caliParam){
+	updateMultiFile <-  function(toDir, caliParam, parameterValue, paraSelection){
 
-	  # Lopp over list of files
-	  for (i in 1:length(caliParam$file)){
- 
-	    updateSingleFile(toDir,
-	                     caliParam$file[i],
-	                     caliParam$fileContent[[i]],
-	                     caliParam$atLine[[i]],
-	                     caliParam$atPosition[[i]],
-	                     caliParam$changeMethod[[i]],
-	                     caliParam$applyValue[[i]],
-	                     caliParam$numberFormat[[i]],
-	                     caliParam$absoluteMin[[i]],
-	                     caliParam$absoluteMax[[i]])
+	  # If this is SWAT+ project
+	  if (isTRUE(caliParam$file == "calibration.cal")){
+	    updateCalibrationFile(paraSelection, parameterValue, toDir)	    
+	    
+	  # If this is SWAT project
+	  } else {
+	    # Loop over list of files
+	    for (i in 1:length(caliParam$file)){
+	      
+	      updateSingleFile(toDir,
+	                       caliParam$file[i],
+	                       caliParam$fileContent[[i]],
+	                       caliParam$atLine[[i]],
+	                       caliParam$atPosition[[i]],
+	                       caliParam$changeMethod[[i]],
+	                       caliParam$applyValue[[i]],
+	                       caliParam$numberFormat[[i]],
+	                       caliParam$absoluteMin[[i]],
+	                       caliParam$absoluteMax[[i]])
+	    }	    
 	  }
 	}
 
@@ -302,22 +309,34 @@
 # ------------------------------------------------------------------------------
 
 	loadSwatParam <- function(swatParamFile){
+  
+	  # check SWAT or SWAT+ parameter file
+	  fileName <- substr(swatParamFile, nchar(swatParamFile) - 12, nchar(swatParamFile))
 	  
-	  swat_param <- readLines(swatParamFile, warn = FALSE)
-	  check <- c()
-
-	  for (i in 1:length(swat_param)){
-	    checkCommentBlankLine <- substr(trimws(swat_param[i]), 1, 1)
-	    if ((checkCommentBlankLine == "!") | (checkCommentBlankLine == "")) {
-	      check <- c(check, i)
+	  # If this is SWAT parameter file
+	  if (fileName == "swatParam.txt"){
+	    
+	    check <- c()
+	    swat_param <- readLines(swatParamFile, warn = FALSE)
+	    
+	    for (i in 1:length(swat_param)){
+	      checkCommentBlankLine <- substr(trimws(swat_param[i]), 1, 1)
+	      if ((checkCommentBlankLine == "!") | (checkCommentBlankLine == "")) {
+	        check <- c(check, i)
+	      }
 	    }
+	    
+	    swat_param <- swat_param[-check]
+	    
+	    param <- read.table(textConnection(swat_param))
+	    colnames(param) <- c("parameter", "lineNumber", "startPosition",
+	                         "endPosition","precision", "absoluteMin", "absoluteMax")	  
+	    
+	  # If this is a SWAT+ paramter file
+	  } else {
+	 
+	    param <- read.table(swatParamFile, skip = 2, header = TRUE, sep = "")
 	  }
-
-	  swat_param <- swat_param[-check]
-
-	  param <- read.table(textConnection(swat_param))
-	  colnames(param) <- c("parameter", "lineNumber", "startPosition",
-	                       "endPosition","precision", "absoluteMin", "absoluteMax")
 
 	  return(param)
 	}
@@ -328,149 +347,158 @@
 	
 	loadParamChangeFileContent <- function(HRUinfo, paraSelection, SWATParam, TxtInOutFolder){
 
-     # List of all file types (according to the spatial resolution)
-	  hruBasedFile <- c("hru", "gw", "mgt", "chm", "sdr", "sep", "sol")
-	  subBasedFile <- c("sub", "rte", "swq", "pnd")
-	  resFile <- c("res")
-	  basinBasedFile <- c("wwq", "bsn")
-
-	  # Convert paraSelection to list object
-	  selectCriteria <- list()
 	  change <- list()
-	  change$parameterRange <- list()
-	  change$atLine <-list()
-	  change$atPosition <- list()
-	  change$numberFormat <- list()
-	  change$changeMethod <- list()
-	  change$applyValue <- list()
-
-	  counter <- 0
 	  
-	  for (i in 1:nrow(paraSelection)){
-      para <- trimws(paraSelection[i,1])
-      temp <-  strsplit(para, split = '.', fixed = TRUE)[[1]]
-      fileType <- temp[2]
-	    changeMethod <- trimws(paraSelection[i,2])
+	  # If this is SWAT+ project
+	  if (ncol(HRUinfo) == 6){
+	    # List of all file types (according to the spatial resolution)
+	    hruBasedFile <- c("hru", "gw", "mgt", "chm", "sdr", "sep", "sol")
+	    subBasedFile <- c("sub", "rte", "swq", "pnd")
+	    resFile <- c("res")
+	    basinBasedFile <- c("wwq", "bsn")
 	    
-	    if (i == 1) {
-	      change$parameterRange <- matrix(as.numeric(paraSelection[i,3:4]), ncol = 2)
-	    } else {
-	      change$parameterRange <- rbind(change$parameterRange, 
-	                                     as.numeric(paraSelection[i,3:4]))
-	    }
-
-	    # Check if there is new files/parameters added by user
-	    if (length(temp) == 3){
-	      files <- paste(temp[2], ".", temp[3], sep = "") 
-	    } else {
-	      if(fileType %in% hruBasedFile){
-	        selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
-	        selectCriteria$lu <- trimws(strsplit(paraSelection[i,6], split=",")[[1]])
-	        selectCriteria$soil <- trimws(strsplit(paraSelection[i,7], split=",")[[1]])
-	        selectCriteria$slope <- trimws(strsplit(paraSelection[i,8], split=",")[[1]])	
-	      } else if (fileType %in% subBasedFile){
-	        selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
-	      } else if (fileType %in% resFile){
-	        selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
+	    # Convert paraSelection to list object
+	    selectCriteria <- list()
+	    change$parameterRange <- list()
+	    change$atLine <-list()
+	    change$atPosition <- list()
+	    change$numberFormat <- list()
+	    change$changeMethod <- list()
+	    change$applyValue <- list()
+	    
+	    counter <- 0
+	    
+	    for (i in 1:nrow(paraSelection)){
+	      para <- trimws(paraSelection[i,1])
+	      temp <-  strsplit(para, split = '.', fixed = TRUE)[[1]]
+	      fileType <- temp[2]
+	      changeMethod <- trimws(paraSelection[i,2])
+	      
+	      if (i == 1) {
+	        change$parameterRange <- matrix(as.numeric(paraSelection[i,3:4]), ncol = 2)
 	      } else {
+	        change$parameterRange <- rbind(change$parameterRange, 
+	                                       as.numeric(paraSelection[i,3:4]))
 	      }
 	      
-	      
-	      #Get list of files
-	      if(fileType %in% hruBasedFile){
-	        files <- hruSubset(HRUinfo, selectCriteria)
-	        files <- gsub("hru", fileType, files)
-	      } else if (fileType %in% subBasedFile){
-          if ("All" %in% selectCriteria$sub) { 
-            selectCriteria$sub <- c(1:max(HRUinfo$sub))
-          } else {
-            selectCriteria$sub <- as.numeric(selectCriteria$sub)
-          }
-	        for(j in 1:length(selectCriteria$sub)){
-	          if (j == 1) {files <- NULL}
-	          files <- c(files, paste(subtofilename(
-	            as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
-	        }
-	      } else if (fileType %in% resFile){
-	        if ("All" %in% selectCriteria$sub) { 
-	          selectCriteria$sub <- substring(list.files(TxtInOutFolder,'.res'), 1, 
-	                             nchar(list.files(TxtInOutFolder,'.res') ) - 8)
+	      # Check if there is new files/parameters added by user
+	      if (length(temp) == 3){
+	        files <- paste(temp[2], ".", temp[3], sep = "") 
+	      } else {
+	        if(fileType %in% hruBasedFile){
+	          selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
+	          selectCriteria$lu <- trimws(strsplit(paraSelection[i,6], split=",")[[1]])
+	          selectCriteria$soil <- trimws(strsplit(paraSelection[i,7], split=",")[[1]])
+	          selectCriteria$slope <- trimws(strsplit(paraSelection[i,8], split=",")[[1]])	
+	        } else if (fileType %in% subBasedFile){
+	          selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
+	        } else if (fileType %in% resFile){
+	          selectCriteria$sub <- trimws(strsplit(paraSelection[i,5], split=",")[[1]])
 	        } else {
-	          selectCriteria$sub <- as.numeric(selectCriteria$sub)
-	        }
-	        for(j in 1:length(selectCriteria$sub)){
-	          if (j == 1) {files <- NULL}
-	          files <- c(files, paste(subtofilename(
-	            as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
 	        }
 	        
-	      } else {
-	        files <- paste("basins.", fileType, sep="")
-	      }	      
-	    }
-        
-        
-	    
-	    # Find location of the parameters in the file
-	    index <- which(SWATParam$parameter == para)
-	    atLine <- SWATParam$lineNumber[[index]]
-	    atPosition <- c(SWATParam$startPosition[[index]], 
-	                    SWATParam$endPosition[[index]])
-	    numberFormat <-   paste('%', atPosition[2] - atPosition[1] + 1, '.', 
-	                            SWATParam$precision[[index]], 'f', sep ="")
-	    absoluteMin <- SWATParam$absoluteMin[[index]]
-	    absoluteMax <- SWATParam$absoluteMax[[index]]
-
-	    if (i == 1){
-	      nfiles <- length(files)
-	      change$file <- files
-	      for (j in 1:nfiles){
-	        change$atLine[[j]] <- atLine
-	        change$atPosition[[j]] <- matrix(atPosition,ncol = 2, byrow = TRUE)
-	        change$numberFormat[[j]] <- numberFormat
-	        change$changeMethod[[j]] <- changeMethod
-	        change$applyValue[[j]] <- i
-	        change$absoluteMin[[j]] <- absoluteMin
-	        change$absoluteMax[[j]] <- absoluteMax
+	        
+	        #Get list of files
+	        if(fileType %in% hruBasedFile){
+	          files <- hruSubset(HRUinfo, selectCriteria)
+	          files <- gsub("hru", fileType, files)
+	        } else if (fileType %in% subBasedFile){
+	          if ("All" %in% selectCriteria$sub) { 
+	            selectCriteria$sub <- c(1:max(HRUinfo$sub))
+	          } else {
+	            selectCriteria$sub <- as.numeric(selectCriteria$sub)
+	          }
+	          for(j in 1:length(selectCriteria$sub)){
+	            if (j == 1) {files <- NULL}
+	            files <- c(files, paste(subtofilename(
+	              as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
+	          }
+	        } else if (fileType %in% resFile){
+	          if ("All" %in% selectCriteria$sub) { 
+	            selectCriteria$sub <- substring(list.files(TxtInOutFolder,'.res'), 1, 
+	                                            nchar(list.files(TxtInOutFolder,'.res') ) - 8)
+	          } else {
+	            selectCriteria$sub <- as.numeric(selectCriteria$sub)
+	          }
+	          for(j in 1:length(selectCriteria$sub)){
+	            if (j == 1) {files <- NULL}
+	            files <- c(files, paste(subtofilename(
+	              as.integer(selectCriteria$sub[j])), ".", fileType, sep ="")) 
+	          }
+	          
+	        } else {
+	          files <- paste("basins.", fileType, sep="")
+	        }	      
 	      }
 	      
-	    } else {
 	      
-	      # Find if old files need to be updated
-	      intersectFiles <- intersect(change$file,files)
-	      if (length(intersectFiles) >= 1){
-	        idx <-  which(change$file %in% intersectFiles)	   
-	        for (j in 1:length(idx)){
-	          change$atLine[[idx[j]]] <- c(change$atLine[[idx[j]]], atLine)
-	          change$atPosition[[idx[j]]] <- rbind(change$atPosition[[idx[j]]], c(atPosition))
-	          change$numberFormat[[idx[j]]] <- c(change$numberFormat[[idx[j]]], numberFormat)
-	          change$changeMethod[[idx[j]]] <- c(change$changeMethod[[idx[j]]], changeMethod)
-	          change$applyValue[[idx[j]]] <- c(change$applyValue[[idx[j]]], i)
-	          change$absoluteMin[[idx[j]]] <- c(change$absoluteMin[[idx[j]]], absoluteMin)
-	          change$absoluteMax[[idx[j]]] <- c(change$absoluteMax[[idx[j]]], absoluteMax)
-	        }	
-	      }
 	      
-	      change$file <- unique(c(change$file, files))
-	      nfiles <- length(change$file)
+	      # Find location of the parameters in the file
+	      index <- which(SWATParam$parameter == para)
+	      atLine <- SWATParam$lineNumber[[index]]
+	      atPosition <- c(SWATParam$startPosition[[index]], 
+	                      SWATParam$endPosition[[index]])
+	      numberFormat <-   paste('%', atPosition[2] - atPosition[1] + 1, '.', 
+	                              SWATParam$precision[[index]], 'f', sep ="")
+	      absoluteMin <- SWATParam$absoluteMin[[index]]
+	      absoluteMax <- SWATParam$absoluteMax[[index]]
 	      
-	      if (nfiles > counter){
-	        for (j in (counter+1):nfiles){
+	      if (i == 1){
+	        nfiles <- length(files)
+	        change$file <- files
+	        for (j in 1:nfiles){
 	          change$atLine[[j]] <- atLine
-	          change$atPosition[[j]] <- matrix(atPosition, ncol = 2, byrow = TRUE) 
+	          change$atPosition[[j]] <- matrix(atPosition,ncol = 2, byrow = TRUE)
 	          change$numberFormat[[j]] <- numberFormat
 	          change$changeMethod[[j]] <- changeMethod
 	          change$applyValue[[j]] <- i
 	          change$absoluteMin[[j]] <- absoluteMin
 	          change$absoluteMax[[j]] <- absoluteMax
-	        }	        
-	      }
-	    }	    
-	    counter <- nfiles	    
+	        }
+	        
+	      } else {
+	        
+	        # Find if old files need to be updated
+	        intersectFiles <- intersect(change$file,files)
+	        if (length(intersectFiles) >= 1){
+	          idx <-  which(change$file %in% intersectFiles)	   
+	          for (j in 1:length(idx)){
+	            change$atLine[[idx[j]]] <- c(change$atLine[[idx[j]]], atLine)
+	            change$atPosition[[idx[j]]] <- rbind(change$atPosition[[idx[j]]], c(atPosition))
+	            change$numberFormat[[idx[j]]] <- c(change$numberFormat[[idx[j]]], numberFormat)
+	            change$changeMethod[[idx[j]]] <- c(change$changeMethod[[idx[j]]], changeMethod)
+	            change$applyValue[[idx[j]]] <- c(change$applyValue[[idx[j]]], i)
+	            change$absoluteMin[[idx[j]]] <- c(change$absoluteMin[[idx[j]]], absoluteMin)
+	            change$absoluteMax[[idx[j]]] <- c(change$absoluteMax[[idx[j]]], absoluteMax)
+	          }	
+	        }
+	        
+	        change$file <- unique(c(change$file, files))
+	        nfiles <- length(change$file)
+	        
+	        if (nfiles > counter){
+	          for (j in (counter+1):nfiles){
+	            change$atLine[[j]] <- atLine
+	            change$atPosition[[j]] <- matrix(atPosition, ncol = 2, byrow = TRUE) 
+	            change$numberFormat[[j]] <- numberFormat
+	            change$changeMethod[[j]] <- changeMethod
+	            change$applyValue[[j]] <- i
+	            change$absoluteMin[[j]] <- absoluteMin
+	            change$absoluteMax[[j]] <- absoluteMax
+	          }	        
+	        }
+	      }	    
+	      counter <- nfiles	    
+	    }
+	    
+	    change$fileContent <- readContentFiles(TxtInOutFolder, change$file)
+	    change$paramFlag <- change$applyValue
+	    
+	  # This is SWAT project
+	  } else {
+	    change$file <- "calibration.cal"
 	  }
-	  
-	  change$fileContent <- readContentFiles(TxtInOutFolder, change$file)
-	  change$paramFlag <- change$applyValue
+
 	  
 	  return(change)
 	}
@@ -530,4 +558,159 @@
 	  return(temp)
 	}
 	
-   
+
+#-------------------------------------------------------------------------------
+# update calibration.cal file with new parameter
+#-------------------------------------------------------------------------------	
+	updateCalibrationFile <- function(paraSelection, parameterValue, currentDirectory){
+	  
+	  # condition type
+	  conTyp <- c("hsg=", "texture=", "plant=", "landuse=", "region=", "region_lte=")
+	  
+	  
+	  fileContent <- c()
+	  fileContent[1] <- "calibration.cal file is created by R-SWAT"
+	  fileContent[2] <- as.character(nrow(paraSelection)) 
+	  fileContent[3] <- "cal_parm            chg_typ       chg_val    conds soil_lyr1 soil_lyr2       yr1       yr2      day1      day2   obj_tot"
+
+	  # Change to SWAT+ keywords
+	  paraSelection[,2] <- gsub("replace", "absval", paraSelection[,2])  
+	  paraSelection[,2] <- gsub("relative", "relchg", paraSelection[,2])  
+	  paraSelection[,2] <- gsub("absolute", "abschg", paraSelection[,2])  
+	  
+	  # Remove the extention e.g., .hru in the parameter selection data
+	  paraName <- strsplit(trimws(paraSelection[,c(1)]), '[.]')
+	  for (i in 1:length(paraName)){
+	    paraSelection[i,1] <- paraName[[i]][1]
+	  }
+	  
+	  # remove spaces in object and conditions
+	  paraSelection[,5] <- gsub(" ", "", paraSelection[,5], fixed = TRUE)
+	  paraSelection[,6] <- gsub(" ", "", paraSelection[,6], fixed = TRUE)	  
+
+	  lineCounter <- 3
+	  for (i in 1:nrow(paraSelection)){
+	    
+	    # Parameter value
+	    val <- parameterValue[i]
+	    
+	    # Soil layer 1 value
+	    lyr1 <- 0
+	    if(grepl("lyr1=", paraSelection[i,6], fixed = TRUE)){
+	      temp <- strsplit(paraSelection[i,6], ";")[[1]]
+	      for (j in 1:length(temp)){
+	        if (grepl("lyr1=", temp[j], fixed = TRUE)){
+	          layerNr <- strsplit(temp[j], "=")[[1]]
+	          lyr1 <- as.numeric(layerNr[length(layerNr)])
+	        }
+	      }
+	    }
+
+	    
+	    # Soil layer 2 value
+	    lyr2 <- 0
+	    if(grepl("lyr2=", paraSelection[i,6], fixed = TRUE)){
+	      temp <- strsplit(paraSelection[i,6], ";")[[1]]
+	      for (j in 1:length(temp)){
+	        if (grepl("lyr2=", temp[j], fixed = TRUE)){
+	          layerNr <- strsplit(temp[j], "=")[[1]]
+	          lyr2 <- as.numeric(layerNr[length(layerNr)])
+	        }
+	      }
+	    }
+	    
+	    year1 <- 0
+	    day1 <- 0
+	    if(grepl("year1=", paraSelection[i,6], fixed = TRUE)){
+	      temp <- strsplit(paraSelection[i,6], ";")[[1]]
+	      for (j in 1:length(temp)){
+	        if (grepl("year1=", temp[j], fixed = TRUE)){
+	          time <- strsplit(temp[j], "=")[[1]]
+	          year1 <- as.numeric(substr(time[length(time)], 1, 4))
+	          day1 <- difftime(as.Date(time[length(time)], "%Y%m%d") + 1,
+	                             as.Date(paste(substr(time[length(time)], 1, 4), 
+	                                           "0101", sep = ""),  "%Y%m%d"), "days")
+	          day1 <- as.numeric(day1)
+	           
+	        }
+	      }
+	    }	    
+	    
+	    year2 <- 0
+	    day2 <- 0
+	    if(grepl("year2=", paraSelection[i,6], fixed = TRUE)){
+	      temp <- strsplit(paraSelection[i,6], ";")[[1]]
+	      for (j in 1:length(temp)){
+	        if (grepl("year2=", temp[j], fixed = TRUE)){
+	          time <- strsplit(temp[j], "=")[[1]]
+	          year2 <- as.numeric(substr(time[length(time)], 1, 4))
+	          day2 <- difftime(as.Date(time[length(time)], "%Y%m%d") + 1,
+	                           as.Date(paste(substr(time[length(time)], 1, 4), 
+	                                         "0101", sep = ""),  "%Y%m%d"), "days")
+	          day2 <- as.numeric(day2)
+	          
+	        }
+	      }
+	    }	
+	    
+	    # object total
+	    if (paraSelection[i,5] == ""){
+	      obj_tot <- 0
+	      obj <-  " "
+	    } else {
+	      obj_tot <- length(eval(parse(text = paste("c(",paraSelection[i,5], ")", sep = "" ))))
+	      obj <- gsub( ":", ",-", paraSelection[i,5])
+	      obj <- as.numeric(strsplit(obj, ",")[[1]])
+	    }
+	    
+	    condition <- c()
+	    conds <- 0
+	    # condition on hsg, texture, landuse, plant,...
+	    if(grepl("hsg=", paraSelection[i,6], fixed = TRUE)){
+	      temp <- strsplit(paraSelection[i,6], ";", fixed = TRUE)[[1]]
+	      for (j in 1:length(temp)){
+	        
+	        # hsg condition
+	        for (cond in 1:length(conTyp)){
+	          if(grepl(conTyp[cond], temp[j], fixed = TRUE)){
+	            condsplit <- strsplit(gsub(conTyp[cond], "", temp[j], fixed = TRUE), ",")[[1]]
+	            condsplit <- sort(condsplit)
+	            conds <- conds + length(condsplit)
+	            for (k in 1:length(condsplit)){
+	              condition[length(condition) + 1] <- paste(format(gsub("=", "", conTyp[cond], fixed = TRUE), width = 20, justify = "left"),
+	                                                        format("=", width = 10, justify = "left"), 
+	                                                        format(0, digits = 5, width = 10, justify = "right"),
+	                                                        format(condsplit[k], width = 10, justify = "right"),
+	                                                        sep = "")
+	            }
+	          }	          
+	        }
+	      }
+	    }
+	    
+	    lineCounter <- lineCounter + 1
+	    fileContent[lineCounter]  <- paste(format(paraSelection[i,1], width = 20, justify = "left"), 
+	                                       format(paraSelection[i,2], width = 10, justify = "left"), 
+	                                       format(round(parameterValue[i], 5), nsmall = 5, width = 10, justify = "right"),
+	                                       format(conds, width = 10, justify = "right"),
+	                                       format(lyr1, width = 10, justify = "right"),
+	                                       format(lyr2, width = 10, justify = "right"),
+	                                       format(year1, width = 10, justify = "right"),
+	                                       format(year2, width = 10, justify = "right"),
+	                                       format(day1, width = 10, justify = "right"),
+	                                       format(day2, width = 10, justify = "right"),
+	                                       format(obj_tot, width = 10, justify = "right"),
+	                                       paste(format(obj, width = 10, justify = "right"), collapse = ""),
+	                                       sep = "")
+	    
+	    if (conds > 0){
+	      for (m in 1:conds){
+	        lineCounter <- lineCounter + 1
+	        fileContent[lineCounter]  <- condition[m]
+	      }
+	    }
+	    
+	  }
+
+	  writeLines(fileContent, paste(currentDirectory, "/", "calibration.cal", sep = ""))
+	}

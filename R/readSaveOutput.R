@@ -109,6 +109,63 @@ readWatoutFile <- function(workingDirectory,
   return(output)
 }
 
+
+#-------------------------------------------------------------------------------
+# Read channel_sd_day.txt file, data is always at daily timestep
+# ------------------------------------------------------------------------------
+readChannel_sd_dayFile <- function(workingDirectory, 
+                              coreNumber, 
+                              fileName, 
+                              fromToDate, 
+                              colNumber, 
+                              fileCioInfo,
+                              rchNumber,
+                              output){
+  
+  
+  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", 
+                    fileName, sep = "")
+  
+  # Get file content/data
+  getChannel_sd_dayData <- read.table(fileName, header = FALSE, sep = "", skip = 3)
+  nrows <- nrow(getChannel_sd_dayData)
+  
+  # Get simulation time series (assume data is at daily time step)
+  startTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[1,4])),"0101", 
+                             sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[1,1]) - 1
+  
+  endTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[nrows,4])),"0101", 
+                           sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[nrows,1]) - 1
+  
+  # Generate time sequence (stat - end simulation time)
+  timeSeries <- seq(startTime, endTime, by="days")
+  
+  # Number of channels
+  nRch <- max(getChannel_sd_dayData$V5)
+  
+  ntimeStep <- nrow(getChannel_sd_dayData)/nRch
+  trim <- c(which(timeSeries ==  fromToDate[1]), 
+            which(timeSeries ==  fromToDate[2]))
+  
+  
+  
+  varNumber <- length(output)
+  
+  for (i in 1:length(colNumber)){
+    for (j in 1:length(rchNumber[[i]])){
+      
+      varNumber <- varNumber + 1
+      output[[varNumber]] <- getChannel_sd_dayData[seq(from = rchNumber[[i]][j], 
+                                                  to = nrow(getChannel_sd_dayData), 
+                                                  by = nRch),
+                                              colNumber[i]]
+      output[[varNumber]] <- output[[varNumber]][c(trim[1]:trim[2])]        
+    }
+  }
+  
+  return(output)
+}
+
 #-------------------------------------------------------------------------------
 # Save output
 #-------------------------------------------------------------------------------
@@ -150,6 +207,17 @@ saveOutput <- function(workingDirectory,
                                   fileCioInfo,
                                   getRchNumber(rchNumber[i]),
                                   output)
+      
+    } else if (fileType[i] == "channel_sd_day.txt"  ){
+      output <- readChannel_sd_dayFile(workingDirectory,
+                                  coreNumber, 
+                                  fileName[i], 
+                                  fromToDate,
+                                  as.numeric(strsplit(colNumber[i],split = ",")[[1]]),
+                                  fileCioInfo,
+                                  getRchNumber(rchNumber[i]),
+                                  output)
+      
     } else if (fileType[i] == "userReadSwatOutput"){
       workingDir <- paste(workingDirectory, "/TxtInOut_", coreNumber, sep = "")
       setwd(workingDir)
@@ -190,47 +258,108 @@ saveOutput <- function(workingDirectory,
 # Get fileCio information (warmup + calibration period)
 getFileCioInfo <- function(TxtInOut){
   
+  info <- list()
+  
   if(substr(TxtInOut,(nchar(TxtInOut)-3), nchar(TxtInOut)) == ".cio"){
     fileCio <- readLines(TxtInOut, 60)
   } else {
     fileCio <- readLines(paste(TxtInOut, "/file.cio", sep = ""), 60)
   }
 
-  startSim <- as.Date(paste(substr(fileCio[9],13,17), "0101", sep=""), "%Y%m%d")
-  startSim <- startSim + as.numeric(substr(fileCio[10],13,17)) - 1
-  
-  endSim <- as.Date(paste(
-    toString(
-      as.numeric(substr(fileCio[9],13,17)) + 
-        as.numeric(substr(fileCio[8],13,17)) - 1
-    ), 
-    "0101", 
-    sep=""
-  ), 
-  "%Y%m%d")
-  
-  endSim <- endSim + as.numeric(substr(fileCio[11],13,17)) - 1
-  nyearSkip  <- as.numeric(substr(fileCio[60],13,16))
-  
-  if(nyearSkip == 0){
-    startEval <- startSim
-  } else {
-    startEval <- as.Date(paste(
+  # Check whether this is TxtInOut of SWAT or SWAT+
+  if (substr(fileCio[8], 21,44) == "| NBYR : Number of years"){
+    startSim <- as.Date(paste(substr(fileCio[9],13,17), "0101", sep=""), "%Y%m%d")
+    startSim <- startSim + as.numeric(substr(fileCio[10],13,17)) - 1
+    
+    endSim <- as.Date(paste(
       toString(
-        as.numeric(substr(fileCio[9],13,17)) + nyearSkip
+        as.numeric(substr(fileCio[9],13,17)) + 
+          as.numeric(substr(fileCio[8],13,17)) - 1
       ), 
       "0101", 
       sep=""
     ), 
     "%Y%m%d")
+    
+    endSim <- endSim + as.numeric(substr(fileCio[11],13,17)) - 1
+    nyearSkip  <- as.numeric(substr(fileCio[60],13,16))
+    
+    if(nyearSkip == 0){
+      startEval <- startSim
+    } else {
+      startEval <- as.Date(paste(
+        toString(
+          as.numeric(substr(fileCio[9],13,17)) + nyearSkip
+        ), 
+        "0101", 
+        sep=""
+      ), 
+      "%Y%m%d")
+    }
+
+    # Display the range of selected day for output extraction    
+    info$startSim <- startSim
+    info$startEval <- startEval
+    info$endSim <- endSim
+    info$timeStepCode <- as.numeric(substr(fileCio[59],13,16))
+    
+  # SWAT+ project, simulation time in different file
+  } else {
+    
+    # Read simulation time information from the time.sim file
+    simTime <- read.table(paste(TxtInOut, "/", "time.sim", sep = ""), skip = 2, sep = "")
+    
+    # Find the starting date of simulation
+    startSim <- as.Date(paste(toString(as.numeric(simTime[2])),"0101", 
+                              sep=""), "%Y%m%d") + as.numeric(simTime[1])
+    
+    # Find the ending date of simulation
+    if(as.numeric(simTime[3]) == 0){
+      endSim <- as.Date(paste(toString(as.numeric(simTime[4])),"1231",
+                              sep=""), "%Y%m%d")
+    } else {
+      endSim <- as.Date(paste(toString(as.numeric(simTime[4])),"0101",
+                              sep=""), "%Y%m%d") + as.numeric(simTime[3]) - 1      
+    }
+
+    
+    # Step
+    timeStepCode <- as.numeric(simTime[5])
+    
+    # Find start of eval or printing
+    printTime <- readLines(paste(TxtInOut, "/print.prt", sep = ""), 3)
+    printTime <- as.numeric(strsplit(trimws(printTime[3]), " +")[[1]])
+
+    startPrint <- max(printTime[1] + as.numeric(simTime[2]) , printTime[3])
+    startPrint <- as.Date(paste(startPrint, "0101", sep = ""), "%Y%m%d") + 
+      max(1, printTime[2]) - 1
+
+    if ((printTime[4] > 0) & (printTime[5] > 0)) {
+      endPrint <- min(endSim, as.Date(paste(printTime[5], "0101", sep = ""), "%Y%m%d") + 
+                        max(1, printTime[4]) - 1)      
+    } else {
+      if (printTime[5] == 0){
+        if (printTime[4] == 0){
+          endPrint <- endSim
+        } else {
+          endPrint <- as.Date(paste(toString(as.numeric(simTime[4])),"0101",
+                                    sep=""), "%Y%m%d") + as.numeric(printTime[4]) - 1
+        }
+      } else {
+        endPrint <- min(endSim, as.Date(paste(printTime[5], "0101", sep = ""), "%Y%m%d") + 
+                          max(1, printTime[4]) - 1)         
+      }
+    }
+    
+    # Display the range of selected day for output extraction
+    info$startSim <- startSim
+    info$startEval <- startPrint
+    info$endSim <- endPrint
+    info$timeStepCode <- timeStepCode
+    
   }
   
-  info <- list()
-  info$startSim <- startSim
-  info$startEval <- startEval
-  info$endSim <- endSim
-  info$timeStepCode <- as.numeric(substr(fileCio[59],13,16))
-  
+
   return(info)
 }
 
