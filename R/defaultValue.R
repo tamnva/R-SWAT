@@ -55,7 +55,7 @@ dataParaSelectionSWATPlus <- data.frame(Parameter = c('cn2.hru', 'canmx.hru', 'e
                                            'replace'),
                                 Min = c(-0.25,1, 0, 0, 0.01, 0.05,0, 0, 3.0, 0.5),
                                 Max = c(0.25,10, 1, 20, 1, 10, 10, 10, 6.0, 20),
-                                Object = c("1-3,5,7-8",NA, NA, NA, NA, NA, NA, NA, NA, NA),
+                                Object = c("1:3,5,7:8",NA, NA, NA, NA, NA, NA, NA, NA, NA),
                                 Conditions = c("hgs=A,B,C; lyr1=1; lyr2=2; landuse = corn, past", NA, NA, NA, NA, NA, NA, NA, NA, NA))
 
 
