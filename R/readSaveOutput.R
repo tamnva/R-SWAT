@@ -1,3 +1,7 @@
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#                         Read outputs from SWAT                               #
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+
 # ------------------------------------------------------------------------------
 # Read output from output.rch, output.sub, output.hru files, 
 # Output from these files are always at daily time step, without warm up period
@@ -109,62 +113,6 @@ readWatoutFile <- function(workingDirectory,
   return(output)
 }
 
-
-#-------------------------------------------------------------------------------
-# Read channel_sd_day.txt file, data is always at daily timestep
-# ------------------------------------------------------------------------------
-readChannel_sd_dayFile <- function(workingDirectory, 
-                              coreNumber, 
-                              fileName, 
-                              fromToDate, 
-                              colNumber, 
-                              fileCioInfo,
-                              rchNumber,
-                              output){
-  
-  
-  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", 
-                    fileName, sep = "")
-  
-  # Get file content/data
-  getChannel_sd_dayData <- read.table(fileName, header = FALSE, sep = "", skip = 3)
-  nrows <- nrow(getChannel_sd_dayData)
-  
-  # Get simulation time series (assume data is at daily time step)
-  startTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[1,4])),"0101", 
-                             sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[1,1]) - 1
-  
-  endTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[nrows,4])),"0101", 
-                           sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[nrows,1]) - 1
-  
-  # Generate time sequence (stat - end simulation time)
-  timeSeries <- seq(startTime, endTime, by="days")
-  
-  # Number of channels
-  nRch <- max(getChannel_sd_dayData$V5)
-  
-  ntimeStep <- nrow(getChannel_sd_dayData)/nRch
-  trim <- c(which(timeSeries ==  fromToDate[1]), 
-            which(timeSeries ==  fromToDate[2]))
-  
-  
-  
-  varNumber <- length(output)
-  
-  for (i in 1:length(colNumber)){
-    for (j in 1:length(rchNumber[[i]])){
-      
-      varNumber <- varNumber + 1
-      output[[varNumber]] <- getChannel_sd_dayData[seq(from = rchNumber[[i]][j], 
-                                                  to = nrow(getChannel_sd_dayData), 
-                                                  by = nRch),
-                                              colNumber[i]]
-      output[[varNumber]] <- output[[varNumber]][c(trim[1]:trim[2])]        
-    }
-  }
-  
-  return(output)
-}
 
 #-------------------------------------------------------------------------------
 # Save output
@@ -377,4 +325,65 @@ appendListObject <- function(listA, listB){
   }
   
   return(listA)
+}
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#                         Read outputs from SWAT +                             #
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+
+#-------------------------------------------------------------------------------
+# Read channel_sd_xxx.txt file, data is always at daily timestep
+#                 xxx could be "day", "month", or "yr"
+# ------------------------------------------------------------------------------
+readChannel_sd_dayFile <- function(workingDirectory, 
+                                   coreNumber, 
+                                   fileName, 
+                                   fromToDate, 
+                                   colNumber, 
+                                   fileCioInfo,
+                                   rchNumber,
+                                   output){
+  
+  
+  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", 
+                    fileName, sep = "")
+  
+  # Get file content/data
+  getChannel_sd_dayData <- read.table(fileName, header = FALSE, sep = "", skip = 3)
+  nrows <- nrow(getChannel_sd_dayData)
+  
+  # Get simulation time series (assume data is at daily time step)
+  startTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[1,4])),"0101", 
+                             sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[1,1]) - 1
+  
+  endTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[nrows,4])),"0101", 
+                           sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[nrows,1]) - 1
+  
+  # Generate time sequence (stat - end simulation time)
+  timeSeries <- seq(startTime, endTime, by="days")
+  
+  # Number of channels
+  nRch <- max(getChannel_sd_dayData$V5)
+  
+  ntimeStep <- nrow(getChannel_sd_dayData)/nRch
+  trim <- c(which(timeSeries ==  fromToDate[1]), 
+            which(timeSeries ==  fromToDate[2]))
+  
+  
+  
+  varNumber <- length(output)
+  
+  for (i in 1:length(colNumber)){
+    for (j in 1:length(rchNumber[[i]])){
+      
+      varNumber <- varNumber + 1
+      output[[varNumber]] <- getChannel_sd_dayData[seq(from = rchNumber[[i]][j], 
+                                                       to = nrow(getChannel_sd_dayData), 
+                                                       by = nRch),
+                                                   colNumber[i]]
+      output[[varNumber]] <- output[[varNumber]][c(trim[1]:trim[2])]        
+    }
+  }
+  
+  return(output)
 }

@@ -591,6 +591,17 @@
 	  lineCounter <- 3
 	  for (i in 1:nrow(paraSelection)){
 	    
+	    # If "All" or "all" then select all object and conditions
+	    if(grepl("All", paraSelection[i,6], fixed = TRUE) |
+	       grepl("all", paraSelection[i,6], fixed = TRUE)){
+	      paraSelection[i,6] <- ""
+	    }
+
+	    if(grepl("All", paraSelection[i,5], fixed = TRUE) |
+	       grepl("all", paraSelection[i,5], fixed = TRUE)){
+	      paraSelection[i,5] <- ""
+	    }
+	    
 	    # Parameter value
 	    val <- parameterValue[i]
 	    

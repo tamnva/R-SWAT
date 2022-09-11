@@ -89,16 +89,11 @@ checkSwatParameterName <- function(paraSelection, SWATParam, HRUinfo, SWATProjec
   # SWAT+ project
   } else {
     # Get the selected parameter name
-    selectedParam <- strsplit(paraSelection[,1], '[.]')
+    selectedParam <- paraSelection[,1]
     
-    # Remove the parameter extension e.g., .hru
-    temp <- c()
-    for (i in 1:length(selectedParam)){
-      temp <- c(temp, selectedParam[[i]][1])
-    }
     
     # Check if the selected parameter in the SWATParam
-    check <- check & all(temp %in% SWATParam[,1])
+    check <- check & all(selectedParam %in% paste(SWATParam[,1], ".", SWATParam[,2], sep = ""))
     
     # Display message if check is not true
     if (!check){

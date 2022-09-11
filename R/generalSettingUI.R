@@ -41,7 +41,7 @@ generalSettingUI <- function(id) {
                        "C:/RSWAT_demo/workingFolder",
                        width = "100%"
              ),
-             textOutput("checkWorkingFolder"),
+             span(textOutput("checkWorkingFolder"), style="color:red"),
       ),
       
       column(width = 1,
@@ -62,7 +62,7 @@ generalSettingUI <- function(id) {
                        "C:/RSWAT_demo/R-SWAT-master/data/TxtInOut",
                        width = "100%"
              ),
-             textOutput("checkTxtInOutFolder"),
+             span(textOutput("checkTxtInOutFolder"), style="color:red"),
              
       ),
       

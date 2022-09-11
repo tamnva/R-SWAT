@@ -13,7 +13,7 @@ introductionUI <- function(id) {
     fluidRow( 
       # Input UI 
       column(width = 10,
-             includeHTML("introduction.html")
+             includeHTML("HTML/introduction.html")
       ),
 
     )
