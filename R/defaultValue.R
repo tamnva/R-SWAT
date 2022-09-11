@@ -48,15 +48,17 @@ columnsParaSelectionSWAT <- data.frame(title= colnames(dataParaSelectionSWAT),
 dataParaSelectionSWATPlus <- data.frame(Parameter = c('cn2.hru', 'canmx.hru', 'esco.hru', 
                                               'k.sol', 'awc.sol', 'surlag.bsn',
                                                'msk_co1.bsn', 'msk_co2.bsn', 'chk.rte'
-                                              , 'wd_rto.rt'),
+                                              , 'wd_rto.rte'),
                                 Change = c('relative', 'replace', 'replace', 
                                            'replace', 'replace', 'replace', 
                                            'replace', 'replace', 'replace', 
                                            'replace'),
                                 Min = c(-0.25,1, 0, 0, 0.01, 0.05,0, 0, 3.0, 0.5),
                                 Max = c(0.25,10, 1, 20, 1, 10, 10, 10, 6.0, 20),
-                                Object = c("1:3,5,7:8",NA, NA, NA, NA, NA, NA, NA, NA, NA),
-                                Conditions = c("hgs=A,B,C; lyr1=1; lyr2=2; landuse = corn, past", NA, NA, NA, NA, NA, NA, NA, NA, NA))
+                                Object = c("1:3,5,7:8",rep("All",9)),
+                                Conditions = c("hgs=A,B,C; lyr1=1; lyr2=2", 
+                                               "landuse = corn, past", 
+                                               rep("All",8)))
 
 
 columnsParaSelectionSWATPlus <- data.frame(title= colnames(dataParaSelectionSWATPlus),
@@ -89,10 +91,14 @@ columnsParaSelectionSWATPlus <- data.frame(title= colnames(dataParaSelectionSWAT
 # ------------------------------------------------------------------------------
 # Default output variables SWAT+
 # ------------------------------------------------------------------------------
-dataOutputExtractionSWATPlus <- data.frame(FileType = c('channel_sd_day.txt'),
-                                   FileName = c('channel_sd_day.txt'),
-                                   Column = c("53"),
-                                   Reach = c("1")
+dataOutputExtractionSWATPlus <- data.frame(FileType = c('channel_sd_day.txt', 
+                                                        'userReadSwatOutput'),
+                                   FileName = c('channel_sd_day.txt', 
+                                                NA),
+                                   Column = c("48, 53",
+                                              "1"),
+                                   Reach = c("1, 2 * 1, 2, 3",
+                                             NA)
 )
 
 

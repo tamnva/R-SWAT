@@ -86,7 +86,7 @@ runSwatUI <- function(id) {
       #-------------------------------------------------------------------------       
       column(width = 10,
              sliderInput("ncores", 
-                         "3. Select number of parallel runs (cores)", 
+                         "3. Select number of parallel runs (threads)", 
                          value = 4, 
                          min = 1, 
                          max = detectCores(),

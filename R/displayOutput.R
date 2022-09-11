@@ -148,7 +148,8 @@ printVariableNameObservedFiles <- function(outputExtraction){
                                               ".txt", sep = "")
       }
     }else if ((outputExtraction$FileType[i] == "output.rsv") | 
-              (outputExtraction$FileType[i] == "output.rch") | 
+              (outputExtraction$FileType[i] == "output.rch") |
+              (outputExtraction$FileType[i] == "channel_sd_day.txt") |
               (outputExtraction$FileType[i] == "output.hru") | 
               (outputExtraction$FileType[i] == "output.sub") | 
               (outputExtraction$FileType[i] == "output.swr")){

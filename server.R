@@ -116,8 +116,11 @@ server <- function(input, output, session) {
       in the working folder", type = "message", duration = 10)
 
       # Save project setting
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/',
-                                           'RSWATproject.rds', sep =''))
+      shinyCatch(
+        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
+                                             'RSWATproject.rds', sep ='')), 
+        blocking_level = "error"
+      )
 
     } else {
 
@@ -199,27 +202,31 @@ server <- function(input, output, session) {
 
       # Update Select SWAT parameters for calibration and/or sensitivity analysis
       if(globalVariable$SWATProject){
-        output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection,
-                                                            columns = columnsParaSelectionSWAT,
-                                                            editable = TRUE,
-                                                            allowInsertRow = TRUE,
-                                                            allowInsertColumn = TRUE,
-                                                            allowDeleteColumn = TRUE,
-                                                            allowDeleteRow = TRUE,
-                                                            rowDrag = TRUE,
-                                                            columnResize = FALSE,
-                                                            wordWrap = TRUE))       
+        output$tableParaSelection <- renderExcel(
+          excelTable(data = globalVariable$paraSelection,
+                     columns = columnsParaSelectionSWAT,
+                     editable = TRUE,
+                     allowInsertRow = TRUE,
+                     allowInsertColumn = TRUE,
+                     allowDeleteColumn = TRUE,
+                     allowDeleteRow = TRUE,
+                     rowDrag = TRUE,
+                     columnResize = FALSE,
+                     wordWrap = TRUE)
+        )       
       } else {
-        output$tableParaSelection <- renderExcel(excelTable(data = globalVariable$paraSelection,
-                                                            columns = columnsParaSelectionSWATPlus,
-                                                            editable = TRUE,
-                                                            allowInsertRow = TRUE,
-                                                            allowInsertColumn = TRUE,
-                                                            allowDeleteColumn = TRUE,
-                                                            allowDeleteRow = TRUE,
-                                                            rowDrag = TRUE,
-                                                            columnResize = FALSE,
-                                                            wordWrap = TRUE))        
+        output$tableParaSelection <- renderExcel(
+          excelTable(data = globalVariable$paraSelection,
+                     columns = columnsParaSelectionSWATPlus,
+                     editable = TRUE,
+                     allowInsertRow = TRUE,
+                     allowInsertColumn = TRUE,
+                     allowDeleteColumn = TRUE,
+                     allowDeleteRow = TRUE,
+                     rowDrag = TRUE,
+                     columnResize = FALSE,
+                     wordWrap = TRUE)
+        )    
       }
 
       # Update Select sensitivity or calibration approach
@@ -238,7 +245,7 @@ server <- function(input, output, session) {
                                     'Read_User_Parameter_File'),
                         selected = globalVariable$samplingApproach)
 
-      # Update Additional information about the selected sensitivty/calibration approach
+      # Update Additional information about the selected sensitivity/calibration approach
       updateTextAreaInput(session,
                           "inputInfo",
                           "3. Additional infomation about the selected sensitivity/calibration approach",
@@ -246,29 +253,31 @@ server <- function(input, output, session) {
 
       # Update define model output for extraction
       if (globalVariable$SWATProject){
-        output$tableOutputExtraction <- 
-          renderExcel(excelTable(data = globalVariable$outputExtraction,
-                                 columns = columnsOutputExtractionSWAT,
-                                 editable = TRUE,
-                                 allowInsertRow = TRUE,
-                                 allowInsertColumn = FALSE,
-                                 allowDeleteColumn = FALSE,
-                                 allowDeleteRow = TRUE,
-                                 rowDrag = FALSE,
-                                 columnResize = FALSE,
-                                 wordWrap = TRUE)) 
+        output$tableOutputExtraction <- renderExcel(
+          excelTable(data = globalVariable$outputExtraction,
+                     columns = columnsOutputExtractionSWAT,
+                     editable = TRUE,
+                     allowInsertRow = TRUE,
+                     allowInsertColumn = FALSE,
+                     allowDeleteColumn = FALSE,
+                     allowDeleteRow = TRUE,
+                     rowDrag = FALSE,
+                     columnResize = FALSE,
+                     wordWrap = TRUE)
+        ) 
       } else {
-        output$tableOutputExtraction <- 
-          renderExcel(excelTable(data = globalVariable$outputExtraction,
-                                 columns = columnsOutputExtractionSWATPlus,
-                                 editable = TRUE,
-                                 allowInsertRow = TRUE,
-                                 allowInsertColumn = FALSE,
-                                 allowDeleteColumn = FALSE,
-                                 allowDeleteRow = TRUE,
-                                 rowDrag = FALSE,
-                                 columnResize = FALSE,
-                                 wordWrap = TRUE))
+        output$tableOutputExtraction <- renderExcel(
+          excelTable(data = globalVariable$outputExtraction,
+                     columns = columnsOutputExtractionSWATPlus,
+                     editable = TRUE,
+                     allowInsertRow = TRUE,
+                     allowInsertColumn = FALSE,
+                     allowDeleteColumn = FALSE,
+                     allowDeleteRow = TRUE,
+                     rowDrag = FALSE,
+                     columnResize = FALSE,
+                     wordWrap = TRUE)
+        )
       }
 
       # Update display corresponding observed file names
@@ -302,7 +311,9 @@ server <- function(input, output, session) {
       output$printObservedDataFile <<- renderText(globalVariable$observedDataFile)
 
       # Show meesage
-      showNotification("All project settings were loaded", type = "message", duration = 10)
+      showNotification("All project settings were loaded", 
+                       type = "message", 
+                       duration = 10)
 
     }
 
@@ -330,7 +341,9 @@ server <- function(input, output, session) {
     
     # Check if the TxtInOut matches the SWAT project
     if (globalVariable$TxtInOutSWAT & globalVariable$SWATPlusProject){
-      output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT ") 
+      output$checkTxtInOutFolder <- renderText(
+        "ERROR: This should be TxtInOut of SWAT "
+        ) 
     } else if (globalVariable$TxtInOutSWAT & globalVariable$SWATProject){
       output$checkTxtInOutFolder <- renderText(" ") 
     } else {
@@ -339,7 +352,9 @@ server <- function(input, output, session) {
 
     # Check if the TxtInOut matches the SWAT+ project    
     if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATProject){
-      output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT+ ") 
+      output$checkTxtInOutFolder <- renderText(
+        "ERROR: This should be TxtInOut of SWAT+ "
+        ) 
     } else if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATPlusProject){
       output$checkTxtInOutFolder <- renderText(" ") 
     } else {
@@ -424,9 +439,11 @@ server <- function(input, output, session) {
     globalVariable$workingFolder <<- trimws(input$workingFolder)
 
     # Save link to the simulation report log file to the global variable
-    globalVariable$CurrentSimulationReportFile <<- paste(globalVariable$workingFolder,
-                                                         '/Output/CurrentSimulationReport.log',
-                                                         sep ='')
+    globalVariable$CurrentSimulationReportFile <<- paste(
+      globalVariable$workingFolder,
+      '/Output/CurrentSimulationReport.log',
+      sep =''
+    )
     # Check if working folder exists
     if(!dir.exists(globalVariable$workingFolder)){
 
@@ -462,11 +479,15 @@ server <- function(input, output, session) {
       
       # check if the TxtInOut is correct
       if (globalVariable$TxtInOutSWAT & globalVariable$SWATPlusProject){
-        output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT ") 
+        output$checkTxtInOutFolder <- renderText(
+          "ERROR: This should be TxtInOut of SWAT "
+          ) 
       }
 
       if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATProject){
-        output$checkTxtInOutFolder <- renderText("ERROR: This should be TxtInOut of SWAT+ ") 
+        output$checkTxtInOutFolder <- renderText(
+          "ERROR: This should be TxtInOut of SWAT+ "
+          ) 
       }   
 
       # Save link to TxtInout Folder to the global variable
@@ -492,19 +513,21 @@ server <- function(input, output, session) {
         
         
         # Display unique land use, soil, slope
-        displayOutput$uniqueHruProperties <<-
-          data.frame(minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
-                     Landuse = c(uniqueLandUse,rep(NA, nRow - nLU)),
-                     soilName = c(uniqueSoil,rep(NA, nRow - nSoil)),
-                     slopeClass = c(uniqueSlope,rep(NA, nRow - nSlope))
-          ) 
+        displayOutput$uniqueHruProperties <<- data.frame(
+          minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
+          Landuse = c(uniqueLandUse,rep(NA, nRow - nLU)),
+          soilName = c(uniqueSoil,rep(NA, nRow - nSoil)),
+          slopeClass = c(uniqueSlope,rep(NA, nRow - nSlope))
+        ) 
         
       # If this is a SWAT+ project
       } else if (globalVariable$SWATPlusProject & globalVariable$TxtInOutSWATPlus){
         displayOutput$uniqueHruProperties <<- NULL
-        globalVariable$HRUinfo <<- read.table(file = paste(globalVariable$TxtInOutFolder, 
-                                                           "/hru-data.hru", sep =""),
-                                              header = TRUE, skip = 1, sep = "")
+        globalVariable$HRUinfo <<- read.table(
+          file = paste(globalVariable$TxtInOutFolder, 
+                       "/hru-data.hru", sep =""),
+          header = TRUE, skip = 1, sep = ""
+        )
         # Find maximum number of HRU
         
         
@@ -581,7 +604,9 @@ server <- function(input, output, session) {
           (SWATParamFile$name == "cal_parms.cal")){
 
         globalVariable$SWATParamFile <<- as.character(SWATParamFile$datapath)
-        globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
+        
+        shinyCatch(globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile), 
+                   blocking_level = "error")
         output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
         output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
       } 
@@ -659,10 +684,14 @@ server <- function(input, output, session) {
   # ****************************************************************************
   observeEvent(input$checkParameterTableButton, {
     
-    checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection,
-                                                  globalVariable$SWATParam,
-                                                  globalVariable$HRUinfo,
-                                                  globalVariable$SWATProject)
+    shinyCatch(
+      checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection,
+                                                    globalVariable$SWATParam,
+                                                    globalVariable$HRUinfo,
+                                                    globalVariable$SWATProject), 
+      blocking_level = "error"
+    )
+    
     output$checkParameterTableTxtOuput <- renderText(checkParameterTable$checkMessage)
   })
 
@@ -717,60 +746,114 @@ server <- function(input, output, session) {
     # Save sampling approach to the global variable
     globalVariable$samplingApproach <<- input$samplingApproach
 
+    # SUFI2 approach
     if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                          "sensitivity/calibration approach"),
                           "100")
-      outputText <- paste("Please input the number of iterations, e.g., 100", sep ="")
+      outputText <- paste("Please input the number of iterations, e.g., 100")
+      
+    # From optimization package
     } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
-                          "optim_sa(fun = SWAT, start = c(runif(nParam, min = minCol, max = maxCol)), lower = minCol,upper = maxCol, trace = TRUE, control = list(t0 = 10,nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7))")
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                          "sensitivity/calibration approach"),
+                          paste("optim_sa(fun = SWAT, start = c(runif(nParam,", 
+                          "min = minCol, max = maxCol)), lower = minCol,",
+                          "upper = maxCol, trace = TRUE, control = list(t0 = 10,",
+                          "nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7)))"))
       outputText <- helpTextCali
+      
+    # From hydroPSO package
     } else if (input$samplingApproach == 'Cali_(from_hydroPSO_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
-                          "hydroPSO(fn = SWAT, lower=minCol, upper=maxCol, control=list(maxit=1))")
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                          "sensitivity/calibration approach"),
+                          paste("hydroPSO(fn = SWAT, lower=minCol, upper=maxCol,",
+                          "control=list(maxit=1))"))
       outputText <- helpTextCali
+      
     } else if (input$samplingApproach == 'Cali_(from_nloptr_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
-                          "bobyqa(runif(nParam, min = minCol, max = maxCol), SWAT, lower = minCol, upper = maxCol, control = list(maxeval = 100))")
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                          "sensitivity/calibration approach"),
+                          paste("bobyqa(runif(nParam, min = minCol, max = maxCol),",
+                          "SWAT, lower = minCol, upper = maxCol,",
+                          "control = list(maxeval = 100))"))
       outputText <- helpTextCali
+      
     } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                          "sensitivity/calibration approach"),
                           "100, 1")
-      outputText <- paste("Please write two INTEGER numbers in a SINGLE line, separated by a comma", "\n",
+      outputText <- paste("Please write two INTEGER numbers in a SINGLE line,",
+                          "separated by a comma", "\n",
                           "The first number is the number of iterations", "\n",
                           "The second number (either 1 or 2) is the parallel approach", "\n",
-                          "  1 indicates the normal parallel approach (DDS run independently in each core) ", "\n",
-                          "  2 indictes that the intermediate best parameter set from all cores is selected", "\n",
-                          "    and is assigned as an inital parameter set for the next run with all cores",
-                          sep ="")
+                          "  1 indicates the normal parallel approach",
+                          "    (DDS run independently in each core) ", "\n",
+                          "  2 indictes that the intermediate best parameter set",
+                               "from all cores is selected", "\n",
+                               "and is assigned as an inital parameter set for the",
+                               "next run with all cores")
+      
     } else if (input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                                "sensitivity/calibration approach"),
                           "100")
       outputText <- paste("Please input the number of iterations, e.g., 100", sep ="")
+      
     } else if (input$samplingApproach == 'Read_User_Parameter_File'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                                "sensitivity/calibration approach"),
                           "C:/data/myParameterFile.txt")
-      outputText <- paste("Please input a link to the parameter set file, formatted as follows:","\n",
+      outputText <- paste("Please input a link to the parameter set file, ", 
+                          "formatted as follows:","\n",
                           "   First row: Name of the parameters","\n",
                           "   From the second row: Parameter value", "\n",
                           "   Leave one row empty at the end of the file", "\n",
                           " ", "\n",
                           "   As many column as the number of parameters","\n",
-                          "   The order of parameters in these columns follows the order of the parameters in the above Table", "\n",
+                          "   The order of parameters in these columns follows ", 
+                          "the order of the parameters in the above Table", "\n",
                          sep = "")
+      
     } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
-                          "Write_your_first_R_command_here \n
-Write_your_second_R_command_here")
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                                "sensitivity/calibration approach"),
+                          paste("Write_your_first_R_command_here \n", 
+                                "Write_your_second_R_command_here", sep = ""))
       outputText <- helpTextSensi
+      
     } else if (input$samplingApproach == 'Cali_(from_userDefined_package)'){
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approach",
+      
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                                "sensitivity/calibration approach"),
                           "Write_your_SINGLE_line_R_command_here")
       outputText <- helpTextCali
+      
     } else {
-      updateTextAreaInput(session, "inputInfo", "3. Additional infomation about the selected sensitivity/calibration approachh",
-                          "sensCaliObject <-  morris(model = SWAT, factors = nParam, binf = minCol, bsup = maxCol, r = 4, design = list(type = 'oat', levels = 5, grid.jump = 3))
-print(sensCaliObject)[]")
+      updateTextAreaInput(session, "inputInfo", 
+                          paste("3. Additional infomation about the selected",
+                                "sensitivity/calibration approach"),
+                          paste("sensCaliObject <-  morris(model = SWAT, factors = ",
+                          "nParam, binf = minCol, bsup = maxCol, r = 4, design = ",
+                          "list(type = 'oat', levels = 5, grid.jump = 3)) \n",
+                          "print(sensCaliObject)[]", sep = ""))
       outputText <- helpTextSensi
     }
     output$displayInputInfo <- renderText(outputText)
@@ -794,7 +877,8 @@ print(sensCaliObject)[]")
       globalVariable$sensCaliCommand <<- input$inputInfo
 
       # Remove comments and split R command
-      globalVariable$sensCaliCommand <<- splitRemoveComment(globalVariable$sensCaliCommand)
+      globalVariable$sensCaliCommand <<- splitRemoveComment(
+        globalVariable$sensCaliCommand)
     } else {
 
       # If input is not R command, then just save as text
@@ -860,7 +944,8 @@ print(sensCaliObject)[]")
     globalVariable$outputExtraction <<- outputExtraction
 
     # Number of output variables
-    OutputVar <- getNumberOutputVar(outputExtraction)
+    shinyCatch(OutputVar <- getNumberOutputVar(outputExtraction), 
+               blocking_level = "error")
     globalVariable$nOutputVar <<- OutputVar$nOutputVar
 
     # Check if this option is activated
@@ -906,7 +991,7 @@ print(sensCaliObject)[]")
   # Get user input range for calibration
   # ****************************************************************************
   observe({
-    # Assign selected date range for calibration/sensitivity analysis to the global variables
+    # Save selected date range for calibration/sensitivity to the global variables
     globalVariable$dateRangeCali <<- input$dateRangeCali
   })
 
@@ -916,7 +1001,7 @@ print(sensCaliObject)[]")
   # ****************************************************************************
   observe({
     req(input$ncores)
-    # Assign the number of selected cores to the global varialbes
+    # Assign the number of selected cores to the global variables
     globalVariable$ncores <<- input$ncores
   })
 
@@ -959,19 +1044,30 @@ print(sensCaliObject)[]")
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
 
         # Generate initial parameter set
-        globalVariable$parameterValue <<- lhsRange(globalVariable$ncores,
-                                                   getParamRange(globalVariable$paraSelection))
+        shinyCatch(
+          globalVariable$parameterValue <<- lhsRange(globalVariable$ncores,
+                                                     getParamRange(globalVariable$paraSelection)), 
+                   blocking_level = "error"
+          )
       }
 
       
       # Load all files that are going to be updated
-      globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo,
-                                                        globalVariable$paraSelection,
-                                                        globalVariable$SWATParam,
-                                                        globalVariable$TxtInOutFolder)        
+      shinyCatch(
+        globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo,
+                                                                globalVariable$paraSelection,
+                                                                globalVariable$SWATParam,
+                                                                globalVariable$TxtInOutFolder), 
+        blocking_level = "error"
+      )
+        
       
       # Save global variables
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
+      shinyCatch(
+        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
+                                             'RSWATproject.rds', sep ='')), 
+        blocking_level = "error"
+      )
       
       # Copy unchanged file for the first simulation
       copyUnchangeFiles <- TRUE
@@ -1008,36 +1104,7 @@ print(sensCaliObject)[]")
         globalVariable$ncores <<- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
 
         # Run SWAT in parallel
-        runSWATpar(globalVariable$workingFolder,
-                   globalVariable$TxtInOutFolder,
-                   globalVariable$outputExtraction,
-                   globalVariable$ncores,
-                   globalVariable$SWATexeFile,
-                   globalVariable$parameterValue,
-                   globalVariable$paraSelection,
-                   globalVariable$caliParam,
-                   copyUnchangeFiles,
-                   globalVariable$fileCioInfo,
-                   globalVariable$dateRangeCali,
-                   firstRun)
-        
-      } else if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)') {
-
-        if(is.null(globalVariable$observedData)){
-
-          # Display message box if there is no observed data provided
-          showModal(modalDialog(
-            title = "Not enough information to perform SWAT run",
-            HTML("You selected 'Cali_(DDS)', please defined objective function and load observed data (Step 4.1) before running SWAT"),
-            easyClose = TRUE,
-            size = "l"
-          ))
-
-        } else {
-          # Save results between iteration
-          saveIterationResult <- list()
-
-          # Run SWAT with init
+        shinyCatch(
           runSWATpar(globalVariable$workingFolder,
                      globalVariable$TxtInOutFolder,
                      globalVariable$outputExtraction,
@@ -1049,7 +1116,45 @@ print(sensCaliObject)[]")
                      copyUnchangeFiles,
                      globalVariable$fileCioInfo,
                      globalVariable$dateRangeCali,
-                     firstRun)
+                     firstRun), 
+          blocking_level = "error"
+        )
+
+        
+      } else if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)') {
+
+        if(is.null(globalVariable$observedData)){
+
+          # Display message box if there is no observed data provided
+          showModal(modalDialog(
+            title = "Not enough information to perform SWAT run",
+            span("You selected 'Cali_(DDS)', please defined objective function ",
+                 "and load observed data (Step 4.1) before running SWAT"),
+            easyClose = TRUE,
+            size = "l"
+          ))
+
+        } else {
+          # Save results between iteration
+          saveIterationResult <- list()
+
+          # Run SWAT with init
+          shinyCatch(
+            runSWATpar(globalVariable$workingFolder,
+                       globalVariable$TxtInOutFolder,
+                       globalVariable$outputExtraction,
+                       globalVariable$ncores,
+                       globalVariable$SWATexeFile,
+                       globalVariable$parameterValue,
+                       globalVariable$paraSelection,
+                       globalVariable$caliParam,
+                       copyUnchangeFiles,
+                       globalVariable$fileCioInfo,
+                       globalVariable$dateRangeCali,
+                       firstRun), 
+            blocking_level = "error"
+          )
+
 
           # Set firstRun = FALSE -> don't need to copy unchanged files again
           firstRun = FALSE
@@ -1065,13 +1170,17 @@ print(sensCaliObject)[]")
                                               fixed = TRUE)[[1]][2])
 
           # Objective function with initial parameter set
-          temp <- calObjFunction(globalVariable$parameterValue,
-                                 globalVariable$ncores,
-                                 globalVariable$nOutputVar,
-                                 globalVariable$userReadSwatOutput,
-                                 globalVariable$observedData,
-                                 globalVariable$workingFolder,
-                                 globalVariable$objFunction)
+          shinyCatch(
+            temp <- calObjFunction(globalVariable$parameterValue,
+                                   globalVariable$ncores,
+                                   globalVariable$nOutputVar,
+                                   globalVariable$userReadSwatOutput,
+                                   globalVariable$observedData,
+                                   globalVariable$workingFolder,
+                                   globalVariable$objFunction), 
+            blocking_level = "error"
+          )
+
 
           # Set new parameter
           newPar <- globalVariable$parameterValue
@@ -1100,7 +1209,8 @@ print(sensCaliObject)[]")
               saveIterationResult$objValueCali <- temp$objValueCali
               saveIterationResult$perCriteriaCali <- temp$perCriteriaCali
               saveIterationResult$simData <- temp$simData
-              print("Iteration - Best objective function value (from the respective core if parallel mode = 1)")
+              print(paste("Iteration - Best objective function value (from the",
+                          "respective core if parallel mode = 1)"))
             }
 
             print(c(i-1, round(best$objValueCali, digits = 3)))
@@ -1141,32 +1251,40 @@ print(sensCaliObject)[]")
             }
 
             # Remove output variables
-            removeOutputFiles(globalVariable$workingFolder, globalVariable$ncores, globalVariable$nOutputVar)
+            removeOutputFiles(globalVariable$workingFolder, 
+                              globalVariable$ncores, 
+                              globalVariable$nOutputVar)
             
             # Run SWAT in parallel
-            runSWATpar(globalVariable$workingFolder,
-                       globalVariable$TxtInOutFolder,
-                       globalVariable$outputExtraction,
-                       globalVariable$ncores,
-                       globalVariable$SWATexeFile,
-                       newPar,
-                       globalVariable$paraSelection,
-                       globalVariable$caliParam,
-                       FALSE,
-                       globalVariable$fileCioInfo,
-                       globalVariable$dateRangeCali,
-                       firstRun)
+            shinyCatch(
+              runSWATpar(globalVariable$workingFolder,
+                         globalVariable$TxtInOutFolder,
+                         globalVariable$outputExtraction,
+                         globalVariable$ncores,
+                         globalVariable$SWATexeFile,
+                         newPar,
+                         globalVariable$paraSelection,
+                         globalVariable$caliParam,
+                         FALSE,
+                         globalVariable$fileCioInfo,
+                         globalVariable$dateRangeCali,
+                         firstRun), 
+              blocking_level = "error"
+            )
+
 
 
             # Caculate objective function
-            temp <- calObjFunction(newPar,
-                                   globalVariable$ncores,
-                                   globalVariable$nOutputVar,
-                                   globalVariable$userReadSwatOutput,
-                                   globalVariable$observedData,
-                                   globalVariable$workingFolder,
-                                   globalVariable$objFunction)
-
+            shinyCatch(
+              temp <- calObjFunction(newPar,
+                                     globalVariable$ncores,
+                                     globalVariable$nOutputVar,
+                                     globalVariable$userReadSwatOutput,
+                                     globalVariable$observedData,
+                                     globalVariable$workingFolder,
+                                     globalVariable$objFunction), 
+              blocking_level = "error"
+            )
 
             # Save iteration result
             saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,newPar)
@@ -1237,7 +1355,8 @@ print(sensCaliObject)[]")
           # Show message box if there is no observed data
           showModal(modalDialog(
             title = "Not enough information to perform SWAT run",
-            HTML("Please defined objective function and load observed data (Step 4.1) before running SWAT"),
+            span("Please defined objective function and load ", 
+                 "observed data (Step 4.1) before running SWAT"),
             easyClose = TRUE,
             size = "l"
           ))
@@ -1291,7 +1410,12 @@ print(sensCaliObject)[]")
       globalVariable$checkSimComplete <<- TRUE
 
       # Save all results as RSWAT project
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
+      shinyCatch(
+        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
+                                             'RSWATproject.rds', sep ='')), 
+        blocking_level = "error"
+      )
+      
 
     } else {
 
@@ -1430,10 +1554,14 @@ print(sensCaliObject)[]")
     if(length(observedDataFile$datapath) == 1){
 
       # Display observed data file paths
-      output$printObservedDataFile <- renderText(as.character(observedDataFile$datapath))
+      output$printObservedDataFile <- renderText(as.character(
+        observedDataFile$datapath)
+      )
 
       # Assign observed data file paths to the global variables
-      globalVariable$observedDataFile <<- sortObservedDataFile(as.character(observedDataFile$datapath))
+      globalVariable$observedDataFile <<- sortObservedDataFile(
+        as.character(observedDataFile$datapath)
+      )
 
       # Observed data
       globalVariable$observedData <<- list()
@@ -1487,7 +1615,11 @@ print(sensCaliObject)[]")
       output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
 
       # Save observed data to globalVariable
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
+      shinyCatch(
+        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
+                                             'RSWATproject.rds', sep ='')), 
+        blocking_level = "error"
+      )
     }
   })
 
@@ -1539,13 +1671,16 @@ print(sensCaliObject)[]")
           output$printCalObjFunction <- NULL
 
           # Objective function in the intermediate step
-          temp <- calObjFunction(globalVariable$parameterValue,
-                                 globalVariable$ncores,
-                                 globalVariable$nOutputVar,
-                                 globalVariable$userReadSwatOutput,
-                                 globalVariable$observedData,
-                                 globalVariable$workingFolder,
-                                 globalVariable$objFunction)
+          shinyCatch(
+            temp <- calObjFunction(globalVariable$parameterValue,
+                                   globalVariable$ncores,
+                                   globalVariable$nOutputVar,
+                                   globalVariable$userReadSwatOutput,
+                                   globalVariable$observedData,
+                                   globalVariable$workingFolder,
+                                   globalVariable$objFunction), 
+            blocking_level = "error"
+          )
 
           # If there is error in the observed data, display an error message
           if(temp$error) output$printCalObjFunction <- renderText("ERROR in input data - please see R console")
@@ -1600,7 +1735,12 @@ print(sensCaliObject)[]")
     }
 
     #Save RSWATObject
-    saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 'RSWATproject.rds', sep =''))
+    shinyCatch(
+      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
+                                           'RSWATproject.rds', sep ='')), 
+      blocking_level = "error"
+    )
+
   })
 
   # ****************************************************************************
@@ -1684,8 +1824,12 @@ print(sensCaliObject)[]")
           tableSensitivity <- as.data.frame(tableSensitivity)
 
           # Parameter sensitivity using multivariate regression analysis
-          tableSensitivity <- summary(lm(formula = objFunction ~ ., tableSensitivity))[4]$coefficients[,3:4]
-
+          shinyCatch(
+            tableSensitivity <- summary(lm(
+              formula = objFunction ~ ., tableSensitivity))[4]$coefficients[,3:4], 
+            blocking_level = "error"
+          )
+          
           # Remove the first row because it is the intercept
           tableSensitivity <- tableSensitivity[-c(1),]
 
@@ -1741,7 +1885,9 @@ print(sensCaliObject)[]")
         # Message show all input was saved
         showModal(modalDialog(
           title = "Sensitivity analysis",
-          HTML("You used parameter set from the extermal file, NO sensitivity analysis will be performed. Please use external program"),
+          span("You used parameter set from the extermal file, ", 
+               "NO sensitivity analysis will be performed.", 
+               " Please use external program"),
           easyClose = TRUE,
           size = "l"
         ))
@@ -1749,7 +1895,8 @@ print(sensCaliObject)[]")
       } else {
         showModal(modalDialog(
           title = "Sensitivity analysis",
-          HTML("The approach you selected in step 2 is not for parameter sensitivity analysis - skip this step"),
+          span("The approach you selected in step 2 is not for parameter ",
+               "sensitivity analysis - skip this step"),
           easyClose = TRUE,
           size = "l"
         ))
@@ -1818,17 +1965,20 @@ print(sensCaliObject)[]")
     if(!is.null(globalVariable$parameterValue) & globalVariable$isBehThresholdValid){
 
       # Find behavioral simulations - 95PPU
-      globalVariable$dataPlotVariableNumber <<- behaSimulation(
-        globalVariable$objValueCali,
-        globalVariable$simData,
-        globalVariable$parameterValue,
-        input$behThreshold,
-        input$plotVarNumber,
-        globalVariable$objFunction,
-        globalVariable$observedData,
-        globalVariable$minOrmax,
-        globalVariable$samplingApproach
-        )
+      shinyCatch(
+        globalVariable$dataPlotVariableNumber <<- behaSimulation(
+          globalVariable$objValueCali,
+          globalVariable$simData,
+          globalVariable$parameterValue,
+          input$behThreshold,
+          input$plotVarNumber,
+          globalVariable$objFunction,
+          globalVariable$observedData,
+          globalVariable$minOrmax,
+          globalVariable$samplingApproach
+        ), 
+        blocking_level = "error"
+      )
 
       # Store 95PPU in a temporary variable
       tempVar <- globalVariable$dataPlotVariableNumber$ppuSimData
@@ -1966,9 +2116,11 @@ print(sensCaliObject)[]")
     req(input$saveAllResults)
 
     # Save observed data to global variable
-    saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/',
-                                         'RSWATproject.rds',
-                                         sep =''))
+    shinyCatch(
+      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
+                                           'RSWATproject.rds', sep ='')), 
+      blocking_level = "error"
+    )
 
     # Display message that all settings/results were saved
     showModal(modalDialog(

@@ -22,7 +22,8 @@ requiredPackages <- c('foreach',         # version >= 1.5.2
                       'boot',            # version >= 1.3-24
                       'optimization',    # version >= 1.0-9  
                       'hydroPSO',        # version >= 0.5-1
-                      'nloptr'           # version >= 2.0.0
+                      'nloptr',          # version >= 2.0.0
+                      'spsComps'         # version >= 0.3.2.1
                       )
                      
 # Check and install only missing packages

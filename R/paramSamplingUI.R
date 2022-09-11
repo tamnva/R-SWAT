@@ -19,7 +19,7 @@ paramSamplingUI <- function(id) {
              HTML("<b>","1. Select SWAT parameters for calibration and/or 
                   sensitivity analysis","</b>"),
       ),
-      
+  
       column(width = 10,
              checkboxInput('helpParameterSelection', 
                            'Display help for parameter selection', 
@@ -27,13 +27,15 @@ paramSamplingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   If you are not sure about the name of the parameter, subbasin, 
-                   land use, soil type, slope, check this box
+             tippy("Help", 
+                   tooltip = "<span style='font-size:16px;'>
+                   If you don't remember the parameter names, subbasin, 
+                   land use, soil type, slope, check this box.
                    <span>", 
                    allowHTML = TRUE, 
                    trigger = "click",
                    theme = "translucent"),
+             
       ),
       
       conditionalPanel(
@@ -66,6 +68,7 @@ paramSamplingUI <- function(id) {
                    allowHTML = TRUE, 
                    trigger = "click",
                    theme = "translucent"),
+             
       ),
       
       
