@@ -88,7 +88,6 @@ generalSettingUI <- function(id) {
                dataTableOutput('tableHRUinfo'),
         ),
       ),
-      
 
       #-------------------------------------------------------------------------
       # 4. Select executable SWAT or SWAT+ file 
@@ -125,13 +124,12 @@ generalSettingUI <- function(id) {
 
       # Pop up window for selecting the executable SWAT or SWAT+ 
       column(width = 10,
-             shinyFilesButton("getSWATexe", "Click here to select" ,
-                              title = "Please select the executable file:",
-                              multiple = FALSE,
-                              buttonType = "default",
-                              style="background-color: #87CEFA; 
+             actionButton("getSWATexe", 
+                          "Click here to select executable file",
+                          buttonType = "default",
+                          style="background-color: #87CEFA; 
                               border-color: #2e6da4",
-                              class = NULL),
+                          class = NULL),
              verbatimTextOutput("printSWATexe", placeholder = TRUE),
       ),
       
@@ -191,14 +189,12 @@ generalSettingUI <- function(id) {
 
       # Select the paramter file
       column(width = 10,
-             shinyFilesButton("getSWATParamFile", "Click here to select" ,
-                              title = "Please select the 'swatParam.txt' for SWAT project or 
-                              'cal_parms.cal' for SWAT+ project file ",
-                              multiple = FALSE,
-                              buttonType = "default", 
-                              style="background-color: #87CEFA;
+             actionButton("getSWATParamFile", 
+                          "Click here to select parameter file",
+                          buttonType = "default",
+                          style="background-color: #87CEFA; 
                               border-color: #2e6da4",
-                              class = NULL),
+                          class = NULL),
       ),
       
       # Display file name

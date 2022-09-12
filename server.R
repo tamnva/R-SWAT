@@ -555,62 +555,49 @@ server <- function(input, output, session) {
   # Get executable SWAT file
   # ****************************************************************************
   observe({
-    # Get volumes
-    volumes <- getVolumes()
 
-    # Show shinyFileChoose window
-    shinyFileChoose(input, "getSWATexe",
-                    roots = volumes,
-                    filetypes=c('', 'exe'),
-                    session = session)
-
+    req(input$getSWATexe)
+    
     # Get full path to SWAT exe file
-    SWATexeFile <- parseFilePaths(volumes, input$getSWATexe)
-
-    # Display and assign SWAT exe file to the global variable
-    if(length(SWATexeFile$datapath) == 1){
-      output$printSWATexe <- renderText(SWATexeFile$datapath)
-      globalVariable$SWATexeFile <<- as.character(SWATexeFile$datapath)
+    shinyCatch(globalVariable$SWATexeFile <<- file.choose(), 
+               blocking_level = "error")
+    
+    if (grepl(".exe", globalVariable$SWATexeFile, fixed = TRUE)){
+      output$printSWATexe <- renderText(globalVariable$SWATexeFile)      
+    } else {
+      output$printSWATexe <- renderText("Error: The selected file must have '.exe' extention")
     }
+
+    
   })
 
   # ****************************************************************************
   # Files with list of all SWAT parameters (get file) + display content of file
   # ****************************************************************************
   observe({
-    # Get volumes
-    volumes <- getVolumes()
-
-    # Show shinyFileChoose window
     
-    if (input$SWATorSWATplus == "SWAT"){
-      shinyFileChoose(input, "getSWATParamFile",
-                      roots = volumes,
-                      filetypes=c('', 'txt'),
-                      session = session)     
+    req(input$getSWATParamFile)
+    
+    # Get full path to SWAT exe file
+    shinyCatch(globalVariable$SWATParamFile <<- file.choose(), 
+               blocking_level = "error")
+    
+    shinyCatch(
+    if (grepl("swatParam.txt", globalVariable$SWATParamFile, fixed = TRUE) |
+        grepl("cal_parms.cal", globalVariable$SWATParamFile, fixed = TRUE)){
+      
+      globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
+      output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
+      output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
+      
     } else {
-      shinyFileChoose(input, "getSWATParamFile",
-                      roots = volumes,
-                      filetypes=c('', 'cal'),
-                      session = session)
-    }
-
-
-    # Get full path to SWAT parameter file
-    SWATParamFile <- parseFilePaths(volumes, input$getSWATParamFile)
-
-    if (length(SWATParamFile$datapath) == 1){
-      if ((SWATParamFile$name == "swatParam.txt") ||
-          (SWATParamFile$name == "cal_parms.cal")){
-
-        globalVariable$SWATParamFile <<- as.character(SWATParamFile$datapath)
-        
-        shinyCatch(globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile), 
-                   blocking_level = "error")
-        output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
-        output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
-      } 
-    }
+      output$printSWATParamFile <- renderText(
+        paste("Error: The selected file must be either 'swatParam.txt'",
+                                                    "or 'cal_parms.cal'")
+        )
+    }, 
+    blocking_level = "error")
+    
   })
 
 
