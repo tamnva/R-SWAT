@@ -1612,13 +1612,6 @@ server <- function(input, output, session) {
 
       # Display check message
       output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
-
-      # Save observed data to globalVariable
-      shinyCatch(
-        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
-                                             'RSWATproject.rds', sep ='')), 
-        blocking_level = "error"
-      )
     }
   })
 
@@ -1733,12 +1726,6 @@ server <- function(input, output, session) {
       ))
     }
 
-    #Save RSWATObject
-    shinyCatch(
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
-                                           'RSWATproject.rds', sep ='')), 
-      blocking_level = "error"
-    )
 
   })
 
@@ -2108,27 +2095,6 @@ server <- function(input, output, session) {
     ))
   })
 
-  # ****************************************************************************
-  # Save all results
-  # ****************************************************************************
-  observe({
-    req(input$saveAllResults)
-
-    # Save observed data to global variable
-    shinyCatch(
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
-                                           'RSWATproject.rds', sep ='')), 
-      blocking_level = "error"
-    )
-
-    # Display message that all settings/results were saved
-    showModal(modalDialog(
-      title = "Save results",
-      HTML("All results was saved as 'RSWATproject.rds' in the working folder"),
-      easyClose = TRUE,
-      size = "l"
-    ))
-  })
 
   #-----------------------------------------------------------------------------
   # Tab 5. Visualization
