@@ -9,23 +9,18 @@ ui <- dashboardPage(
     
     # Add two buttons in the header for saving and loading project
     tags$li(class = "dropdown", 
-            
+          
             # Save project button
             actionButton(inputId = "saveProject",
                          label = "Save project", 
                          icon = icon("save"),
-                         style="background-color: #b1fa87; border-color: #b1fa87; 
-                         float:left; padding-top:13px; padding-bottom:13px;"),
+                         style="background-color: #b1fa87; border-color: #b1fa87"),
             
             # Load project button
-            shinyFilesButton("loadProject", "Load project" , 
-                             title = "Load project: Please select the 'RSWATproject.rds' file",
-                             multiple = FALSE,
-                             buttonType = "default",
-                             icon = icon("upload"),
-                             style="background-color: #fafa87; border-color: 
-                             #2e6da4; padding-top:13px; padding-bottom:13px;",
-                             class = NULL)
+            actionButton(inputId = "loadProject", 
+                         label = "Load project" , 
+                         icon = icon("upload"),
+                         style="background-color: #fafa87; border-color: #2e6da4")
             )
   ),
   
@@ -147,6 +142,7 @@ ui <- dashboardPage(
               subUI("subUI")
       )
     )
-  ) 
+  ),
+  useShinyjs()
  #------------------------------------------------------------------------------ 
 )

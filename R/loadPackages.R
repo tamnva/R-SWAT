@@ -14,6 +14,7 @@ requiredPackages <- c('foreach',         # version >= 1.5.2
                       'rgdal',           # version >= 1.5-28
                       'raster',          # version >= 3.5-15 
                       'shiny',           # version >= 1.7.1
+                      'shinyjs',
                       'shinydashboard',  # version >= 0.7.2
                       'shinyFiles',      # version >= 0.9.1
                       'tippy',           # version >= 0.1.0
