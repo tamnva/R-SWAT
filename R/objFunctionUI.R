@@ -83,11 +83,29 @@ objFunctionUI <- function(id) {
       ),
 
       column(width = 10,
-             shinyFilesButton("getObservedDataFile", "Click here to select" ,
-                              title = "Please select observed data file(s)",
-                              multiple = TRUE,
-                              buttonType = "default", 
-                              class = NULL),
+             conditionalPanel(
+               condition = sprintf("'%s' != 'windows'", .Platform$OS.type),
+               shinyFilesButton("getObservedDataFile", "Click here to select" ,
+                                title = "Please select observed data file(s)",
+                                multiple = TRUE,
+                                buttonType = "default",
+                                style="background-color: #87CEFA; border-color: #2e6da4",
+                                class = NULL),
+             ),             
+      ),
+
+      column(width = 10,
+             conditionalPanel(
+               condition = sprintf("'%s' == 'windows'", .Platform$OS.type),
+               actionButton("getObservedDataFileWindow", 
+                            "Please select observed data file(s)",
+                            buttonType = "default",
+                            style="background-color: #87CEFA; border-color: #2e6da4",
+                            class = NULL),
+             ),             
+      ),
+      
+      column(width = 10,
              verbatimTextOutput("printObservedDataFile"),
              textOutput("checkGetObservedDataFile"),
       ),
@@ -118,7 +136,6 @@ objFunctionUI <- function(id) {
         ),
       ),
       
-      
       #-------------------------------------------------------------------------
       # 3. Calculate objective function
       #------------------------------------------------------------------------- 
@@ -129,7 +146,9 @@ objFunctionUI <- function(id) {
       ),
 
       column(width = 10,
-             actionButton("calObjFunction", "Click here to calculate objective function"),
+             actionButton("calObjFunction", 
+                          "Click here to calculate objective function",
+                          style="background-color: #87CEFA; border-color: #2e6da4"),
              verbatimTextOutput("printCalObjFunction"),
       ),
 

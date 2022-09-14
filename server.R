@@ -1536,83 +1536,100 @@ server <- function(input, output, session) {
   # Get observed data files
   # ****************************************************************************
   observe({
+    
+    if(.Platform$OS.type == 'windows'){
+      req(input$getObservedDataFileWindow)      
+    } else {
+      req(input$getObservedDataFile)      
+    }
+    
+    if(.Platform$OS.type == 'windows'){
+     
+      shinyjs::disable("getObservedDataFileWindow")
+      observedDataFile <- choose.files()
+      shinyjs::enable("getObservedDataFileWindow")
+      
+    } else {
+      print("notok")
+      # Get volumes
+      volumes <- getVolumes()
+      
+      # Display shinyFileChoose
+      shinyFileChoose(input, "getObservedDataFile",
+                      roots = volumes,
+                      filetypes=c('', 'txt'),
+                      session = session)
+      
+      # Get full path to the observed data files
+      observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile) 
+      observedDataFile <- observedDataFile$path
+    }
+    
 
-    # Get volumes
-    volumes <- getVolumes()
-
-    # Display shinyFileChoose
-    shinyFileChoose(input, "getObservedDataFile",
-                    roots = volumes,
-                    filetypes=c('', 'txt'),
-                    session = session)
-
-    # Get full path to the observed data files
-    observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile)
 
     # Get observed data
-    if(length(observedDataFile$datapath) == 1){
-
-      # Display observed data file paths
-      output$printObservedDataFile <- renderText(as.character(
-        observedDataFile$datapath)
-      )
-
-      # Assign observed data file paths to the global variables
-      globalVariable$observedDataFile <<- sortObservedDataFile(
-        as.character(observedDataFile$datapath)
-      )
-
-      # Observed data
-      globalVariable$observedData <<- list()
-
-      checkGetObservedDataFileMessage <- " "
-      # Check number of output variable files
-
-      if (globalVariable$nOutputVar != length(globalVariable$observedDataFile)){
-
-        # Print out message if there are more/less number of observed data files
-        checkGetObservedDataFileMessage <- paste("Error: Number of observed files should be: ",
-                                                 globalVariable$nOutputVar,
-                                                 sep ="")
-
+    shinyCatch(
+      if(TRUE){
+        # Assign observed data file paths to the global variables
+        globalVariable$observedDataFile <<- sortObservedDataFile(observedDataFile)
+      
+        # Display observed data file paths
+        output$printObservedDataFile <- renderText(as.character(globalVariable$observedDataFile))
+        
+        
+        
+        # Observed data
+        globalVariable$observedData <<- list()
+        
+        checkGetObservedDataFileMessage <- " "
+        # Check number of output variable files
+        
+        if (globalVariable$nOutputVar != length(globalVariable$observedDataFile)){
+          
+          # Print out message if there are more/less number of observed data files
+          checkGetObservedDataFileMessage <- paste("Error: Number of observed files should be: ",
+                                                   globalVariable$nOutputVar,
+                                                   sep ="")
+          
         } else {
-
-        # Get content of observed data files
-        for (i in 1:length(globalVariable$observedDataFile)){
-
-          if (!grepl(paste("obs_var_", i, ".txt", sep =""), 
-                     globalVariable$observedDataFile[i], fixed = TRUE)){
+          
+          # Get content of observed data files
+          for (i in 1:length(globalVariable$observedDataFile)){
             
-            checkGetObservedDataFileMessage <- paste("Error: change file name ",
-                                                     globalVariable$observedDataFile[i],
-                                                     " to ",
-                                                     paste("obs_var_", i, ".txt", 
-                                                           sep =""), sep = "")
-          } else {
-    
-            # Read observed data
-            temp <- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
-            
-            # check observed data
-            checkGetObservedDataFileMessage <- checkObservedData(temp)
-            
-            if (checkGetObservedDataFileMessage == ""){
-              # Store observed data in the global variables
-              temp <- data.frame(Date = as.POSIXct(paste(temp[,1], temp[,2], sep = " "), 
-                                                   format = "%Y-%m-%d %H:%M", tz = ""),
-                                 Value = temp[,3],
-                                 Flag = temp[,4])
+            if (!grepl(paste("obs_var_", i, ".txt", sep =""), 
+                       globalVariable$observedDataFile[i], fixed = TRUE)){
               
-              # Assign back observed data to global variable
-              globalVariable$observedData[[i]] <<- temp              
-            }   
+              checkGetObservedDataFileMessage <- paste("Error: change file name ",
+                                                       globalVariable$observedDataFile[i],
+                                                       " to ",
+                                                       paste("obs_var_", i, ".txt", 
+                                                             sep =""), sep = "")
+            } else {
+              
+              # Read observed data
+              temp <- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
+              
+              # check observed data
+              checkGetObservedDataFileMessage <- checkObservedData(temp)
+              
+              if (checkGetObservedDataFileMessage == ""){
+                # Store observed data in the global variables
+                temp <- data.frame(Date = as.POSIXct(paste(temp[,1], temp[,2], sep = " "), 
+                                                     format = "%Y-%m-%d %H:%M", tz = ""),
+                                   Value = temp[,3],
+                                   Flag = temp[,4])
+                
+                # Assign back observed data to global variable
+                globalVariable$observedData[[i]] <<- temp              
+              }   
+            }
           }
         }
-    }
-
-      # Display check message
-      output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
-    }
+        
+        # Display check message
+        output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
+      },
+      blocking_level = "error")
   })
 
   # ****************************************************************************

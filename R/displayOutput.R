@@ -10,8 +10,9 @@ sortObservedDataFile <- function(observedDataFile){
     for (i in 1:length(observedDataFile)){
       wantName <- paste("obs_var_", i, ".txt", sep = "")
       for (j in 1:length(observedDataFile)){
-        temp <- strsplit(observedDataFile[j], split = "/")
-        temp <- temp[[1]][length(temp[[1]])]
+        temp <- substr(observedDataFile[j], 
+                       nchar(observedDataFile[j]) - nchar(wantName) + 1, 
+                       nchar(observedDataFile[j]))
         if(temp == wantName) check = c(check, j)
       }
     }
@@ -81,6 +82,11 @@ getNumberOutputVar <- function(outputExtraction){
 
     } else if(outputExtraction[i,1] == "output.rch" |
               outputExtraction[i,1] == "channel_sd_day.txt" |
+              outputExtraction[i,1] == 'channel_sd_mon.txt' | 
+              outputExtraction[i,1] == 'channel_sd_yr.txt'  |
+              outputExtraction[i,1] == 'channel_sdmorph_day.txt' | 
+              outputExtraction[i,1] == 'channel_sdmorph_mon.txt' | 
+              outputExtraction[i,1] == 'channel_sdmorph_yr.txt'  |
               outputExtraction[i,1] == "output.hru" |
               outputExtraction[i,1] == "output.sub" |
               outputExtraction[i,1] == "output.rsv"){
@@ -150,6 +156,11 @@ printVariableNameObservedFiles <- function(outputExtraction){
     }else if ((outputExtraction$FileType[i] == "output.rsv") | 
               (outputExtraction$FileType[i] == "output.rch") |
               (outputExtraction$FileType[i] == "channel_sd_day.txt") |
+              (outputExtraction$FileType[i] == "channel_sd_mon.txt") |
+              (outputExtraction$FileType[i] == "channel_sd_yr.txt") |
+              (outputExtraction$FileType[i] == "channel_sdmorph_day.txt") |
+              (outputExtraction$FileType[i] == "channel_sdmorph_mon.txt") |
+              (outputExtraction$FileType[i] == "channel_sdmorph_yr.txt") |
               (outputExtraction$FileType[i] == "output.hru") | 
               (outputExtraction$FileType[i] == "output.sub") | 
               (outputExtraction$FileType[i] == "output.swr")){

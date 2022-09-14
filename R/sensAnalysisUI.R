@@ -19,7 +19,9 @@ sensAnalysisUI <- function(id) {
     ),
 
     column(width = 10,
-           actionButton("calSensitivity", "Click here to do sensitivity analysis"),
+           actionButton("calSensitivity", 
+                        "Click here to do sensitivity analysis",
+                        style="background-color: #87CEFA; border-color: #2e6da4"),
     ),
     
 

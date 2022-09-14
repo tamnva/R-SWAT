@@ -156,8 +156,13 @@ saveOutput <- function(workingDirectory,
                                   getRchNumber(rchNumber[i]),
                                   output)
       
-    } else if (fileType[i] == "channel_sd_day.txt"  ){
-      output <- readChannel_sd_dayFile(workingDirectory,
+    } else if (fileType[i] == "channel_sd_day.txt"      |
+                              "channel_sd_mon.txt"      |
+                              "channel_sd_yr.txt"       |
+                              "channel_sdmorph_day.txt" |
+                              "channel_sdmorph_mon.txt" |
+                              "channel_sdmorph_yr.txt"){
+      output <- readChannelFile(workingDirectory,
                                   coreNumber, 
                                   fileName[i], 
                                   fromToDate,
@@ -333,43 +338,57 @@ appendListObject <- function(listA, listB){
 
 #-------------------------------------------------------------------------------
 # Read channel_sd_xxx.txt file, data is always at daily timestep
-#                 xxx could be "day", "month", or "yr"
+#                 xxx could be "day", "month", or "yr"  readChannel_sd_dayFile
 # ------------------------------------------------------------------------------
-readChannel_sd_dayFile <- function(workingDirectory, 
-                                   coreNumber, 
-                                   fileName, 
-                                   fromToDate, 
-                                   colNumber, 
-                                   fileCioInfo,
-                                   rchNumber,
-                                   output){
+readChannelFile <- function(workingDirectory, 
+                               coreNumber, 
+                               fileName, 
+                               fromToDate, 
+                               colNumber, 
+                               fileCioInfo,
+                               rchNumber,
+                               output){
   
+  fileType <- c("channel_sd_day.txt", 
+                "channel_sd_mon.txt", 
+                "channel_sd_yr.txt",
+                "channel_sdmorph_day.txt", 
+                "channel_sdmorph_mon.txt", 
+                "channel_sdmorph_yr.txt")
   
-  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", 
+  filePath <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", 
                     fileName, sep = "")
   
   # Get file content/data
-  getChannel_sd_dayData <- read.table(fileName, header = FALSE, sep = "", skip = 3)
-  nrows <- nrow(getChannel_sd_dayData)
+  channelData <- read.table(filePath, header = FALSE, sep = "", skip = 3)
+  nrows <- nrow(channelData)
   
-  # Get simulation time series (assume data is at daily time step)
-  startTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[1,4])),"0101", 
-                             sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[1,1]) - 1
+  # Get number of units
+  nunits <- max(channelData$V5)
   
-  endTime <- as.Date(paste(toString(as.numeric(getChannel_sd_dayData[nrows,4])),"0101", 
-                           sep=""), "%Y%m%d") + as.numeric(getChannel_sd_dayData[nrows,1]) - 1
+  # Convert to to time series
+  temp <- seq(1, nrows, nunits)
+  timeSeries <- paste(channelData$V4[temp], "-", channelData$V2[temp], "-", 
+                      channelData$V3[temp], "-", sep = "" )
+  timeSeries <- as.Date(timeSeries, "%Y-%m-%d")
+  timeStep <- length(seq(timeSeries[1], timeSeries[2], by= "days")) -1
   
-  # Generate time sequence (stat - end simulation time)
-  timeSeries <- seq(startTime, endTime, by="days")
-  
-  # Number of channels
-  nRch <- max(getChannel_sd_dayData$V5)
-  
-  ntimeStep <- nrow(getChannel_sd_dayData)/nRch
-  trim <- c(which(timeSeries ==  fromToDate[1]), 
-            which(timeSeries ==  fromToDate[2]))
-  
-  
+  # Daily output file
+  if(timeStep == 1){
+    trim <- c(which(timeSeries ==  fromToDate[1]), 
+              which(timeSeries ==  fromToDate[2]))
+    
+  # Monthly output file
+  } else if((timeStep > 27) & (timeStep < 31)){
+    trim <- c(which(format(timeSeries,"%Y-%m") ==  format(fromToDate[1],"%Y-%m")), 
+              which(format(timeSeries,"%Y-%m") ==  format(fromToDate[1],"%Y-%m"))) 
+  } else if((timeStep == 365) | (timeStep == 366)){
+    trim <- c(which(format(timeSeries,"%Y") ==  format(fromToDate[1],"%Y")), 
+              which(format(timeSeries,"%Y") ==  format(fromToDate[1],"%Y")))     
+  } else {
+    # TODO
+    trim <- c("error", "error")
+  }
   
   varNumber <- length(output)
   
@@ -377,10 +396,11 @@ readChannel_sd_dayFile <- function(workingDirectory,
     for (j in 1:length(rchNumber[[i]])){
       
       varNumber <- varNumber + 1
-      output[[varNumber]] <- getChannel_sd_dayData[seq(from = rchNumber[[i]][j], 
-                                                       to = nrow(getChannel_sd_dayData), 
-                                                       by = nRch),
-                                                   colNumber[i]]
+      output[[varNumber]] <- channelData[seq(from = rchNumber[[i]][j], 
+                                             to = nrows, 
+                                             by = nunits),
+                                         colNumber[i]]
+      
       output[[varNumber]] <- output[[varNumber]][c(trim[1]:trim[2])]        
     }
   }

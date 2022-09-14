@@ -127,8 +127,7 @@ generalSettingUI <- function(id) {
              actionButton("getSWATexe", 
                           "Click here to select executable file",
                           buttonType = "default",
-                          style="background-color: #87CEFA; 
-                              border-color: #2e6da4",
+                          style="background-color: #87CEFA; border-color: #0d0c0c",
                           class = NULL),
              verbatimTextOutput("printSWATexe", placeholder = TRUE),
       ),
@@ -192,8 +191,7 @@ generalSettingUI <- function(id) {
              actionButton("getSWATParamFile", 
                           "Click here to select parameter file",
                           buttonType = "default",
-                          style="background-color: #87CEFA; 
-                              border-color: #2e6da4",
+                          style="background-color: #87CEFA; border-color: #0d0c0c",
                           class = NULL),
       ),
       
