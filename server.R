@@ -137,185 +137,191 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   observe({
 
-    # Open file selection window
-    volumes <- getVolumes()
-    shinyFileChoose(input, "loadProject",
-                    roots = volumes,
-                    filetypes=c('', 'rds'),
-                    session = session)
+    req(input$loadProject)
 
     # Get full link of the selected file
-    RSWATProjectFile <- parseFilePaths(volumes, input$loadProject)
+    shinyjs::disable("loadProject")
+    shinyCatch(RSWATProjectFile <- file.choose(), blocking_level = "none")
+    shinyjs::enable("loadProject")
 
-    # Read RSWATproject.rds file and updated input fields
-    if(length(RSWATProjectFile$datapath) == 1){
-
-      # Read data in this file
-      globalVariable <<- readRDS(RSWATProjectFile$datapath)
-
-      # Now the load project is true (because the RSWATproject.rds was given)
-      globalVariable$loadProject <<- TRUE
-
-      #-------------------------------------------------------------------------
-      # Update Tab 1: General Setting
-      #-------------------------------------------------------------------------
-      
-      # Update select SWAT project
-      if(globalVariable$SWATProject){
+    shinyCatch( 
+      if(substr(RSWATProjectFile, nchar(RSWATProjectFile) - 15, 
+                nchar(RSWATProjectFile)) == "RSWATproject.rds"){
+        
+        # Read data in this file
+        globalVariable <<- readRDS(RSWATProjectFile)
+        
+        # Now the load project is true (because the RSWATproject.rds was given)
+        globalVariable$loadProject <<- TRUE
+        
+        #-------------------------------------------------------------------------
+        # Update Tab 1: General Setting
+        #-------------------------------------------------------------------------
+        
+        # Update select SWAT project
+        if(globalVariable$SWATProject){
+          updateSelectInput(session,
+                            "SWATorSWATplus",
+                            label = "1. SWAT or SWAT+ project", 
+                            choices = c('SWAT', 'SWAT+'),
+                            selected = "SWAT")        
+        } else {
+          updateSelectInput(session,
+                            "SWATorSWATplus",
+                            label = "1. SWAT or SWAT+ project", 
+                            choices = c('SWAT', 'SWAT+'),
+                            selected = "SWAT+")
+        }
+        
+        
+        # Update working folder
+        updateTextInput(session, "workingFolder",
+                        label = "1. Working folder",
+                        value = globalVariable$workingFolder)
+        
+        # Update TxtInOut folder
+        updateTextInput(session, "TxtInOutFolder",
+                        label = "2. TxtInOut folder",
+                        value = globalVariable$TxtInOutFolder)
+        
+        
+        # Update Select executable SWAT file Help
+        output$printSWATexe <- renderText(globalVariable$SWATexeFile)
+        
+        # Update Files with list of all SWAT parameters
+        output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
+        
+        # Update display content of the SWAT parameter file
+        output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
+        
+        #-------------------------------------------------------------------------
+        # Update Tab 2: Parameter sampling
+        #-------------------------------------------------------------------------
+        
+        # Update Select SWAT parameters for calibration and/or sensitivity analysis
+        if(globalVariable$SWATProject){
+          output$tableParaSelection <- renderExcel(
+            excelTable(data = globalVariable$paraSelection,
+                       columns = columnsParaSelectionSWAT,
+                       editable = TRUE,
+                       allowInsertRow = TRUE,
+                       allowInsertColumn = TRUE,
+                       allowDeleteColumn = TRUE,
+                       allowDeleteRow = TRUE,
+                       rowDrag = TRUE,
+                       columnResize = FALSE,
+                       wordWrap = TRUE)
+          )       
+        } else {
+          output$tableParaSelection <- renderExcel(
+            excelTable(data = globalVariable$paraSelection,
+                       columns = columnsParaSelectionSWATPlus,
+                       editable = TRUE,
+                       allowInsertRow = TRUE,
+                       allowInsertColumn = TRUE,
+                       allowDeleteColumn = TRUE,
+                       allowDeleteRow = TRUE,
+                       rowDrag = TRUE,
+                       columnResize = FALSE,
+                       wordWrap = TRUE)
+          )    
+        }
+        
+        # Update Select sensitivity or calibration approach
         updateSelectInput(session,
-                          "SWATorSWATplus",
-                          label = "1. SWAT or SWAT+ project", 
-                          choices = c('SWAT', 'SWAT+'),
-                          selected = "SWAT")        
-      } else {
+                          "samplingApproach",
+                          label = "2. Select sensitivity or calibration approach",
+                          choices = c('Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
+                                      'Sensi_(from_sensitivity_package)',
+                                      'Sensi_(from_userDefined_package)',
+                                      'Cali_(from_optimization_package)',
+                                      'Cali_(from_hydroPSO_package)',
+                                      'Cali_(from_nloptr_package)',
+                                      'Cali_(Dynamically_Dimensioned_Search)',
+                                      'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
+                                      'Cali_(from_userDefined_package)',
+                                      'Read_User_Parameter_File'),
+                          selected = globalVariable$samplingApproach)
+        
+        # Update Additional information about the selected sensitivity/calibration approach
+        updateTextAreaInput(session,
+                            "inputInfo",
+                            "3. Additional infomation about the selected sensitivity/calibration approach",
+                            globalVariable$sensCaliCommand)
+        
+        # Update define model output for extraction
+        if (globalVariable$SWATProject){
+          output$tableOutputExtraction <- renderExcel(
+            excelTable(data = globalVariable$outputExtraction,
+                       columns = columnsOutputExtractionSWAT,
+                       editable = TRUE,
+                       allowInsertRow = TRUE,
+                       allowInsertColumn = FALSE,
+                       allowDeleteColumn = FALSE,
+                       allowDeleteRow = TRUE,
+                       rowDrag = FALSE,
+                       columnResize = FALSE,
+                       wordWrap = TRUE)
+          ) 
+        } else {
+          output$tableOutputExtraction <- renderExcel(
+            excelTable(data = globalVariable$outputExtraction,
+                       columns = columnsOutputExtractionSWATPlus,
+                       editable = TRUE,
+                       allowInsertRow = TRUE,
+                       allowInsertColumn = FALSE,
+                       allowDeleteColumn = FALSE,
+                       allowDeleteRow = TRUE,
+                       rowDrag = FALSE,
+                       columnResize = FALSE,
+                       wordWrap = TRUE)
+          )
+        }
+        
+        # Update display corresponding observed file names
+        output$tableOutputExtractionDisplayOnly <- renderDataTable(
+          printVariableNameObservedFiles(globalVariable$outputExtraction))
+        
+        # Update select date range
+        updateDateRangeInput(session,
+                             "dateRangeCali",
+                             "2. Select date range",
+                             start = globalVariable$dateRangeCali[1],
+                             end   = globalVariable$dateRangeCali[2])
+        
+        # Update number of parallel runs
+        updateSliderInput(session,
+                          "ncores",
+                          "3. Select number of parallel runs (cores)",
+                          value = globalVariable$ncores,
+                          min = 1,
+                          max = detectCores())
+        
+        # Update objective function
         updateSelectInput(session,
-                          "SWATorSWATplus",
-                          label = "1. SWAT or SWAT+ project", 
-                          choices = c('SWAT', 'SWAT+'),
-                          selected = "SWAT+")
-      }
-
+                          "objFunction",
+                          label = "1. Select objective function",
+                          choices = c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS',
+                                      'userObjFunction'),
+                          selected = globalVariable$objFunction)
+        
+        # Update get observed data files
+        output$printObservedDataFile <<- renderText(globalVariable$observedDataFile)
+        
+        # Show meesage
+        showNotification("All project settings were loaded", 
+                         type = "message", 
+                         duration = 10)
+        
+      } else {
+        # Show meesage
+        showNotification("Error: Input file must be 'RSWATproject.rds'", 
+                         type = "error", 
+                         duration = 10)      
+      },
       
-      # Update working folder
-      updateTextInput(session, "workingFolder",
-                      label = "1. Working folder",
-                      value = globalVariable$workingFolder)
-
-      # Update TxtInOut folder
-      updateTextInput(session, "TxtInOutFolder",
-                      label = "2. TxtInOut folder",
-                      value = globalVariable$TxtInOutFolder)
-
-
-      # Update Select executable SWAT file Help
-      output$printSWATexe <- renderText(globalVariable$SWATexeFile)
-
-      # Update Files with list of all SWAT parameters
-      output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
-
-      # Update display content of the SWAT parameter file
-      output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
-
-      #-------------------------------------------------------------------------
-      # Update Tab 2: Parameter sampling
-      #-------------------------------------------------------------------------
-
-      # Update Select SWAT parameters for calibration and/or sensitivity analysis
-      if(globalVariable$SWATProject){
-        output$tableParaSelection <- renderExcel(
-          excelTable(data = globalVariable$paraSelection,
-                     columns = columnsParaSelectionSWAT,
-                     editable = TRUE,
-                     allowInsertRow = TRUE,
-                     allowInsertColumn = TRUE,
-                     allowDeleteColumn = TRUE,
-                     allowDeleteRow = TRUE,
-                     rowDrag = TRUE,
-                     columnResize = FALSE,
-                     wordWrap = TRUE)
-        )       
-      } else {
-        output$tableParaSelection <- renderExcel(
-          excelTable(data = globalVariable$paraSelection,
-                     columns = columnsParaSelectionSWATPlus,
-                     editable = TRUE,
-                     allowInsertRow = TRUE,
-                     allowInsertColumn = TRUE,
-                     allowDeleteColumn = TRUE,
-                     allowDeleteRow = TRUE,
-                     rowDrag = TRUE,
-                     columnResize = FALSE,
-                     wordWrap = TRUE)
-        )    
-      }
-
-      # Update Select sensitivity or calibration approach
-      updateSelectInput(session,
-                        "samplingApproach",
-                        label = "2. Select sensitivity or calibration approach",
-                        choices = c('Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
-                                    'Sensi_(from_sensitivity_package)',
-                                    'Sensi_(from_userDefined_package)',
-                                    'Cali_(from_optimization_package)',
-                                    'Cali_(from_hydroPSO_package)',
-                                    'Cali_(from_nloptr_package)',
-                                    'Cali_(Dynamically_Dimensioned_Search)',
-                                    'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
-                                    'Cali_(from_userDefined_package)',
-                                    'Read_User_Parameter_File'),
-                        selected = globalVariable$samplingApproach)
-
-      # Update Additional information about the selected sensitivity/calibration approach
-      updateTextAreaInput(session,
-                          "inputInfo",
-                          "3. Additional infomation about the selected sensitivity/calibration approach",
-                          globalVariable$sensCaliCommand)
-
-      # Update define model output for extraction
-      if (globalVariable$SWATProject){
-        output$tableOutputExtraction <- renderExcel(
-          excelTable(data = globalVariable$outputExtraction,
-                     columns = columnsOutputExtractionSWAT,
-                     editable = TRUE,
-                     allowInsertRow = TRUE,
-                     allowInsertColumn = FALSE,
-                     allowDeleteColumn = FALSE,
-                     allowDeleteRow = TRUE,
-                     rowDrag = FALSE,
-                     columnResize = FALSE,
-                     wordWrap = TRUE)
-        ) 
-      } else {
-        output$tableOutputExtraction <- renderExcel(
-          excelTable(data = globalVariable$outputExtraction,
-                     columns = columnsOutputExtractionSWATPlus,
-                     editable = TRUE,
-                     allowInsertRow = TRUE,
-                     allowInsertColumn = FALSE,
-                     allowDeleteColumn = FALSE,
-                     allowDeleteRow = TRUE,
-                     rowDrag = FALSE,
-                     columnResize = FALSE,
-                     wordWrap = TRUE)
-        )
-      }
-
-      # Update display corresponding observed file names
-      output$tableOutputExtractionDisplayOnly <- renderDataTable(
-        printVariableNameObservedFiles(globalVariable$outputExtraction))
-
-      # Update select date range
-      updateDateRangeInput(session,
-                           "dateRangeCali",
-                           "2. Select date range",
-                           start = globalVariable$dateRangeCali[1],
-                           end   = globalVariable$dateRangeCali[2])
-
-      # Update number of parallel runs
-      updateSliderInput(session,
-                        "ncores",
-                        "3. Select number of parallel runs (cores)",
-                        value = globalVariable$ncores,
-                        min = 1,
-                        max = detectCores())
-
-      # Update objective function
-      updateSelectInput(session,
-                        "objFunction",
-                        label = "1. Select objective function",
-                        choices = c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS',
-                                    'userObjFunction'),
-                        selected = globalVariable$objFunction)
-
-      # Update get observed data files
-      output$printObservedDataFile <<- renderText(globalVariable$observedDataFile)
-
-      # Show meesage
-      showNotification("All project settings were loaded", 
-                       type = "message", 
-                       duration = 10)
-
-    }
+      blocking_level = "error")
+    
 
   })
 
@@ -555,62 +561,55 @@ server <- function(input, output, session) {
   # Get executable SWAT file
   # ****************************************************************************
   observe({
-    # Get volumes
-    volumes <- getVolumes()
 
-    # Show shinyFileChoose window
-    shinyFileChoose(input, "getSWATexe",
-                    roots = volumes,
-                    filetypes=c('', 'exe'),
-                    session = session)
-
+    req(input$getSWATexe)
+    
     # Get full path to SWAT exe file
-    SWATexeFile <- parseFilePaths(volumes, input$getSWATexe)
+    shinyjs::disable("getSWATexe")
+    shinyCatch(globalVariable$SWATexeFile <<- file.choose(), 
+               blocking_level = "none")
+    shinyjs::enable("getSWATexe")
+    
+    shinyCatch(
+      if (grepl(".exe", globalVariable$SWATexeFile, fixed = TRUE)){
+        output$printSWATexe <- renderText(globalVariable$SWATexeFile)      
+      } else {
+        output$printSWATexe <- renderText("Error: The selected file must have '.exe' extention")
+      },
+      blocking_level = "error")
 
-    # Display and assign SWAT exe file to the global variable
-    if(length(SWATexeFile$datapath) == 1){
-      output$printSWATexe <- renderText(SWATexeFile$datapath)
-      globalVariable$SWATexeFile <<- as.character(SWATexeFile$datapath)
-    }
+    
   })
 
   # ****************************************************************************
   # Files with list of all SWAT parameters (get file) + display content of file
   # ****************************************************************************
   observe({
-    # Get volumes
-    volumes <- getVolumes()
-
-    # Show shinyFileChoose window
     
-    if (input$SWATorSWATplus == "SWAT"){
-      shinyFileChoose(input, "getSWATParamFile",
-                      roots = volumes,
-                      filetypes=c('', 'txt'),
-                      session = session)     
+    req(input$getSWATParamFile)
+    
+    # Get full path to SWAT exe file
+    shinyjs::disable("getSWATParamFile")
+    shinyCatch(globalVariable$SWATParamFile <<- file.choose(), 
+               blocking_level = "none")
+    shinyjs::enable("getSWATParamFile")
+    
+    shinyCatch(
+    if (grepl("swatParam.txt", globalVariable$SWATParamFile, fixed = TRUE) |
+        grepl("cal_parms.cal", globalVariable$SWATParamFile, fixed = TRUE)){
+      
+      globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
+      output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
+      output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
+      
     } else {
-      shinyFileChoose(input, "getSWATParamFile",
-                      roots = volumes,
-                      filetypes=c('', 'cal'),
-                      session = session)
-    }
-
-
-    # Get full path to SWAT parameter file
-    SWATParamFile <- parseFilePaths(volumes, input$getSWATParamFile)
-
-    if (length(SWATParamFile$datapath) == 1){
-      if ((SWATParamFile$name == "swatParam.txt") ||
-          (SWATParamFile$name == "cal_parms.cal")){
-
-        globalVariable$SWATParamFile <<- as.character(SWATParamFile$datapath)
-        
-        shinyCatch(globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile), 
-                   blocking_level = "error")
-        output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
-        output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
-      } 
-    }
+      output$printSWATParamFile <- renderText(
+        paste("Error: The selected file must be either 'swatParam.txt'",
+                                                    "or 'cal_parms.cal'")
+        )
+    }, 
+    blocking_level = "error")
+    
   })
 
 
@@ -1537,90 +1536,100 @@ server <- function(input, output, session) {
   # Get observed data files
   # ****************************************************************************
   observe({
+    
+    if(.Platform$OS.type == 'windows'){
+      req(input$getObservedDataFileWindow)      
+    } else {
+      req(input$getObservedDataFile)      
+    }
+    
+    if(.Platform$OS.type == 'windows'){
+     
+      shinyjs::disable("getObservedDataFileWindow")
+      observedDataFile <- choose.files()
+      shinyjs::enable("getObservedDataFileWindow")
+      
+    } else {
+      print("notok")
+      # Get volumes
+      volumes <- getVolumes()
+      
+      # Display shinyFileChoose
+      shinyFileChoose(input, "getObservedDataFile",
+                      roots = volumes,
+                      filetypes=c('', 'txt'),
+                      session = session)
+      
+      # Get full path to the observed data files
+      observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile) 
+      observedDataFile <- observedDataFile$path
+    }
+    
 
-    # Get volumes
-    volumes <- getVolumes()
-
-    # Display shinyFileChoose
-    shinyFileChoose(input, "getObservedDataFile",
-                    roots = volumes,
-                    filetypes=c('', 'txt'),
-                    session = session)
-
-    # Get full path to the observed data files
-    observedDataFile <- parseFilePaths(volumes, input$getObservedDataFile)
 
     # Get observed data
-    if(length(observedDataFile$datapath) == 1){
-
-      # Display observed data file paths
-      output$printObservedDataFile <- renderText(as.character(
-        observedDataFile$datapath)
-      )
-
-      # Assign observed data file paths to the global variables
-      globalVariable$observedDataFile <<- sortObservedDataFile(
-        as.character(observedDataFile$datapath)
-      )
-
-      # Observed data
-      globalVariable$observedData <<- list()
-
-      checkGetObservedDataFileMessage <- " "
-      # Check number of output variable files
-
-      if (globalVariable$nOutputVar != length(globalVariable$observedDataFile)){
-
-        # Print out message if there are more/less number of observed data files
-        checkGetObservedDataFileMessage <- paste("Error: Number of observed files should be: ",
-                                                 globalVariable$nOutputVar,
-                                                 sep ="")
-
+    shinyCatch(
+      if(TRUE){
+        # Assign observed data file paths to the global variables
+        globalVariable$observedDataFile <<- sortObservedDataFile(observedDataFile)
+      
+        # Display observed data file paths
+        output$printObservedDataFile <- renderText(as.character(globalVariable$observedDataFile))
+        
+        
+        
+        # Observed data
+        globalVariable$observedData <<- list()
+        
+        checkGetObservedDataFileMessage <- " "
+        # Check number of output variable files
+        
+        if (globalVariable$nOutputVar != length(globalVariable$observedDataFile)){
+          
+          # Print out message if there are more/less number of observed data files
+          checkGetObservedDataFileMessage <- paste("Error: Number of observed files should be: ",
+                                                   globalVariable$nOutputVar,
+                                                   sep ="")
+          
         } else {
-
-        # Get content of observed data files
-        for (i in 1:length(globalVariable$observedDataFile)){
-
-          if (!grepl(paste("obs_var_", i, ".txt", sep =""), 
-                     globalVariable$observedDataFile[i], fixed = TRUE)){
+          
+          # Get content of observed data files
+          for (i in 1:length(globalVariable$observedDataFile)){
             
-            checkGetObservedDataFileMessage <- paste("Error: change file name ",
-                                                     globalVariable$observedDataFile[i],
-                                                     " to ",
-                                                     paste("obs_var_", i, ".txt", 
-                                                           sep =""), sep = "")
-          } else {
-    
-            # Read observed data
-            temp <- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
-            
-            # check observed data
-            checkGetObservedDataFileMessage <- checkObservedData(temp)
-            
-            if (checkGetObservedDataFileMessage == ""){
-              # Store observed data in the global variables
-              temp <- data.frame(Date = as.POSIXct(paste(temp[,1], temp[,2], sep = " "), 
-                                                   format = "%Y-%m-%d %H:%M", tz = ""),
-                                 Value = temp[,3],
-                                 Flag = temp[,4])
+            if (!grepl(paste("obs_var_", i, ".txt", sep =""), 
+                       globalVariable$observedDataFile[i], fixed = TRUE)){
               
-              # Assign back observed data to global variable
-              globalVariable$observedData[[i]] <<- temp              
-            }   
+              checkGetObservedDataFileMessage <- paste("Error: change file name ",
+                                                       globalVariable$observedDataFile[i],
+                                                       " to ",
+                                                       paste("obs_var_", i, ".txt", 
+                                                             sep =""), sep = "")
+            } else {
+              
+              # Read observed data
+              temp <- read.table(globalVariable$observedDataFile[i], skip = 1, sep = "")
+              
+              # check observed data
+              checkGetObservedDataFileMessage <- checkObservedData(temp)
+              
+              if (checkGetObservedDataFileMessage == ""){
+                # Store observed data in the global variables
+                temp <- data.frame(Date = as.POSIXct(paste(temp[,1], temp[,2], sep = " "), 
+                                                     format = "%Y-%m-%d %H:%M", tz = ""),
+                                   Value = temp[,3],
+                                   Flag = temp[,4])
+                
+                # Assign back observed data to global variable
+                globalVariable$observedData[[i]] <<- temp              
+              }   
+            }
           }
         }
-    }
-
-      # Display check message
-      output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
-
-      # Save observed data to globalVariable
-      shinyCatch(
-        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
-                                             'RSWATproject.rds', sep ='')), 
-        blocking_level = "error"
-      )
-    }
+        
+        # Display check message
+        output$checkGetObservedDataFile <- renderText(checkGetObservedDataFileMessage)
+      },
+      blocking_level = "error")
   })
 
   # ****************************************************************************
@@ -1734,12 +1743,6 @@ server <- function(input, output, session) {
       ))
     }
 
-    #Save RSWATObject
-    shinyCatch(
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
-                                           'RSWATproject.rds', sep ='')), 
-      blocking_level = "error"
-    )
 
   })
 
@@ -2109,27 +2112,6 @@ server <- function(input, output, session) {
     ))
   })
 
-  # ****************************************************************************
-  # Save all results
-  # ****************************************************************************
-  observe({
-    req(input$saveAllResults)
-
-    # Save observed data to global variable
-    shinyCatch(
-      saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
-                                           'RSWATproject.rds', sep ='')), 
-      blocking_level = "error"
-    )
-
-    # Display message that all settings/results were saved
-    showModal(modalDialog(
-      title = "Save results",
-      HTML("All results was saved as 'RSWATproject.rds' in the working folder"),
-      easyClose = TRUE,
-      size = "l"
-    ))
-  })
 
   #-----------------------------------------------------------------------------
   # Tab 5. Visualization

@@ -3,7 +3,7 @@
 
 paramSamplingUI <- function(id) {
 
-  # NS(id) returns a namespace function, which was save as `ns` and will
+  # NS(id) returns a namespace function, which was saved as `ns` and will
   # invoke later.
   
   ns <- NS(id)

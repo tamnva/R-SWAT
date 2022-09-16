@@ -136,7 +136,9 @@ runSwatUI <- function(id) {
       ),
       
       column(width = 10,
-             actionButton("runSWAT", "Click here to run SWAT"),
+             actionButton("runSWAT",
+                          "Click here to run SWAT",
+                          style="background-color: #87CEFA; border-color: #2e6da4"),
              verbatimTextOutput('printRuning'),
       ),
 
