@@ -157,11 +157,11 @@ saveOutput <- function(workingDirectory,
                                   output)
       
     } else if (fileType[i] == "channel_sd_day.txt"      |
-                              "channel_sd_mon.txt"      |
-                              "channel_sd_yr.txt"       |
-                              "channel_sdmorph_day.txt" |
-                              "channel_sdmorph_mon.txt" |
-                              "channel_sdmorph_yr.txt"){
+               fileType[i] == "channel_sd_mon.txt"      |
+               fileType[i] == "channel_sd_yr.txt"       |
+               fileType[i] == "channel_sdmorph_day.txt" |
+               fileType[i] == "channel_sdmorph_mon.txt" |
+               fileType[i] == "channel_sdmorph_yr.txt"){
       output <- readChannelFile(workingDirectory,
                                   coreNumber, 
                                   fileName[i], 
@@ -381,10 +381,10 @@ readChannelFile <- function(workingDirectory,
   # Monthly output file
   } else if((timeStep > 27) & (timeStep < 31)){
     trim <- c(which(format(timeSeries,"%Y-%m") ==  format(fromToDate[1],"%Y-%m")), 
-              which(format(timeSeries,"%Y-%m") ==  format(fromToDate[1],"%Y-%m"))) 
+              which(format(timeSeries,"%Y-%m") ==  format(fromToDate[2],"%Y-%m"))) 
   } else if((timeStep == 365) | (timeStep == 366)){
     trim <- c(which(format(timeSeries,"%Y") ==  format(fromToDate[1],"%Y")), 
-              which(format(timeSeries,"%Y") ==  format(fromToDate[1],"%Y")))     
+              which(format(timeSeries,"%Y") ==  format(fromToDate[2],"%Y")))     
   } else {
     # TODO
     trim <- c("error", "error")

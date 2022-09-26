@@ -288,7 +288,7 @@ server <- function(input, output, session) {
                              "2. Select date range",
                              start = globalVariable$dateRangeCali[1],
                              end   = globalVariable$dateRangeCali[2])
-        
+
         # Update number of parallel runs
         updateSliderInput(session,
                           "ncores",
@@ -974,15 +974,15 @@ server <- function(input, output, session) {
       
       # Assign simulation dates to the global variale
       globalVariable$fileCioInfo <<- myDate
-      
-      # Update selected date range for calibration/sensitivity
-      updateDateRangeInput(session, "dateRangeCali",
-                           start = myDate$startEval,
-                           end = myDate$endSim,
-                           min = myDate$startEval,
-                           max = myDate$endSim
-      )        
-      
+
+      if (!globalVariable$loadProject){
+        # Update selected date range for calibration/sensitivity
+        updateDateRangeInput(session, "dateRangeCali",
+                             start = myDate$startEval,
+                             end = myDate$endSim,
+                             min = myDate$startEval,
+                             max = myDate$endSim)
+      }   
     }
   })
 
@@ -990,6 +990,7 @@ server <- function(input, output, session) {
   # Get user input range for calibration
   # ****************************************************************************
   observe({
+    req(input$dateRangeCali)
     # Save selected date range for calibration/sensitivity to the global variables
     globalVariable$dateRangeCali <<- input$dateRangeCali
   })
@@ -1550,7 +1551,7 @@ server <- function(input, output, session) {
       shinyjs::enable("getObservedDataFileWindow")
       
     } else {
-      print("notok")
+
       # Get volumes
       volumes <- getVolumes()
       
