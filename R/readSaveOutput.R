@@ -407,3 +407,4 @@ readChannelFile <- function(workingDirectory,
   
   return(output)
 }
+

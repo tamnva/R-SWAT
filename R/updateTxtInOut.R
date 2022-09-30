@@ -526,6 +526,14 @@
 	  listFiles <- paste(fromDir, "/", listFiles, sep = "")
 	  
 	  file.copy(listFiles, toDir)
+	  
+	  # Copy files in subfolders (SWAT+ project)
+	  listDir <- list.dirs(fromDir, recursive = FALSE)
+	  if(length(listDir) > 0) {
+	    for (i in 1:length(listDir)){
+	      file.copy(listDir[i], toDir, recursive=TRUE)		      
+	    }
+	  }
 	}	
 
 #-------------------------------------------------------------------------------	
@@ -578,7 +586,7 @@
 	  paraSelection[,2] <- gsub("relative", "relchg", paraSelection[,2])  
 	  paraSelection[,2] <- gsub("absolute", "abschg", paraSelection[,2])  
 	  
-	  # Remove the extention e.g., .hru in the parameter selection data
+	  # Remove the extension e.g., .hru in the parameter selection data
 	  paraName <- strsplit(trimws(paraSelection[,c(1)]), '[.]')
 	  for (i in 1:length(paraName)){
 	    paraSelection[i,1] <- paraName[[i]][1]

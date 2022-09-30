@@ -345,27 +345,23 @@ server <- function(input, output, session) {
       globalVariable$SWATPlusProject <<- TRUE      
     }
     
+    # Initially there is no warning message
+    output$checkTxtInOutFolder <- renderText(" ") 
+    
     # Check if the TxtInOut matches the SWAT project
-    if (globalVariable$TxtInOutSWAT & globalVariable$SWATPlusProject){
-      output$checkTxtInOutFolder <- renderText(
-        "ERROR: This should be TxtInOut of SWAT "
-        ) 
-    } else if (globalVariable$TxtInOutSWAT & globalVariable$SWATProject){
-      output$checkTxtInOutFolder <- renderText(" ") 
+    if (globalVariable$SWATPlusProject){
+      if(globalVariable$TxtInOutSWAT){
+        output$checkTxtInOutFolder <- renderText(
+          "ERROR: This should be TxtInOut of SWAT+"
+        )         
+      }
     } else {
-      
-    }
-
-    # Check if the TxtInOut matches the SWAT+ project    
-    if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATProject){
-      output$checkTxtInOutFolder <- renderText(
-        "ERROR: This should be TxtInOut of SWAT+ "
-        ) 
-    } else if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATPlusProject){
-      output$checkTxtInOutFolder <- renderText(" ") 
-    } else {
-      
-    }
+      if(globalVariable$TxtInOutSWATPlus){
+        output$checkTxtInOutFolder <- renderText(
+          "ERROR: This should be TxtInOut of SWAT"
+        )         
+      }     
+    } 
 
     # ****************************************************************************
     # Select SWAT parameters to calibration and/or sensitivity: Default setting
@@ -483,18 +479,20 @@ server <- function(input, output, session) {
       globalVariable$TxtInOutSWAT <<- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWAT
       globalVariable$TxtInOutSWATPlus <<- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWATPlus
       
-      # check if the TxtInOut is correct
-      if (globalVariable$TxtInOutSWAT & globalVariable$SWATPlusProject){
-        output$checkTxtInOutFolder <- renderText(
-          "ERROR: This should be TxtInOut of SWAT "
-          ) 
-      }
-
-      if (globalVariable$TxtInOutSWATPlus & globalVariable$SWATProject){
-        output$checkTxtInOutFolder <- renderText(
-          "ERROR: This should be TxtInOut of SWAT+ "
-          ) 
-      }   
+      # Check if the TxtInOut matches the SWAT project
+      if (globalVariable$SWATPlusProject){
+        if(globalVariable$TxtInOutSWAT){
+          output$checkTxtInOutFolder <- renderText(
+            "ERROR: This should be TxtInOut of SWAT+"
+          )         
+        }
+      } else {
+        if(globalVariable$TxtInOutSWATPlus){
+          output$checkTxtInOutFolder <- renderText(
+            "ERROR: This should be TxtInOut of SWAT"
+          )         
+        }     
+      }    
 
       # Save link to TxtInout Folder to the global variable
       globalVariable$TxtInOutFolder <<- trimws(input$TxtInOutFolder)

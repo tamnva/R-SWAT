@@ -164,14 +164,19 @@
                                         TxtInOut, exceptFiles, swatExe,
                                         firstRun){
     
+    # Remove existing TxtInOut_xxx folders
     if (firstRun){
+      # List of existing folders in the working directory
       existingDir <- list.dirs(path = workingDirectory, 
                                full.names = TRUE, recursive = TRUE)
       
       for (i in 1:length(existingDir)){
+        
+        # Get only the folder names
         temp <- trimws(strsplit(existingDir[i], split="/")[[1]])
         temp <- temp[length(temp)]
         
+        # Delete all TxtInOut folders
         if(substr(temp,1,9) == 'TxtInOut_'){
           unlink(existingDir[i], recursive = TRUE)
         }

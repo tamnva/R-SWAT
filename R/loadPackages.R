@@ -34,4 +34,5 @@ install.packages(setdiff(requiredPackages,rownames(installed.packages())), depen
 update.packages(requiredPackages, ask = FALSE)
   
 # Load dependency packages
-invisible(lapply(requiredPackages, library, character.only = TRUE))
+suppressMessages(suppressWarnings(lapply(requiredPackages, library, character.only = TRUE)))
+
