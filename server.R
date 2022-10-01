@@ -679,7 +679,7 @@ server <- function(input, output, session) {
     
     showModal(modalDialog(
       title = "Help: 5. File with list of SWAT or SWAT+ parameters",
-      renderUI(HTML(readLines(paste("globalVariable$HTMLdir",
+      renderUI(HTML(readLines(paste(globalVariable$HTMLdir,
                                     "/HTML/helpSWATparamFile.html",
                                     sep = "")))),
       easyClose = TRUE
@@ -816,7 +816,7 @@ server <- function(input, output, session) {
     req(input$helpParamSelection)
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-      renderUI(HTML(readLines(paste("globalVariable$HTMLdir",
+      renderUI(HTML(readLines(paste(globalVariable$HTMLdir,
                                     "/HTML/helpParamSelection.html",
                                     sep = "")))),
       easyClose = TRUE
@@ -1096,7 +1096,7 @@ server <- function(input, output, session) {
     
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-      renderUI(HTML(readLines(paste("globalVariable$HTMLdir",
+      renderUI(HTML(readLines(paste(globalVariable$HTMLdir,
                                     "/HTML/helpOutputExtraction.html",
                                     sep = "")))),
       easyClose = TRUE
