@@ -142,16 +142,7 @@ generalSettingUI <- function(id) {
                          "</b>"),
              ),
              
-             column(width = 1,
-                    actionButton("helpSWATparamFile", 
-                                 "Help",
-                                 buttonType = "default",
-                                 style="background-color: none; border-color: none",
-                                 class = NULL),
-
-             ),
            ),
-           
            
            # If this is a SWAT+ project
            conditionalPanel(
@@ -161,16 +152,18 @@ generalSettingUI <- function(id) {
                          "5. File with list of all SWAT+ parameters",
                          "</b>"),
              ),
-             column(width = 1,
-                    tippy("Help", tooltip = "<span style ='font-size:16px'>
-                            This is a SWAT+ project, please select the file 
-                            'cal_parms.cal' in your SWAT+ TxtInOur folder.
-                   <span>", 
-                          allowHTML = TRUE, 
-                          trigger = "click",
-                          theme = "translucent"),
-             ),
            ),
+           
+           column(width = 1,
+                  actionButton("helpSWATparamFile", 
+                               "Help",
+                               buttonType = "default",
+                               style="background-color: none; border-color: none",
+                               class = NULL),
+                  
+           ),
+           
+           
       ),
 
       # Select the paramter file
