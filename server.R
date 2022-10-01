@@ -20,6 +20,7 @@ server <- function(input, output, session) {
   globalVariable$TxtInOutSWATPlus <<- FALSE
   globalVariable$SWATProject <<- TRUE
   globalVariable$paraSelection <<- dataParaSelectionSWAT 
+  globalVariable$HTMLdir <<- getwd()
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
@@ -678,7 +679,9 @@ server <- function(input, output, session) {
     
     showModal(modalDialog(
       title = "Help: 5. File with list of SWAT or SWAT+ parameters",
-      renderUI(HTML(readLines("./HTML/helpSWATparamFile.html"))),
+      renderUI(HTML(readLines(paste("globalVariable$HTMLdir",
+                                    "/HTML/helpSWATparamFile.html",
+                                    sep = "")))),
       easyClose = TRUE
     ))     
   })
@@ -811,10 +814,11 @@ server <- function(input, output, session) {
   observe({
     
     req(input$helpParamSelection)
-    
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-      renderUI(HTML(readLines("./HTML/helpParamSelection.html"))),
+      renderUI(HTML(readLines(paste("globalVariable$HTMLdir",
+                                    "/HTML/helpParamSelection.html",
+                                    sep = "")))),
       easyClose = TRUE
     ))    
     
@@ -1092,7 +1096,9 @@ server <- function(input, output, session) {
     
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-      renderUI(HTML(readLines("./HTML/helpOutputExtraction.html"))),
+      renderUI(HTML(readLines(paste("globalVariable$HTMLdir",
+                                    "/HTML/helpOutputExtraction.html",
+                                    sep = "")))),
       easyClose = TRUE
     ))    
     
