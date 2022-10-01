@@ -39,9 +39,9 @@ The following interface (attached screenshot on the end of this document) will a
 
 If you don't know which input is required, simply clicking to "Help?" at the right side of each respective input field. A sample of data for running this app can be downloaded from my [GitHub repository](https://github.com/tamnva/R-SWAT/blob/master/data/obs_var_1.txt), including:
 
- 1. _/data/TxtInOut_: A TxtInOut folder and all associated files created by ArcSWAT
- 2. _swatParam.txt_: An input file describing all SWAT parameters that you will need for the input field _1. General Setting => 4. Files with list of all SWAT Parameters_
- 3. _obs_var_1.txt_: Observed data file (streamflow) at the catchment outlet that you might need to input to evaluate the model performance _4.1. Objective function => 2. Get observed data files_
+ 1. _/data/example_SWAT/TxtInOut_ and _/data/example_SWAT+/TxtInOut_: TxtInOut folders and all associated files created by ArcSWAT and SWAT+ Editor, respectively
+ 2. _/data/example_SWAT/swatParam.txt_ and _/data/example_SWAT+/cal_parms.cal_ : An input file describing all SWAT and SWAT+ parameters, respectively, that you will need for the input field _1. General Setting => 4. Files with list of all SWAT Parameters_
+ 3. _/data/example_SWAT/obs_var_1.txt_ and _/data/example_SWAT+/obs_var_1.txt_: Observed data file (streamflow) at the catchment outlet that you might need to input to evaluate the model performance _4.1. Objective function => 2. Get observed data files_
   4. _data/examples_: you will see examples how to include new parameters in new files (e.g., this could be the case  if you modify SWAT code)
 
 ## R-SWAT user interface
