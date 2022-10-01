@@ -1,0 +1,4 @@
+aqu_catunit.ele: written by SWAT+ editor v2.0.4 on 2022-01-28 14:45
+      id  name                   obj_typ  obj_typ_no      bsn_frac      sub_frac      reg_frac  
+       1  aqu10                      aqu           1       1.00000       0.00000       0.00000  
+       2  aqu_deep01                 aqu           2       1.00000       0.00000       0.00000  

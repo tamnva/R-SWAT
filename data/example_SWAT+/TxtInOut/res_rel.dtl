@@ -1,0 +1,11 @@
+res_rel.dtl: written by SWAT+ editor v2.0.4 on 2022-01-28 14:45
+1
+
+name                     conds      alts      acts  
+wetland                      2         2         2  
+var                        obj   obj_num           lim_var            lim_op     lim_const      alt1      alt2  
+vol_wet                    hru         0              pvol                 *       1.00000         >         -  
+vol_wet                    hru         0              evol                 *       1.00000         <         >  
+act_typ                    obj   obj_num              name            option         const        const2                fp  outcome           
+release                    hru         0        below_emer              days      10.00000       0.00000              null  y   n   
+release                    hru         0        above_emer              days       2.00000       0.00000              null  n   y   
