@@ -17,27 +17,13 @@ runSwatUI <- function(id) {
       column(width = 10,
              HTML("<b>","1. Define model outputs for extraction","</b>"),
       ),
+
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   You can read from multiple 'watout.dat' file type with different 
-                   names, add more rows if you do so. The column specifies which 
-                   columns from that file you want to extract (e.g., column 4 and 
-                   5 and 7) -> the input should be '4,5,7' with comma to seperate 
-                   the column name. In case of reading from watout.dat file type,
-                   leave the reach number empty. In case of reading from .rch, 
-                   .sub, .hru, the reach number is also the subbasin or hru number.
-                   For example, you want to read from column 4 reach number 1,2 and
-                   from columnn 5 reach number 1,2,3, column 7 reach number 3. Input
-                   to the Column should be '4,5,7', to the Reach should be 
-                   '1,2 * 1,2,3 * 3' Note * must be use to seperate this expression. Currently
-                   incase of reading from .hru, .sub, .rch the file name and file type 
-                   must be identical. Please check the tick box below to ensure that 
-                   all numbers you enter here appear in the display table. Please also see section 4
-                   of R-SWAT wiki page https://github.com/tamnva/R-SWAT/wiki/R-SWAT-User-Manual
-                   <span> ", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpOutputExtraction", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
       
       column(width = 10,

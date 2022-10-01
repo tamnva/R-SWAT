@@ -114,7 +114,7 @@ server <- function(input, output, session) {
       # Display message that save was done
       showNotification("Project settings were saved as 'RSWATproject.rds'
       in the working folder", type = "message", duration = 10)
-
+      
       # Save project setting
       shinyCatch(
         saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
@@ -362,7 +362,7 @@ server <- function(input, output, session) {
         )         
       }     
     } 
-
+    
     # ****************************************************************************
     # Select SWAT parameters to calibration and/or sensitivity: Default setting
     # ****************************************************************************
@@ -430,6 +430,21 @@ server <- function(input, output, session) {
     }
     
   })
+
+  # ****************************************************************************
+  # Help button select SWAT or SWAT+ project
+  # ****************************************************************************
+  observe({
+    req(input$helpSWATorSWATplus)
+    
+    showModal(modalDialog(
+      title = "Help: 1. SWAT or SWAT+ project",
+      "Please select SWAT or SWAT+ model, the graphical user interface will be
+      changed after the selection",
+      easyClose = TRUE
+    ))    
+    
+  })
   
   # ****************************************************************************
   # Get working folder
@@ -459,6 +474,23 @@ server <- function(input, output, session) {
     
   })
 
+  # ****************************************************************************
+  # Help button select working folder
+  # ****************************************************************************
+  observe({
+    req(input$helpworkingFolder)
+    
+    showModal(modalDialog(
+      title = "Help: 2. Working folder",
+      "All files created by R-SWAT will be saved in this folder, for example,
+      project setting file 'RSWATproject.rds' when you save your project, 
+      this file also can be used to load project settings from previous setup, 
+      simulation outputs, TxtInOut folders for parallel runs, etc...",
+      easyClose = TRUE
+    ))    
+    
+  })
+  
   # ****************************************************************************
   # TxtInOut folder: Display HRU info from TxtInOut folder
   # ****************************************************************************
@@ -556,6 +588,20 @@ server <- function(input, output, session) {
   })
 
   # ****************************************************************************
+  # Help button select TxtInOut folder
+  # ****************************************************************************
+  observe({
+    req(input$helpTxtInOutFolder)
+    
+    showModal(modalDialog(
+      title = "Help: 3. TxtInOut folder",
+      "Path to the TxtInOut directory which contains all original SWAT (or SWAT+) 
+      input files. These files will not be changed by R-SWAT",
+      easyClose = TRUE
+    ))
+  })
+  
+  # ****************************************************************************
   # Get executable SWAT file
   # ****************************************************************************
   observe({
@@ -579,6 +625,20 @@ server <- function(input, output, session) {
     
   })
 
+  
+  # ****************************************************************************
+  # Help button select executable SWAT
+  # ****************************************************************************
+  observe({
+    req(input$helpgetSWATexe)
+    
+    showModal(modalDialog(
+      title = "Help: 4. Select executable SWAT",
+      "Select the executable SWAT or SWAT+ file, for example, swat_32debug.exe",
+      easyClose = TRUE
+    ))     
+  })
+  
   # ****************************************************************************
   # Files with list of all SWAT parameters (get file) + display content of file
   # ****************************************************************************
@@ -610,7 +670,19 @@ server <- function(input, output, session) {
     
   })
 
-
+  # ****************************************************************************
+  # Help button select file SWAT (or SWAT+) parameter file
+  # ****************************************************************************
+  observe({
+    req(input$helpSWATparamFile)
+    
+    showModal(modalDialog(
+      title = "Help: 5. File with list of SWAT or SWAT+ parameters",
+      renderUI(HTML(readLines("./HTML/helpSWATparamFile.html"))),
+      easyClose = TRUE
+    ))     
+  })
+  
   #-----------------------------------------------------------------------------
   # Tab 2. Parameter sampling
   #-----------------------------------------------------------------------------
@@ -675,7 +747,20 @@ server <- function(input, output, session) {
     }
   })
 
-
+  # ****************************************************************************
+  # Help parameter selection
+  # ****************************************************************************
+  observe({
+    req(input$helpParam)
+    
+    showModal(modalDialog(
+      title = "Help: 1. Display help for parameter selection",
+      "If you don't know the parameter, subbasin, land use, and slope names, 
+      check this box. We will get this information from the TxtInOut folder for you",
+      easyClose = TRUE
+    ))     
+  })
+  
   # ****************************************************************************
   # Check input 'Select SWAT parameters for calibration'
   # ****************************************************************************
@@ -720,6 +805,20 @@ server <- function(input, output, session) {
 
   })
 
+  # ****************************************************************************
+  # Help button parameter change selection
+  # ****************************************************************************
+  observe({
+    
+    req(input$helpParamSelection)
+    
+    showModal(modalDialog(
+      title = "Help: Parameter Selection",
+      renderUI(HTML(readLines("./HTML/helpParamSelection.html"))),
+      easyClose = TRUE
+    ))    
+    
+  })
   # ****************************************************************************
   # Parameter sampling: Default setting
   # ****************************************************************************
@@ -857,6 +956,20 @@ server <- function(input, output, session) {
   })
 
   # ****************************************************************************
+  # Help: Selecting sensitivity, calibration approach
+  # ****************************************************************************
+  observe({
+    req(input$helpSelectingApproach)
+    
+    showModal(modalDialog(
+      title = "Help: 1. Selecting calibration and/or sensitivity approach",
+      "Sensi', 'Cali', and 'Sensi_Cali' mean for sensitivity, calibration,
+      and both sensitivity and calibration simulations respectively",
+      easyClose = TRUE
+    ))     
+  })
+  
+  # ****************************************************************************
   # Parameter sampling: get input information
   # ****************************************************************************
   observe({
@@ -884,6 +997,21 @@ server <- function(input, output, session) {
 
     })
 
+  # ****************************************************************************
+  # Help: Additional infomation about the selected sensitivity/calibration
+  # ****************************************************************************
+  observe({
+    req(input$helpAdditionalInfo)
+    
+    showModal(modalDialog(
+      title = "Help: 3. Additional infomation for sensitivity/calibration",
+      "Default input for each method is given, please modify the text if necessary
+      (see help text below for modifying). Please see also Sections 2.1 and 2.2
+      in the R-SWAT wiki page: https://github.com/tamnva/R-SWAT/wiki/R-SWAT-User-Manual",
+      easyClose = TRUE
+    ))     
+  })
+  
   #-----------------------------------------------------------------------------
   # Tab 3. Run SWAT
   #-----------------------------------------------------------------------------
@@ -955,6 +1083,20 @@ server <- function(input, output, session) {
 
   })
 
+  # ****************************************************************************
+  # Help output extraction
+  # ****************************************************************************
+  observe({
+    
+    req(input$helpOutputExtraction)
+    
+    showModal(modalDialog(
+      title = "Help: Parameter Selection",
+      renderUI(HTML(readLines("./HTML/helpOutputExtraction.html"))),
+      easyClose = TRUE
+    ))    
+    
+  })
 
   # ****************************************************************************
   # Update select input range based on file.cio in the TxtInOutFolder

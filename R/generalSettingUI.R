@@ -24,12 +24,11 @@ generalSettingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   Please select which project are you going to use: SWAT or SWAT+
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpSWATorSWATplus", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
       
       #-------------------------------------------------------------------------
@@ -45,12 +44,11 @@ generalSettingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   All files created by R-SWAT will be saved in this folder
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpworkingFolder", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
 
       #-------------------------------------------------------------------------
@@ -67,14 +65,12 @@ generalSettingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-             Link to the TxtInOut directory which contains all 
-             original SWAT or SWAT+ input files. These files will 
-             not be changed by R-SWAT
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpTxtInOutFolder", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
+            
       ),
       
       column(width = 10,
@@ -112,14 +108,12 @@ generalSettingUI <- function(id) {
         ),
       ),
       
-      # Help text for selecting executable SWAT or SWAT+ file
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                  Select the executable SWAT or SWAT+ file, for example, swat_32debug.exe
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpgetSWATexe", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
 
       # Pop up window for selecting the executable SWAT or SWAT+ 
@@ -147,21 +141,14 @@ generalSettingUI <- function(id) {
                          "5. File with list of all SWAT parameters",
                          "</b>"),
              ),
+             
              column(width = 1,
-                    tippy("Help", tooltip = "<span style ='font-size:16px'>
-                            Select the file 'swatParam.txt' with list of all SWAT parameters. 
-                            If there are  parameters that you want to calibrate 
-                            but are missing in this file, 
-                            simply open this file manually and add to the file. 
-                            The theoretical min and max are used to 
-                            restrict the parameters that you are going to modify
-                            will not out of this range. Please check again 
-                            the theoretical min and max of your selected 
-                            parameters.
-                   <span>", 
-                          allowHTML = TRUE, 
-                          trigger = "click",
-                          theme = "translucent"),
+                    actionButton("helpSWATparamFile", 
+                                 "Help",
+                                 buttonType = "default",
+                                 style="background-color: none; border-color: none",
+                                 class = NULL),
+
              ),
            ),
            

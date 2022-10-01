@@ -27,14 +27,11 @@ paramSamplingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help", 
-                   tooltip = "<span style='font-size:16px;'>
-                   If you don't remember the parameter names, subbasin, 
-                   land use, soil type, slope, check this box.
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpParam", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
              
       ),
       
@@ -52,23 +49,11 @@ paramSamplingUI <- function(id) {
       ),
       
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;text-align: left;'>
-                   Parameters defined at the hru level (in files .hru, .gw, .mgt,
-                   .chm, .sdr, .sep, .sol files) you should fill in all fields 
-                   of this table. <br> Parameter defined at the subbasin level 
-                   (.sub, .rte, .wq, .pnd .res files), the land use, soil, slope 
-                   can be left empty. Basin parameters (.wwq, .bsn files), the 
-                   subbasin, landuse, soil, slope cells can be left emtpy. If 
-                   you select all subbasins/landuse/soil or slope, just type 
-                   'All'. Note: 'relative' change means
-                   x_new = x_old*(1 + appliedValue). 'absolute' change means
-                   x_new = x_old + appliedValue. 'replace' means
-                   x_new = appliedValue
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
-             
+             actionButton("helpParamSelection", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
       
       
@@ -108,13 +93,11 @@ paramSamplingUI <- function(id) {
       ),
 
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   'Sensi', 'Cali', and 'Sensi_Cali' mean for sensitivity, calibration,
-                   and both sensitivity and calibration simulations respectively,
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpSelectingApproach", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
     
       #-------------------------------------------------------------------------
@@ -128,20 +111,17 @@ paramSamplingUI <- function(id) {
                            height = "100px",
                            resize = "vertical") %>%
                shiny::tagAppendAttributes(style = 'width: 100%;'),
-             
              verbatimTextOutput("displayInputInfo"),
              ),
       
+      
+      
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;text-align: left;'>
-                   Default input for each method is given, please modify the text if necessary
-                   (see help text below for modifying). Please see also Sections 2.1 and 2.2
-                   in the R-SWAT wiki page: https://github.com/tamnva/R-SWAT/wiki/R-SWAT-User-Manual
- 
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpAdditionalInfo", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
       
     )
