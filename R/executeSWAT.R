@@ -138,7 +138,10 @@
                                                       "updateSingleFile",
                                                       "saveOutput",
                                                       "userReadSwatOutput",
-                                                      "readWatoutFile")) %dopar% {
+                                                      "readWatoutFile",
+                                                      "updateCalibrationFile",
+                                                      "readChannelFile",
+                                                      "getRchNumber")) %dopar% {
                                                         
                                                         runSWATSequential(i, 
                                                                           workingDirectory, 

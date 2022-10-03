@@ -85,14 +85,6 @@ observedDataFile <- c("C:/RSWAT_demo/obs_var_1.txt")
 #                            End user input                                    #
 # -----------------------------------------------------------------------------#
 # Load R-SWAT functions
-RSWATfiles <- c("executeSWAT.R", "glue.R", "multiRegression.R",
-                "objFunction.R", "readSaveOutput.R", "updateTxtInOut.R",
-                "userObjFunction.R", "userReadSwatOutput.R")
-
-# Load R-SWAT function
-setwd(RSWATsourceFile)
-lapply(RSWATfiles, source)
-
 # Require packages
 requiredPackages <- c('foreach', 'doParallel', 'lhs', 'sensitivity', 'boot', 
                       'optimization', 'hydroPSO','nloptr','spsComps')
@@ -103,11 +95,25 @@ install.packages(setdiff(requiredPackages,rownames(installed.packages())), depen
 # Load these packages
 lapply(requiredPackages, library, character.only = TRUE)
 
+# Load R-SWAT functions
+RSWATfiles <- c("executeSWAT.R", "glue.R", "multiRegression.R",
+                "objFunction.R", "readSaveOutput.R", "updateTxtInOut.R",
+                "userObjFunction.R", "userReadSwatOutput.R", "displayOutput.R")
+
+# Load R-SWAT function
+setwd(RSWATsourceFile)
+lapply(RSWATfiles, source)
+
 # Generate parameter samples using Latin Hypercube Sampling
 parameterValue <- lhsRange(sensCaliCommand, getParamRange(paraSelection))
 
 # Get HRU infor (HRU names, landuse, soil, slope, subbasin)
-HRUinfo <- getHruInfo(TxtInOutFolder)
+if (SWATproject){
+  HRUinfo <- getHruInfo(TxtInOutFolder)
+} else {
+  HRUinfo <- read.table( paste(TxtInOutFolder, "/hru-data.hru", sep =""),
+                         header = TRUE, skip = 1, sep = "")
+}
 
 # Read SWAT parameter
 SWATParam <- loadSwatParam(SWATParamFile)
