@@ -39,8 +39,8 @@ paraSelection <- data.frame(
 # paraSelection <- data.frame(
 #   Parameter = c("cn2.hru"   , "canmx.hru"),
 #   Change =    c("relative"  , "replace"),
-#   Min =       c(-0.25       , 0.25),
-#   Max =       c(1.00        , 10.00),
+#   Min =       c(-0.25       , 1.0),
+#   Max =       c(0.25        , 10.0),
 #   Object  =   c("All"       , "All"),
 #   Conditions = c("All"      , "All")
 # )
@@ -74,7 +74,7 @@ dateRangeCali <- as.Date(c("2000-01-01", "2007-12-31"), format = "%Y-%m-%d")
 # 11. Number of parallel runs
 ncores <- 4
 
-# 12. Objective function
+# 12. Objective function could be "NSE", "KGE", "RMSE", "R2", "aBIAS" is absolute bias ranging from [0, inf]
 objFunction <- "NSE"
 
 # 13. Observed data file(s)
@@ -181,6 +181,8 @@ colnames(parameterObj) <- c("objFunction", paraSelection[,1])
 ParamSensitivity <- summary(lm(formula = objFunction ~ ., parameterObj))[4]$coefficients[,3:4] 
 
 # The objective function should be maximum "Maximize" or minimum "Minimize"
+# e.g., if objective function is NSE, KGE , R2 then it should be "Maximize"
+#       if objective function is "RMSE", "aBIAS" then it should be "Minimize"
 minOrmax <- "Maxmimize"
 
 # Behavioral threshold
