@@ -5,8 +5,8 @@
 #                              Start user input                                #
 # -----------------------------------------------------------------------------#
 
-# Load R-SWAT functions
-RSWATsourceFile <- "C:/Users/nguyenta/Documents/GitHub/R-SWAT/R"
+# R-SWAT source code
+RSWATsourceFile <- "C:/RSWAT_demo/R-SWAT-master/R"
 
 # 1. Set SWATproject is TRUE if you run SWAT, set to FALSE if you run SWAT+
 SWATproject <- TRUE
@@ -15,13 +15,13 @@ SWATproject <- TRUE
 workingFolder <- "C:/RSWAT_demo/workingFolder"
 
 # 3. TxtInOut folder
-TxtInOutFolder <- "C:/RSWAT_demo/example_SWAT/TxtInOut"
+TxtInOutFolder <- "C:/RSWAT_demo/R-SWAT-master/data/example_SWAT/TxtInOut"
 
 # 4. SWAT (or SWAT+) executable file
 SWATexeFile <- "C:/SWAT/ArcSWAT/swat_64rel.exe"
 
 # 5. SWAT (or SWAT+) parameter file
-SWATParamFile <- "C:/RSWAT_demo/swatParam.txt"
+SWATParamFile <- "C:/RSWAT_demo/R-SWAT-master/data/example_SWAT/swatParam.txt"
 
 # 6. Select parameter for calibration or sensitivity analysis with SWAT
 paraSelection <- data.frame(
@@ -78,7 +78,7 @@ ncores <- 4
 objFunction <- "NSE"
 
 # 13. Observed data file(s)
-observedDataFile <- c("C:/RSWAT_demo/obs_var_1.txt")
+observedDataFile <- c("C:/RSWAT_demo/R-SWAT-master/data/example_SWAT/obs_var_1.txt")
 
 
 # -----------------------------------------------------------------------------#
@@ -181,7 +181,7 @@ colnames(parameterObj) <- c("objFunction", paraSelection[,1])
 ParamSensitivity <- summary(lm(formula = objFunction ~ ., parameterObj))[4]$coefficients[,3:4] 
 
 # The objective function should be maximum "Maximize" or minimum "Minimize"
-minOrmax <- "Minimize"
+minOrmax <- "Maxmimize"
 
 # Behavioral threshold
 behThreshold <- -0.5
@@ -215,19 +215,6 @@ behavioral <- behaSimulation(obj$objValueCali,
 save.image(paste(workingFolder, "/RSWATproject.RData", sep = ""))
 
 # Load all data function for later work
-# 
-# load("directory_of_RSWATproject/RSWATproject.RData")
+# load("Path_to_the_working_folder/RSWATproject.RData")
+ 
 
-
-#----------------------------------------------------------user setting for SWAT+
-# 6. Select parameter for calibration or sensitivity analysis (for SWAT+ see at the end of this document)
-paraSelection <- data.frame(
-  Parameter = c("GW_DELAY.gw", "CN2.mgt"),
-  Change =    c("replace"    , "relative"),
-  Min =       c(50           , -0.25),
-  Max =       c(450          , 0.25),
-  Subbasin =  c("All"        , "All"),
-  Landuse =   c("All"        , "All"),
-  Soil =      c("All"        , "All"),
-  Slope =     c("All"        , "All")
-)
