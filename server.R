@@ -365,7 +365,7 @@ server <- function(input, output, session) {
     } 
     
     # ****************************************************************************
-    # Select SWAT parameters to calibration and/or sensitivity: Default setting
+    # Select SWAT parameters for calibration and/or sensitivity: Default setting
     # ****************************************************************************
     if (!globalVariable$loadProject){
       
@@ -1143,7 +1143,22 @@ server <- function(input, output, session) {
 
 
   # ****************************************************************************
-  # Get user input number of cores
+  # Help button select file SWAT (or SWAT+) parameter file
+  # ****************************************************************************
+  observe({
+    req(input$helpDateRangeCali)
+    
+    showModal(modalDialog(
+      title = "Help: 2. Select date range for calibration",
+      renderUI(HTML(readLines(paste(globalVariable$HTMLdir,
+                                    "/HTML/helpDateRangeCali.html",
+                                    sep = "")))),
+      easyClose = TRUE
+    ))     
+  })
+  
+  # ****************************************************************************
+  # Get user input number of cores/threads
   # ****************************************************************************
   observe({
     req(input$ncores)
@@ -1151,6 +1166,21 @@ server <- function(input, output, session) {
     globalVariable$ncores <<- input$ncores
   })
 
+  # ****************************************************************************
+  # Help button select file SWAT (or SWAT+) parameter file
+  # ****************************************************************************
+  observe({
+    req(input$helpNumberofThreads)
+    
+    showModal(modalDialog(
+      title = "Help: 3. Select number of parallel runs (threads)",
+      renderUI(HTML(readLines(paste(globalVariable$HTMLdir,
+                                    "/HTML/helpNumberofThreads.html",
+                                    sep = "")))),
+      easyClose = TRUE
+    ))     
+  })
+  
   # ****************************************************************************
   # Run SWAT
   # ****************************************************************************
@@ -1577,6 +1607,8 @@ server <- function(input, output, session) {
     })
   })
 
+  
+  
   # ****************************************************************************
   # See simulation report - Open file CurrentSimulationReport.log
   # ****************************************************************************

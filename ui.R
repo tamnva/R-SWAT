@@ -127,20 +127,16 @@ ui <- dashboardPage(
       
       # Visualization
       tabItem(tabName = "watout",
-              watoutUI("watoutUI")
-      ),
+              watoutUI("watoutUI")),
       
       tabItem(tabName = "hru",
-              hruUI("hruUI")
-      ),
+              hruUI("hruUI")),
       
       tabItem(tabName = "rch",
-              rchUI("rchUI")
-      ),
+              rchUI("rchUI")),
 
       tabItem(tabName = "sub",
-              subUI("subUI")
-      )
+              subUI("subUI"))
     )
   ),
   

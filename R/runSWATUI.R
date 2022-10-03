@@ -32,6 +32,14 @@ runSwatUI <- function(id) {
                          height = "1px"),
       ),
 
+      column(width = 1,
+             actionButton("helpCheckColumn", 
+                          "Help open output file to see column number",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
+      ),
+      
       column(width = 5,
              checkboxInput('checkOutputExtractionDisplayOnly', 
                            'Display corresponding observed file names', 
@@ -55,18 +63,15 @@ runSwatUI <- function(id) {
                             end   = "2010-12-31"),
              
       ),
+      
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:16px;'>
-                   Select the time range for sensitivity analysis/calibration. 
-                   The min and maximum dates is automatically detect by this 
-                   program by reading the 'file.cio'. Feel free to select any 
-                   dates that this tool allows you
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpDateRangeCali", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
-
+      
       #-------------------------------------------------------------------------
       # 3. Select number of parallel runs (cores)
       #-------------------------------------------------------------------------       
@@ -81,20 +86,13 @@ runSwatUI <- function(id) {
              ),
       
       column(width = 1,
-             tippy("Help", tooltip = "<span style='font-size:15px;'>
-                   The maximum number of parallel runs is the number of 
-                   logical processors in this computer. Please check how much CPU 
-                   or Memory you need for each simulation. Then you can select the
-                   optimal number of cores. Otherwise your computer will be overloaded 
-                   if you use 100% CPU or Memory. You can check this manually by 
-                   runing your SWAT (in the way that you have done) project and 
-                   see changes in CPU and Memory (see Task Manager if you used Window)
-                   <span>", 
-                   allowHTML = TRUE, 
-                   trigger = "click",
-                   theme = "translucent"),
+             actionButton("helpNumberofThreads", 
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
-
+      
       #-------------------------------------------------------------------------
       # 4. Run SWAT
       #-------------------------------------------------------------------------        

@@ -137,7 +137,8 @@
                                                       "updateMultiFile",
                                                       "updateSingleFile",
                                                       "saveOutput",
-                                                      "userReadSwatOutput")) %dopar% {
+                                                      "userReadSwatOutput",
+                                                      "readWatoutFile")) %dopar% {
                                                         
                                                         runSWATSequential(i, 
                                                                           workingDirectory, 
