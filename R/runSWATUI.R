@@ -31,14 +31,6 @@ runSwatUI <- function(id) {
                          width = "100%", 
                          height = "1px"),
       ),
-
-      column(width = 1,
-             actionButton("helpCheckColumn", 
-                          "Help open output file to see column number",
-                          buttonType = "default",
-                          style="background-color: none; border-color: none",
-                          class = NULL),
-      ),
       
       column(width = 5,
              checkboxInput('checkOutputExtractionDisplayOnly', 

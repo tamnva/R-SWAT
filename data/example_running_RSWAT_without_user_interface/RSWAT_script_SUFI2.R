@@ -217,6 +217,4 @@ behavioral <- behaSimulation(obj$objValueCali,
 save.image(paste(workingFolder, "/RSWATproject.RData", sep = ""))
 
 # Load all data function for later work
-# load("Path_to_the_working_folder/RSWATproject.RData")
- 
-
+# load("C:/RSWAT_demo/workingFolder/RSWATproject.RData")

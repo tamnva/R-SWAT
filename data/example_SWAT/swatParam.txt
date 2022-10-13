@@ -2,7 +2,7 @@
 ! This is comment line
 ! Line start with ! or blank line will be ignored by the program
 !--------------------------------------------------------------------------------------
-!Parameter    AtLine         StartPosition  EndPosition   RoundUp    AbsoluteMin   AbsoluteMin
+!Parameter    AtLine         StartPosition  EndPosition   RoundUp    AbsoluteMin   AbsoluteMax
 !--------------------------------------------------------------------------------------
 HRU_FR.hru        2              1              16            7		     0.0         1.0
 SLSUBBSN.hru      3              1              16            3         10.0	   150.0

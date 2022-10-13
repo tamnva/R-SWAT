@@ -153,7 +153,7 @@ objFunctionUI <- function(id) {
       ),
 
       column(width = 10, 
-             checkboxInput('checkDisplayObjFunctionPlot', 'Check here to display plot', 
+             checkboxInput('checkDisplayObjFunctionPlot', 'Display plot of objective function values', 
                            value = FALSE, width = NULL),
       ),
       
@@ -163,11 +163,12 @@ objFunctionUI <- function(id) {
                plotlyOutput("plotObjFunction", height = "500px"),
         ),
         
-        column(width = 10, 
-               checkboxInput('checkDisplayObjFunction', 'Check here to display result', 
-                             value = FALSE, width = NULL),
-        ),
       ), 
+      
+      column(width = 10, 
+             checkboxInput('checkDisplayObjFunction', 'Display table of objective function values', 
+                           value = FALSE, width = NULL),
+      ),
       
       conditionalPanel(
         condition = "input.checkDisplayObjFunction == 1",
@@ -177,7 +178,20 @@ objFunctionUI <- function(id) {
                            height = "1px"),
         ),
       ), 
+
+      column(width = 10, 
+             checkboxInput('ObjEachVar', 'Display table of obj. func. each variable', 
+                           value = FALSE, width = NULL),
+      ),
       
+      conditionalPanel(
+        condition = "input.ObjEachVar == 1",
+        column(width = 10,
+               excelOutput("tableObjEachVar", 
+                           width = "100%", 
+                           height = "1px"),
+        ),
+      ),       
     )
     
   )}
