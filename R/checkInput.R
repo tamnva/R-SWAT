@@ -91,7 +91,6 @@ checkSwatParameterName <- function(paraSelection, SWATParam, HRUinfo, SWATProjec
     # Get the selected parameter name
     selectedParam <- paraSelection[,1]
     
-    
     # Check if the selected parameter in the SWATParam
     check <- check & all(selectedParam %in% paste(SWATParam[,1], ".", SWATParam[,2], sep = ""))
     

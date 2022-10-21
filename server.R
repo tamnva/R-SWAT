@@ -425,7 +425,9 @@ server <- function(input, output, session) {
                                  allowDeleteRow = TRUE,
                                  rowDrag = FALSE,
                                  columnResize = FALSE,
-                                 wordWrap = TRUE)) 
+                                 wordWrap = TRUE))
+        
+        globalVariable$paraSelection <<- dataParaSelectionSWATPlus
       }
       
     }
