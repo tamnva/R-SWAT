@@ -161,7 +161,10 @@ saveOutput <- function(workingDirectory,
                fileType[i] == "channel_sd_yr.txt"       |
                fileType[i] == "channel_sdmorph_day.txt" |
                fileType[i] == "channel_sdmorph_mon.txt" |
-               fileType[i] == "channel_sdmorph_yr.txt"){
+               fileType[i] == "channel_sdmorph_yr.txt"  |
+               fileType[i] == "lsunit_wb_day.txt"       |
+               fileType[i] == "lsunit_wb_mon.txt"       |
+               fileType[i] == "lsunit_wb_yr.txt"){
       output <- readChannelFile(workingDirectory,
                                   coreNumber, 
                                   fileName[i], 
@@ -337,8 +340,7 @@ appendListObject <- function(listA, listB){
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
 #-------------------------------------------------------------------------------
-# Read channel_sd_xxx.txt file, data is always at daily timestep
-#                 xxx could be "day", "month", or "yr"  readChannel_sd_dayFile
+# Read channel and lsunit data at daily, monthly, yearly time step
 # ------------------------------------------------------------------------------
 readChannelFile <- function(workingDirectory, 
                                coreNumber, 
@@ -354,7 +356,10 @@ readChannelFile <- function(workingDirectory,
                 "channel_sd_yr.txt",
                 "channel_sdmorph_day.txt", 
                 "channel_sdmorph_mon.txt", 
-                "channel_sdmorph_yr.txt")
+                "channel_sdmorph_yr.txt",
+                "lsunit_wb_day.txt",
+                "lsunit_wb_mon.txt",
+                "lsunit_wb_yr.txt")
   
   filePath <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/", 
                     fileName, sep = "")
