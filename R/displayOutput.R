@@ -87,6 +87,9 @@ getNumberOutputVar <- function(outputExtraction){
               outputExtraction[i,1] == 'channel_sdmorph_day.txt' | 
               outputExtraction[i,1] == 'channel_sdmorph_mon.txt' | 
               outputExtraction[i,1] == 'channel_sdmorph_yr.txt'  |
+              outputExtraction[i,1] == 'lsunit_wb_day.txt' | 
+              outputExtraction[i,1] == 'lsunit_wb_mon.txt' | 
+              outputExtraction[i,1] == 'lsunit_wb_yr.txt'  |              
               outputExtraction[i,1] == "output.hru" |
               outputExtraction[i,1] == "output.sub" |
               outputExtraction[i,1] == "output.rsv"){
@@ -161,6 +164,9 @@ printVariableNameObservedFiles <- function(outputExtraction){
               (outputExtraction$FileType[i] == "channel_sdmorph_day.txt") |
               (outputExtraction$FileType[i] == "channel_sdmorph_mon.txt") |
               (outputExtraction$FileType[i] == "channel_sdmorph_yr.txt") |
+              (outputExtraction$FileType[i] == "lsunit_wb_day.txt") |
+              (outputExtraction$FileType[i] == "lsunit_wb_mon.txt") |
+              (outputExtraction$FileType[i] == "lsunit_wb_yr.txt") |
               (outputExtraction$FileType[i] == "output.hru") | 
               (outputExtraction$FileType[i] == "output.sub") | 
               (outputExtraction$FileType[i] == "output.swr")){
