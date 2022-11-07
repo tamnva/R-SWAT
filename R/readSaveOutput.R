@@ -164,7 +164,10 @@ saveOutput <- function(workingDirectory,
                fileType[i] == "channel_sdmorph_yr.txt"  |
                fileType[i] == "lsunit_wb_day.txt"       |
                fileType[i] == "lsunit_wb_mon.txt"       |
-               fileType[i] == "lsunit_wb_yr.txt"){
+               fileType[i] == "lsunit_wb_yr.txt"        |
+               fileType[i] == "basin_wb_day.txt"       |
+               fileType[i] == "basin_wb_mon.txt"       |
+               fileType[i] == "basin_wb_yr.txt"){
       output <- readChannelFile(workingDirectory,
                                   coreNumber, 
                                   fileName[i], 
