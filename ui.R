@@ -5,7 +5,7 @@ ui <- dashboardPage(
   # ----------------------------------------------------------------------Header
   dashboardHeader(
     # Name of the app
-    title = "R-SWAT (v2.0.1)", 
+    title = "R-SWAT (v2.1)", 
     
     # Add two buttons in the header for saving and loading project
     tags$li(class = "dropdown", 
@@ -76,16 +76,6 @@ ui <- dashboardPage(
                           tabName = "paraOptUncerTab", 
                           selected = FALSE))
       
-    ),
-    
-    # Visualization Tab
-    sidebarMenu(
-      menuItem("Visualization", tabName = "visual",icon = icon("eye"),
-               startExpanded = FALSE, selected = FALSE,
-               menuSubItem("watout.dat", tabName = "watout", selected = FALSE),
-               menuSubItem("output.hru", tabName = "hru", selected = FALSE),
-               menuSubItem("output.rch", tabName = "rch", selected = FALSE),
-               menuSubItem("output.sub", tabName = "sub", selected = FALSE))
     )
     
   ),
@@ -123,20 +113,7 @@ ui <- dashboardPage(
               sensAnalysisUI("sensAnalysisUI")),
       
       tabItem(tabName = "paraOptUncerTab",
-              paraOptUncerUI("paraOptUncerUI")),
-      
-      # Visualization
-      tabItem(tabName = "watout",
-              watoutUI("watoutUI")),
-      
-      tabItem(tabName = "hru",
-              hruUI("hruUI")),
-      
-      tabItem(tabName = "rch",
-              rchUI("rchUI")),
-
-      tabItem(tabName = "sub",
-              subUI("subUI"))
+              paraOptUncerUI("paraOptUncerUI"))
     )
   ),
   

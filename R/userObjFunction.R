@@ -36,6 +36,10 @@ userObjFunction <- function(obs, sim){
     }    
   }
   
+  # Define output variable 
+  output <- list()
+  output$perCriteria <- list()
+
   # Calculate your user defined objective function here
   # ----------------------------------------------------------------------------  
   # Delete the existing code below and add your code below this line
@@ -47,18 +51,21 @@ userObjFunction <- function(obs, sim){
   #  output <- (1 * R2_var_1 + 2 * R2_var_2)/3
   
   # R2 of the first variable
-  R2_var_1 <- cor(obs[[1]], sim[[1]])**2
+  output$perCriteria[[1]] <- cor(obs[[1]], sim[[1]])**2
   
   # R2 of the second variable
-  R2_var_2 <- cor(obs[[2]], sim[[2]])**2
+  output$perCriteria[[2]] <- cor(obs[[2]], sim[[2]])**2
   
   # Final objective function value (with different weights), must be with the name "output"
-  output <- (1 * R2_var_1 + 2 * R2_var_2)/3
+  output$overalPerCriteria <- (1 * output$perCriteria[[1]] + 2 * output$perCriteria[[2]])/3
   
   # ----------------------------------------------------------------------------  
   # End: Don't modify anything after this line
   # ----------------------------------------------------------------------------
-
+  for (i in 1:length(output$perCriteria)){
+    output$perCriteria[[i]] <- data.frame(userObjFunc = output$perCriteria[[i]])
+  }
+  
   return(output)
   
 }

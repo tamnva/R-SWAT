@@ -3,8 +3,7 @@
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
 # ------------------------------------------------------------------------------
-# Read output from output.rch, output.sub, output.hru files, 
-# Output from these files are always at daily time step, without warm up period
+# Read output from output.rch, output.sub, output.hru files at daily time step
 # ------------------------------------------------------------------------------
 readOutputRchFile <- function(workingDirectory, 
                            coreNumber, 
@@ -21,21 +20,73 @@ readOutputRchFile <- function(workingDirectory,
   
   getOutputRsvData <- read.table(fileName, header = FALSE, sep = "", skip = 9)
 
-  # by default, assume that simulated data does not include warm up period
-  timeSeries <- seq(fileCioInfo$startEval, fileCioInfo$endSim, by="days")
+  # By default, assume that simulated data does not include warm up period
+  # Daily output
+  if (fileCioInfo$timeStepCode == 1){
+    timeSeries <- seq(fileCioInfo$startEval, fileCioInfo$endSim, by="days")
+    
+  # Monthly output
+  } else if (fileCioInfo$timeStepCode == 0) {
+    timeSeries <- seq(as.Date(paste0(substr(fileCioInfo$startEval,1,7), "-01"), "%Y-%m-%d"), 
+                      fileCioInfo$endSim, by="months")
+  
+  # Yearly output
+  } else {                                    
+    timeSeries <- seq(as.Date(paste0(substr(fileCioInfo$startEval,1,4), "-01-01"), "%Y-%m-%d"), 
+                      fileCioInfo$endSim, by="years")    
+  }
+  
   
   nRch <- max(getOutputRsvData$V2)
 
-  # Check whether simulated data including warm-up period
-  if (nrow(getOutputRsvData) != (nRch * length(timeSeries))){
+  # Check whether simulated data including warm-up period - output daily
+  if ((nrow(getOutputRsvData) != (nRch * length(timeSeries))) 
+      & (fileCioInfo$timeStepCode == 1)){
     timeSeries <- seq(fileCioInfo$startSim, fileCioInfo$endSim, by="days")
   }
- 
+
+  # Check whether simulated data including warm-up period - output monthly
+  if ((nrow(getOutputRsvData) != (nRch * (length(timeSeries) + 1 + length(unique(substr(timeSeries,1,4))))))
+      & (fileCioInfo$timeStepCode == 0)){
+    timeSeries <- seq(as.Date(paste0(substr(fileCioInfo$startSim,1,7), "-01"), "%Y-%m-%d"), 
+                      fileCioInfo$endSim, by="months")
+  }
+  
+  # Check whether simulated data including warm-up period - output yearly
+  if ((nrow(getOutputRsvData) != (nRch * (length(timeSeries) + 1)))
+      & (fileCioInfo$timeStepCode == 2)){
+    timeSeries <- seq(as.Date(paste0(substr(fileCioInfo$startSim,1,4), "-01-01"), "%Y-%m-%d"), 
+                      fileCioInfo$endSim, by="years") 
+  }
+  
+  # remove summary data of the whole simulation time
+  # Monthly
+  if (fileCioInfo$timeStepCode == 0){
+    getOutputRsvData <- getOutputRsvData[-c((nrow(getOutputRsvData) - nRch + 1):nrow(getOutputRsvData)),]
+    getOutputRsvData <- getOutputRsvData[-yearlyOutputLoc(timeSeries, nRch), ]
+    
+  # Yearly output
+  } else if (fileCioInfo$timeStepCode == 2) {
+    getOutputRsvData <- getOutputRsvData[-c((nrow(getOutputRsvData) - nRch + 1):nrow(getOutputRsvData)),]
+  } else {                                    
+    
+  }
+  
   ntimeStep <- nrow(getOutputRsvData)/nRch
-  trim <- c(which(timeSeries ==  fromToDate[1]), 
-            which(timeSeries ==  fromToDate[2]))
   
-  
+  # Daily output
+  if (fileCioInfo$timeStepCode == 1){
+    trim <- c(which(timeSeries ==  fromToDate[1]), 
+              which(timeSeries ==  fromToDate[2]))    
+  # Monthly output
+  } else if (fileCioInfo$timeStepCode == 0){
+    trim <- c(which(timeSeries ==  as.Date(paste0(substr(fromToDate[1],1,7), "-01"), "%Y-%m-%d")), 
+              which(timeSeries ==  as.Date(paste0(substr(fromToDate[2],1,7), "-01"), "%Y-%m-%d")))  
+  # Yearly output
+  } else {
+    trim <- c(which(timeSeries ==  as.Date(paste0(substr(fromToDate[1],1,4), "-01-01"), "%Y-%m-%d")), 
+              which(timeSeries ==  as.Date(paste0(substr(fromToDate[2],1,4), "-01-01"), "%Y-%m-%d")))      
+  }
     
   varNumber <- length(output)
   
@@ -53,6 +104,7 @@ readOutputRchFile <- function(workingDirectory,
   
   return(output)
 }
+
 
 #-------------------------------------------------------------------------------
 # Get reach (rch), subbasin, or hru number from output.rch ,hru, subbasin files
@@ -416,3 +468,23 @@ readChannelFile <- function(workingDirectory,
   return(output)
 }
 
+
+#-------------------------------------------------------------------------------
+# Find location of yearly output summary in output.rch, output.sub, output.hru files
+# ------------------------------------------------------------------------------
+
+yearlyOutputLoc <- function(timeSeries, nRch){
+  
+  # Location of the ending year
+  endingYearLoc <- substr(timeSeries, 6, 7)
+  endingYearLoc <- which(endingYearLoc %in% "12")
+  
+  # Find location of yearly summary
+  iloc <- c()
+  for (i in 1:length(endingYearLoc)){
+    iloc <- c(iloc, c((endingYearLoc[i] * nRch + 1):((endingYearLoc[i] + 1) * nRch)))
+  }
+  
+  return(iloc)
+  
+}

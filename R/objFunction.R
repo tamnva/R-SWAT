@@ -312,7 +312,6 @@ calObjFunction <- function(parameterValue, ncores,
             output$objValueValid[counter[j]] <- output$objValueValid[counter[j]] + 
               output$perCriteriaValid[[j]][[counter[j]]][perIndex]
           }
-          
         }        
       }
     }
@@ -324,22 +323,33 @@ calObjFunction <- function(parameterValue, ncores,
         
         # Select calibration data with flag "C" or "c"
         flag <- c("C", "c")
-        output$objValueCali[count] <- userObjFunction(observedToList(observedData, flag), 
-                                                  simToList(simData, count, flag))
-
+        temp  <- userObjFunction(observedToList(observedData, flag),
+                                 simToList(simData, count, observedData, flag))
+        output$objValueCali[count] <- temp$overalPerCriteria
+        
+        for (j in 1:nOutputVar){
+          output$perCriteriaCali[[j]][[count]] <- temp$perCriteria[[j]]
+        }
+        
+        
         # Select validation data with flag "V" or "v"
-        flag <- c("V", "v")        
-        output$objValueCali[count] <- userObjFunction(observedToList(observedData, flag), 
-                                                      simToList(simData, count, observedData, flag))
+        flag <- c("V", "v") 
+        temp  <- userObjFunction(observedToList(observedData, flag),
+                                 simToList(simData, count, observedData, flag))
+        output$objValueValid[count] <- temp$overalPerCriteria
+        for (j in 1:nOutputVar){
+          output$perCriteriaValid[[j]][[count]] <- temp$perCriteria[[j]]
+        }
       }
-    }      
-    
+    }
   }
   
   if (index != 'userObjFunction'){
     output$objValueCali <- output$objValueCali/nOutputVar
     output$objValueValid <- output$objValueValid/nOutputVar
   }
+  
+
   
   return(output) 
 }

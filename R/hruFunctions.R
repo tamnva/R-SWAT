@@ -1,14 +1,3 @@
-
-# Install and load required packages
-# install.packages("raster") 
-# install.packages("rgdal") 
-
-library(raster)
-library(rgdal)
-library(plotly)
-library(shinydashboard)
-library(shinyFiles)
-
 # ------------------------------------------------------------------------------
 getDate <- function(TxtInOut){
   file_cio <- readLines(paste(TxtInOut, "/file.cio", sep = ""), 60)

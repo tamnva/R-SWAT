@@ -459,3 +459,54 @@ findSoilGroupSWATPlus <- function(TxtInOut){
   
   return(soilGroup)
 }
+
+
+# ------------------------------------------------------------------------------
+# Display objective function value for each variable
+# ------------------------------------------------------------------------------
+objFunctionEachVar <- function(perCriteria, caliOrValid){
+  pc <- list()
+  # Convert list of vector to list of data frame
+  for (i in 1:length(perCriteria)){
+    for (j in 1:length(perCriteria[[1]])){
+      if (j == 1){
+        pc[[i]] <- perCriteria[[i]][[j]]
+      } else {
+        pc[[i]] <- rbind(pc[[i]],perCriteria[[i]][[j]] )
+      }
+    }
+    
+    colnames(pc[[i]]) <- paste0(caliOrValid, "var_", i, "_", colnames(pc[[i]]))
+  }
+  
+  # Convert list of data frame to data frame
+  if (length(pc) > 1){
+    
+    pcDataFrame <- pc[[1]]
+    for (i in 2:length(pc)){
+      pcDataFrame <- cbind(pcDataFrame, pc[[i]])
+    }
+  } else {
+    pcDataFrame <- pc[[1]]
+  }
+  
+  # round up to 3 digits
+  pcDataFrame <- round(pcDataFrame, digits = 3)
+  
+  # Return result
+  return(pcDataFrame)
+}
+
+# ------------------------------------------------------------------------------
+# Display objective function value for each variable
+# ------------------------------------------------------------------------------
+objFunctionEachVarCaliValid <- function(perCriteriaCali, perCriteriaValid){
+  
+  pcDataFrameCali <- objFunctionEachVar(perCriteriaCali, "cali_")
+  pcDataFrameValid <- objFunctionEachVar(perCriteriaValid, "valid_")
+  simNr <- data.frame(SimNr = c(1:nrow(pcDataFrameCali)))
+  
+  # Return result
+  return(cbind(simNr, pcDataFrameCali, pcDataFrameValid))
+  
+}
