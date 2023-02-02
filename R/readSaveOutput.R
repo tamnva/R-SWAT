@@ -482,7 +482,8 @@ yearlyOutputLoc <- function(timeSeries, nRch){
   # Find location of yearly summary
   iloc <- c()
   for (i in 1:length(endingYearLoc)){
-    iloc <- c(iloc, c((endingYearLoc[i] * nRch + 1):((endingYearLoc[i] + 1) * nRch)))
+    temp <- endingYearLoc[i] * nRch + 1 + (i-1)* nRch
+    iloc <- c(iloc, c(temp:(temp + nRch - 1)))
   }
   
   return(iloc)
