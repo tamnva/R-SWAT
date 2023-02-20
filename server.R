@@ -1934,12 +1934,14 @@ server <- function(input, output, session) {
 
     req(input$checkDisplayObjFunctionPlot)
 
-    # Plot parameter values and objective function
-    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValueCali)){
-      output$plotObjFunction <- renderPlotly(plotObjFuncParaValue(globalVariable))
-    } else {
-      output$plotObjFunction <- NULL
-    }
+    shinyCatch(
+      if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValueCali)){
+        output$plotObjFunction <- renderPlotly(plotObjFuncParaValue(globalVariable))
+      } else {
+        output$plotObjFunction <- NULL
+      }, 
+      blocking_level = "error"
+    )
   })
 
   # ****************************************************************************
@@ -1947,42 +1949,46 @@ server <- function(input, output, session) {
   # ****************************************************************************
   observe({
     req(input$checkDisplayObjFunction)
+    
     # Get parameter values
-
-    if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValueCali)){
-      tableParaObj <- globalVariable$parameterValue
-
-      # Replace the first row as it is the simulation number with the obj function value
-      tableParaObj <- cbind(tableParaObj[,1], globalVariable$objValueCali, 
-                            globalVariable$objValueValid, tableParaObj[,-c(1)])
-      tableParaObj <- as.data.frame(tableParaObj)
-
-      colnames(tableParaObj) <- c("SimNr", "objCalibration", "objValidation", globalVariable$paraSelection$Parameter)
-
-      # round up to 3 decimal digits
-      is.num <- sapply(tableParaObj, is.numeric)
-      tableParaObj[is.num] <- lapply(tableParaObj[is.num], round, 3)
-
-      # Visual setting for the output table
-      columnsCalObjFunction <- data.frame(title = colnames(tableParaObj),
-                                          source = rep(NA, ncol(tableParaObj)),
-                                          width = rep(300, ncol(tableParaObj)),
-                                          type = rep('text', ncol(tableParaObj)))
-
-      # Fill output tables with parameter and objective function values
-      output$tableCalObjFunction <- renderExcel(excelTable(data = tableParaObj,
-                                                           columns = columnsCalObjFunction,
-                                                           editable = FALSE,
-                                                           allowInsertRow = FALSE,
-                                                           allowInsertColumn = FALSE,
-                                                           allowDeleteColumn = FALSE,
-                                                           allowDeleteRow = FALSE,
-                                                           rowDrag = FALSE,
-                                                           columnResize = FALSE,
-                                                           wordWrap = FALSE))
-    } else {
-      output$tableCalObjFunction <- NULL
-    }
+    shinyCatch(
+      if(!is.null(globalVariable$parameterValue) & !is.null(globalVariable$objValueCali)){
+        tableParaObj <- globalVariable$parameterValue
+        
+        # Replace the first row as it is the simulation number with the obj function value
+        tableParaObj <- cbind(tableParaObj[,1], globalVariable$objValueCali, 
+                              globalVariable$objValueValid, tableParaObj[,-c(1)])
+        tableParaObj <- as.data.frame(tableParaObj)
+        
+        colnames(tableParaObj) <- c("SimNr", "objCalibration", "objValidation", globalVariable$paraSelection$Parameter)
+        
+        # round up to 3 decimal digits
+        is.num <- sapply(tableParaObj, is.numeric)
+        tableParaObj[is.num] <- lapply(tableParaObj[is.num], round, 3)
+        
+        # Visual setting for the output table
+        columnsCalObjFunction <- data.frame(title = colnames(tableParaObj),
+                                            source = rep(NA, ncol(tableParaObj)),
+                                            width = rep(300, ncol(tableParaObj)),
+                                            type = rep('text', ncol(tableParaObj)))
+        
+        # Fill output tables with parameter and objective function values
+        output$tableCalObjFunction <- renderExcel(excelTable(data = tableParaObj,
+                                                             columns = columnsCalObjFunction,
+                                                             editable = FALSE,
+                                                             allowInsertRow = FALSE,
+                                                             allowInsertColumn = FALSE,
+                                                             allowDeleteColumn = FALSE,
+                                                             allowDeleteRow = FALSE,
+                                                             rowDrag = FALSE,
+                                                             columnResize = FALSE,
+                                                             wordWrap = FALSE))
+      } else {
+        output$tableCalObjFunction <- NULL
+      }, 
+      blocking_level = "error"
+    )
+    
   })
 
   # ****************************************************************************
