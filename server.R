@@ -1956,8 +1956,10 @@ server <- function(input, output, session) {
         tableParaObj <- globalVariable$parameterValue
         
         # Replace the first row as it is the simulation number with the obj function value
-        tableParaObj <- cbind(tableParaObj[,1], globalVariable$objValueCali, 
-                              globalVariable$objValueValid, tableParaObj[,-c(1)])
+        tableParaObj <- cbind(tableParaObj[,1], 
+                              globalVariable$objValueCali, 
+                              globalVariable$objValueValid, 
+                              matrix(tableParaObj[,-c(1)], nrow = nrow(tableParaObj)))
         tableParaObj <- as.data.frame(tableParaObj)
         
         colnames(tableParaObj) <- c("SimNr", "objCalibration", "objValidation", globalVariable$paraSelection$Parameter)
