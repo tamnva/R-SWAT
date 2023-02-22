@@ -1368,6 +1368,8 @@ server <- function(input, output, session) {
           if(parallelMode == 1){
             best$objValueCali <- temp$objValueCali
             best$perCriteriaCali <- temp$perCriteriaCali
+            best$objValueValid <- temp$objValueValid
+            best$perCriteriaValid <- temp$perCriteriaValid
             best$simData <- temp$simData
           } else {
             idBest <- which(temp$objValueCali == max(temp$objValueCali))
@@ -1376,6 +1378,7 @@ server <- function(input, output, session) {
             # Take the better parameter value and objective function values
             best$parameterValue <- best$parameterValue[idBest, ]
             best$objValueCali <- temp$objValueCali[idBest]
+            best$objValueValid <- temp$objValueValid[idBest]
           }
 
           # Loop over number of iteration
@@ -1385,7 +1388,9 @@ server <- function(input, output, session) {
               # Save iteration result
               saveIterationResult$parameterValue <- globalVariable$parameterValue
               saveIterationResult$objValueCali <- temp$objValueCali
+              saveIterationResult$objValueValid <- temp$objValueValid
               saveIterationResult$perCriteriaCali <- temp$perCriteriaCali
+              saveIterationResult$perCriteriaValid <- temp$perCriteriaValid
               saveIterationResult$simData <- temp$simData
               print(paste("Iteration - Best objective function value (from the",
                           "respective core if parallel mode = 1)"))
@@ -1400,6 +1405,7 @@ server <- function(input, output, session) {
                 if(temp$objValueCali[j] > best$objValueCali[j]){
                   globalVariable$parameterValue[j, ] <<- newPar[j, ]
                   best$objValueCali[j] <- temp$objValueCali[j]
+                  best$objValueValid[j] <- temp$objValueValid[j]
                 }
               }
 
@@ -1418,6 +1424,7 @@ server <- function(input, output, session) {
               if(temp$objValueCali[idBest] > best$objValueCali){
                 globalVariable$parameterValue <<- newPar[idBest, ]
                 best$objValueCali <- temp$objValueCali[idBest]
+                best$objValueValid <- temp$objValueValid[idBest]
               }
               # Generate new parameter set
               newPar <- data.frame(min = as.numeric(globalVariable$paraSelection$Min),
@@ -1467,7 +1474,9 @@ server <- function(input, output, session) {
             # Save iteration result
             saveIterationResult$parameterValue <- rbind(saveIterationResult$parameterValue,newPar)
             saveIterationResult$objValueCali <- c(saveIterationResult$objValueCali, temp$objValueCali)
+            saveIterationResult$objValueValid <- c(saveIterationResult$objValueValid, temp$objValueValid)
             saveIterationResult$perCriteriaCali <- bindList(saveIterationResult$perCriteriaCali,temp$perCriteriaCali)
+            saveIterationResult$perCriteriaValid <- bindList(saveIterationResult$perCriteriaValid,temp$perCriteriaValid)
             saveIterationResult$simData <- bindList(saveIterationResult$simData,temp$simData)
           }
 
@@ -1476,6 +1485,7 @@ server <- function(input, output, session) {
             for (j in 1:nrow(newPar)){
               if(temp$objValueCali[j] > best$objValueCali[j]){
                 best$objValueCali[j] <- temp$objValueCali[j]
+                best$objValueValid[j] <- temp$objValueValid[j]
               }
             }
           } else {
@@ -1484,6 +1494,7 @@ server <- function(input, output, session) {
 
             if(temp$objValueCali[idBest] > best$objValueCali){
               best$objValueCali <- temp$objValueCali[idBest]
+              best$objValueValid <- temp$objValueValid[idBest]
             }
           }
 
@@ -1493,7 +1504,9 @@ server <- function(input, output, session) {
           # Assign back to global variables
           globalVariable$parameterValue <<- saveIterationResult$parameterValue
           globalVariable$objValueCali <<- saveIterationResult$objValueCali
+          globalVariable$objValueValid <<- saveIterationResult$objValueValid
           globalVariable$perCriteriaCali <<- saveIterationResult$perCriteriaCali
+          globalVariable$perCriteriaValid <<- saveIterationResult$perCriteriaValid
           globalVariable$simData <<- saveIterationResult$simData
           globalVariable$parameterValue[,1] <<- c(1:nrow(globalVariable$parameterValue))
           
@@ -1543,6 +1556,7 @@ server <- function(input, output, session) {
           # There is no simulated data and obj function values when the model has not been run
           globalVariable$simData <<- NULL
           globalVariable$objValueCali <<- NULL
+          globalVariable$objValueValid <<- NULL
 
           # First run is true
           globalVariable$copyUnchangeFiles <<- TRUE
