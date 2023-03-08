@@ -134,13 +134,13 @@
       foreach(i = 1:ncores, .combine = 'c', .export=c("runSWATSequential",
                                                       "getParameterValue", 
                                                       "updateMultiFile",
-                                                      "updateMultiFile",
                                                       "updateSingleFile",
                                                       "saveOutput",
                                                       "userReadSwatOutput",
                                                       "readWatoutFile",
                                                       "updateCalibrationFile",
                                                       "readChannelFile",
+                                                      "readOutputRchFile",
                                                       "getRchNumber")) %dopar% {
                                                         
                                                         runSWATSequential(i, 
