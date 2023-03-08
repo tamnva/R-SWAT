@@ -7,6 +7,7 @@ Please cite R-SWAT as follows:
 **Nguyen, T. V.**, Dietrich, J., Dang, D. T., Tran, D. A., Doan, B. V., Sarrazin, F. J., Abbaspour, K., Srinivasan, R. (2022). An interactive graphical interface tool for parameter calibration, sensitivity analysis, uncertainty analysis, and visualization for the Soil and Water Assessment Tool. Environmental Modelling & Software, 156, 105497. https://doi.org/10.1016/j.envsoft.2022.105497
 
 - This is an interactive web-based app (written in [R](https://cran.r-project.org/bin/windows/base/) language with [shiny](https://shiny.rstudio.com/) package) for parallel parameter sensitivity, calibration, and uncertainty analysis with the Soil and Water Assessment Tool ([SWAT](https://swat.tamu.edu/)). The official name of this app is R-SWAT (initially its name was SWATshiny)
+- An R script file for running R-SWAT in HPC without using graphical interface is also available [here](https://github.com/tamnva/R-SWAT/blob/master/data/example_running_RSWAT_without_user_interface/RSWAT_script_SUFI2.R).
 - The latest version of this app is always in the "master" branch.
 - If you would like to contribute to the code, have any suggestions, want to report errors, and have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/R-SWAT) specially designed for this app. Tutorial videos can be found in [R-SWAT youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - This is the first version, the app will be continued to be developed to serve the SWAT community. If you would like to contribute to the development of this app, please let me know. Together we can make this app much better as my time and R knowledge for this app are very limited.
@@ -42,7 +43,7 @@ If you don't know which input is required, simply clicking to "Help?" at the rig
  1. _/data/example_SWAT/TxtInOut_ and _/data/example_SWAT+/TxtInOut_: TxtInOut folders and all associated files created by ArcSWAT and SWAT+ Editor, respectively
  2. _/data/example_SWAT/swatParam.txt_ and _/data/example_SWAT+/cal_parms.cal_ : An input file describing all SWAT and SWAT+ parameters, respectively, that you will need for the input field _1. General Setting => 4. Files with list of all SWAT Parameters_
  3. _/data/example_SWAT/obs_var_1.txt_ and _/data/example_SWAT+/obs_var_1.txt_: Observed data file (streamflow) at the catchment outlet that you might need to input to evaluate the model performance _4.1. Objective function => 2. Get observed data files_
-  4. _data/examples_: you will see examples how to include new parameters in new files (e.g., this could be the case  if you modify SWAT code)
+ 4. _data/examples_: you will see examples how to include new parameters in new files (e.g., this could be the case  if you modify SWAT code)
 
 ## R-SWAT user interface
 <p align="center">
