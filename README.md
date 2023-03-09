@@ -11,7 +11,6 @@ Please cite R-SWAT as follows:
 - The latest version of this app is always in the "master" branch.
 - If you would like to contribute to the code, have any suggestions, want to report errors, and have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the  [google group](https://groups.google.com/g/R-SWAT) specially designed for this app. Tutorial videos can be found in [R-SWAT youtube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - This is the first version, the app will be continued to be developed to serve the SWAT community. If you would like to contribute to the development of this app, please let me know. Together we can make this app much better as my time and R knowledge for this app are very limited.
-- This work has not been published in any journal. If you use this program for your publication and want to know the technical behind this app, please contact me.
 - [A full documentation of _R-SWAT_ with examples is in its wiki page](https://github.com/tamnva/R-SWAT/wiki/R-SWAT-User-Manual).
 
 ## Quick Start!
@@ -22,7 +21,7 @@ To run this app, install latest **[R version 4.1.1](https://cran.r-project.org/b
 
 - **Step 1**: [Click here](https://github.com/tamnva/R-SWAT/archive/refs/heads/master.zip) to download the whole code of this app.
 - **Step 2**: Extract the downloaded file => Open RStudio
-- **Step 3**: Open the file *./R/loadPackages.R* with R studio and install all packages list in this file (take 5-10 minutes). If you have problem with installing the following packages "raster", "terra", and "Rtools", please see answer in [this link](https://groups.google.com/g/R-SWAT/c/n0O3Zlu8a-0) 
+- **Step 3**: Open the file *./R/loadPackages.R* with R studio and install all packages list in this file (take 5-10 minutes).  
 - **Step 4**: Open the file server.R or ui.R in R studio => then click the green button named *Run App*
 
 **Next time** when you use this app just **step 4** is needed **or you can download the latest app and run it using the following commands**
@@ -45,7 +44,8 @@ If you don't know which input is required, simply clicking to "Help?" at the rig
  3. _/data/example_SWAT/obs_var_1.txt_ and _/data/example_SWAT+/obs_var_1.txt_: Observed data file (streamflow) at the catchment outlet that you might need to input to evaluate the model performance _4.1. Objective function => 2. Get observed data files_
  4. _data/examples_: you will see examples how to include new parameters in new files (e.g., this could be the case  if you modify SWAT code)
 
-## R-SWAT user interface
+## R-SWAT user interface 
+(NOTE: in the latest version, the user interface could be slightly difference)
 <p align="center">
   <img src="data/figures/RSWAT.gif" width=100% title="hover text">
 </p>
