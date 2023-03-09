@@ -118,8 +118,8 @@ objFunctionUI <- function(id) {
       column(width = 1,
              tippy("Help", tooltip = "<span style='font-size:16px;'>
                    Show all observed data here, each observed data have 
-                   2 columns, the first 2 columns are data of the file
-                   obs_var_1.txt, the next 2 columns are data of the 
+                   3 columns, the first 3 columns are data of the file
+                   obs_var_1.txt, the next 3 columns are data of the 
                    file obs_var_2.txt and so on
                    <span>",
                    allowHTML = TRUE, 
