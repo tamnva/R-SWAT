@@ -193,7 +193,7 @@
       
       if (firstRun){
         dir <- paste(workingDirectory, '/', 'TxtInOut', '_', i, sep ='')
-        dir.create(dir)        
+        dir.create(dir, showWarnings = FALSE)
       }
       
       # Copy all unchanged files

@@ -241,3 +241,4 @@ helpTextSensi <- paste("Please write TWO R commands (EACH command MUST be on a S
                       "Please do steps 4.1. Objective function => 1. Select objective function and ", "\n",
                       "  2.Get observed data file BEFORE proceeding to the next steps", "\n",
                       sep ="")
+

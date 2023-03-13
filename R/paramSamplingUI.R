@@ -61,7 +61,7 @@ paramSamplingUI <- function(id) {
              actionButton("checkParameterTableButton", 
                           "Click here to check the input table (IMPORTANT)",
                           #icon("paper-plane"), 
-                          style="background-color: #87CEFA; 
+                          style="background-color: #fa8787; 
                           border-color: #2e6da4"),
              verbatimTextOutput('checkParameterTableTxtOuput'),
       ),

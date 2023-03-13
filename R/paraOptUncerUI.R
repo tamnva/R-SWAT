@@ -54,7 +54,6 @@ paraOptUncerUI <- function(id) {
         
         condition = "input.checkPlotVariableNumber == 1",
         column(width = 10,
-               actionButton("savePlotVariableNumber", "Click here to save plot"),
                plotlyOutput("PlotVariableNumber"),
                
         ),

@@ -348,7 +348,7 @@
 	loadParamChangeFileContent <- function(HRUinfo, paraSelection, SWATParam, TxtInOutFolder){
 
 	  change <- list()
-	  
+
 	  # If this is SWAT+ project
 	  if (ncol(HRUinfo) == 6){
 	    # List of all file types (according to the spatial resolution)

@@ -5,7 +5,7 @@ ui <- dashboardPage(
   # ----------------------------------------------------------------------Header
   dashboardHeader(
     # Name of the app
-    title = "R-SWAT (v2.1)", 
+    title = "R-SWAT (v3.0)", 
     
     # Add two buttons in the header for saving and loading project
     tags$li(class = "dropdown", 
@@ -76,6 +76,13 @@ ui <- dashboardPage(
                           tabName = "paraOptUncerTab", 
                           selected = FALSE))
       
+    ),
+
+    sidebarMenu(
+      menuItem("Manual calibration", 
+               tabName = "swatEdu", 
+               icon = icon("graduation-cap"),
+               selected = FALSE)
     )
     
   ),
@@ -113,7 +120,11 @@ ui <- dashboardPage(
               sensAnalysisUI("sensAnalysisUI")),
       
       tabItem(tabName = "paraOptUncerTab",
-              paraOptUncerUI("paraOptUncerUI"))
+              paraOptUncerUI("paraOptUncerUI")),
+      
+      tabItem(tabName = "swatEdu",
+              swatEduUI("swatEdu"))
+      
     )
   ),
   

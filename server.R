@@ -21,22 +21,23 @@ server <- function(input, output, session) {
   globalVariable$SWATProject <<- TRUE
   globalVariable$paraSelection <<- dataParaSelectionSWAT 
   globalVariable$HTMLdir <<- getwd()
+  globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
+  globalVariable$runManualCaliSuccess <<- FALSE
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
   #-----------------------------------------------------------------------------
   SWAT <- function(parameterValue){
-    print(parameterValue)
+
     # Make sure that parameterValue is data frame or matrix
     if (is.matrix(parameterValue) |
         is.data.frame(parameterValue)){
 
-      # Numbering the parameter set number and add to the 1st column
+      # Numbering the parameter set number and add it to the 1st column
       nrow <- nrow(parameterValue)
       parameterValue <- cbind(c(1:nrow), parameterValue)
 
     } else {
-
       # Convert input vector to matrix, add 1 to 1st column as the parameter set number
       parameterValue <- matrix(c(1,parameterValue), nrow = 1)
     }
@@ -83,14 +84,14 @@ server <- function(input, output, session) {
       globalVariable$objValueCali <<- temp$objValueCali
       globalVariable$objValueValid <<- temp$objValueValid
 
-    # If this is not the first run, then combine result to the existing data
+    # If this is not the first run, then combine result with the existing data
     } else {
       globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
       globalVariable$objValueCali <<- c(globalVariable$objValueCali, temp$objValueCali)
       globalVariable$objValueValid <<- c(globalVariable$objValueValid, temp$objValueValid)
     }
 
-   # Next run, don't need to copy unchanged SWAT input files
+   # Next run, no need to copy unchanged SWAT input files
    globalVariable$copyUnchangeFiles <<- FALSE
 
    # Parameter optimization: convert to the minimize problem, regardless of input
@@ -115,11 +116,11 @@ server <- function(input, output, session) {
       # Display message that save was done
       showNotification("Project settings were saved as 'RSWATproject.rds'
       in the working folder", type = "message", duration = 10)
-      
+
       # Save project setting
       shinyCatch(
-        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/', 
-                                             'RSWATproject.rds', sep ='')), 
+        saveRDS(globalVariable, file = paste(globalVariable$workingFolder, '/',
+                                             'RSWATproject.rds', sep ='')),
         blocking_level = "error"
       )
 
@@ -163,9 +164,9 @@ server <- function(input, output, session) {
         if(globalVariable$SWATProject){
           updateSelectInput(session,
                             "SWATorSWATplus",
-                            label = "1. SWAT or SWAT+ project", 
+                            label = "1. SWAT or SWAT+ project",
                             choices = c('SWAT', 'SWAT+'),
-                            selected = "SWAT")        
+                            selected = "SWAT")
         } else {
           updateSelectInput(session,
                             "SWATorSWATplus",
@@ -309,6 +310,57 @@ server <- function(input, output, session) {
         # Update get observed data files
         output$printObservedDataFile <<- renderText(globalVariable$observedDataFile)
         
+        # remove slider input when parameter selection was updated
+        for (i in 2:30){
+          removeUI(selector = paste0("div:has(> #parameter", i, ")"),
+                   multiple = TRUE,
+                   immediate = TRUE,
+                   session)
+        }
+
+        # Min and max value of parameter 1
+        minVal <- as.numeric(globalVariable$paraSelection$Min[1])
+        maxVal <- as.numeric(globalVariable$paraSelection$Max[1])
+        
+        # Update slider input
+        updateSliderInput(session,
+                          inputId = "parameter1", 
+                          label = globalVariable$paraSelection$Parameter[1],
+                          min = minVal, 
+                          max = maxVal, 
+                          value = minVal,
+                          step = (maxVal - minVal)/50)
+        
+        
+        # Update number of calibrated parameter
+        globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
+        
+        # Add slider input for other parameters  
+        if (nrow(globalVariable$paraSelection) > 1){
+          lapply(1:(nrow(globalVariable$paraSelection)-1), FUN = function(i) {
+            if (check_null_na_empty(globalVariable$paraSelection$Min[i+1]) &
+                check_null_na_empty(globalVariable$paraSelection$Max[i+1])){
+              
+              # Min and max value
+              minVal <- as.numeric(globalVariable$paraSelection$Min[i+1])
+              maxVal <- as.numeric(globalVariable$paraSelection$Max[i+1])
+              
+              insertUI(
+                selector = "#parameter1",
+                where = "afterEnd",
+                ui = sliderInput(
+                  inputId = paste0("parameter", i+1),
+                  label = globalVariable$paraSelection$Parameter[i+1],
+                  min = minVal, 
+                  max = maxVal, 
+                  value = minVal,
+                  step = (maxVal - minVal)/50
+                )
+              )            
+            }
+          })      
+        }
+        
         # Show meesage
         showNotification("All project settings were loaded", 
                          type = "message", 
@@ -320,13 +372,17 @@ server <- function(input, output, session) {
                          type = "error", 
                          duration = 10)      
       },
-      
       blocking_level = "error")
     
-
+    # Update number of plots in Manual calibration
+    shinyCatch(
+      updateSelectInput(session,
+                        "showPlotVariables",
+                        label = "", 
+                        choices = paste0("variable ", c(1:globalVariable$nOutputVar)),
+                        selected = 1), 
+      blocking_level = "error")
   })
-
-
 
   #-----------------------------------------------------------------------------
   # Tab 1. General Setting
@@ -733,7 +789,6 @@ server <- function(input, output, session) {
           output$tableHelpParameterSelection <- renderDataTable(tempUniqueHruProperties)
         }        
         
-        
       }
       
       # If this is a SWAT+ project
@@ -782,7 +837,6 @@ server <- function(input, output, session) {
     output$checkParameterTableTxtOuput <- renderText(checkParameterTable$checkMessage)
   })
 
-
   # ****************************************************************************
   # Save "SWAT parameters for calibration" to global variable
   # ****************************************************************************
@@ -807,7 +861,73 @@ server <- function(input, output, session) {
     # Save parameter selection to the global variable
     globalVariable$paraSelection  <<- paraSelection
     globalVariable$paraSelection[,1] <<- trimws(paraSelection[,1])
+    
+    shinyCatch(
+      if(check_null_na_empty(globalVariable$paraSelection$Min[1]) &
+         check_null_na_empty(globalVariable$paraSelection$Max[1])){
 
+        # Min and max value
+        minVal <- as.numeric(globalVariable$paraSelection$Min[1])
+        maxVal <- as.numeric(globalVariable$paraSelection$Max[1])
+        
+        # Update slider input
+        updateSliderInput(session,
+                          inputId = "parameter1", 
+                          label = globalVariable$paraSelection$Parameter[1],
+                          min = minVal, 
+                          max = maxVal, 
+                          value = minVal,
+                          step = (maxVal - minVal)/50
+        ) 
+      },
+      blocking_level = "warning"
+    )
+    
+    # remove slider input when parameter selection was updated
+    shinyCatch(
+      if(globalVariable$nCaliParam > 1){
+        for (i in 2:globalVariable$nCaliParam){
+          removeUI(selector = paste0("div:has(> #parameter", i, ")"),
+                   multiple = TRUE,
+                   immediate = TRUE,
+                   session)
+        }
+      },
+      blocking_level = "warning"
+    )
+    
+    # Update number of calibrated parameter
+    globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
+    
+    # Add slider input for other parameters  
+    shinyCatch(
+      if (nrow(globalVariable$paraSelection) > 1){
+        lapply(1:(nrow(globalVariable$paraSelection)-1), FUN = function(i) {
+          if (check_null_na_empty(globalVariable$paraSelection$Min[i+1]) &
+              check_null_na_empty(globalVariable$paraSelection$Max[i+1])){
+            
+            # Min and max value
+            minVal <- as.numeric(globalVariable$paraSelection$Min[i+1])
+            maxVal <- as.numeric(globalVariable$paraSelection$Max[i+1])
+            
+            # Update slider input
+            insertUI(
+              selector = "#parameter1",
+              where = "afterEnd",
+              ui = sliderInput(
+                inputId = paste0("parameter", i+1),
+                label = globalVariable$paraSelection$Parameter[i+1],
+                min = minVal, 
+                max = maxVal, 
+                value = minVal,
+                step = (maxVal - minVal)/50
+              )
+            )            
+          }
+        })      
+      }, 
+      blocking_level = "error"
+    )
   })
 
   # ****************************************************************************
@@ -1086,6 +1206,15 @@ server <- function(input, output, session) {
     output$tableOutputExtractionDisplayOnly <- renderDataTable(
       printVariableNameObservedFiles(outputExtraction)
     )
+    
+    # Get number of output plots
+    shinyCatch(
+      updateSelectInput(session,
+                        "showPlotVariables",
+                        label = "", 
+                        choices = paste0("variable ", c(1:globalVariable$nOutputVar)),
+                        selected = 1), 
+      blocking_level = "error")
 
   })
 
@@ -2294,61 +2423,245 @@ server <- function(input, output, session) {
   })
 
   # ****************************************************************************
-  # Save plot simulated result
+  # 5. R-SWAT Education
+  # ****************************************************************************
+
+  # ****************************************************************************
+  # Default list of parameters for manual calibration
+  # ****************************************************************************
+  shinyCatch(
+    if(check_null_na_empty(globalVariable$paraSelection$Min[1]) &
+       check_null_na_empty(globalVariable$paraSelection$Max[1])){
+      
+      # Min and max value
+      minVal <- as.numeric(globalVariable$paraSelection$Min[1])
+      maxVal <- as.numeric(globalVariable$paraSelection$Max[1])
+      
+      # Update slider input
+      updateSliderInput(session,
+                        inputId = "parameter1", 
+                        label = globalVariable$paraSelection$Parameter[1],
+                        min = minVal, 
+                        max = maxVal, 
+                        value = minVal,
+                        step = (maxVal - minVal)/50
+      ) 
+    },
+    blocking_level = "warning"
+  )
+  
+  # remove slider input when parameter selection was updated
+  shinyCatch(
+    if(globalVariable$nCaliParam > 1){
+      for (i in 2:globalVariable$nCaliParam){
+        removeUI(selector = paste0("div:has(> #parameter", i, ")"),
+                 multiple = TRUE,
+                 immediate = TRUE,
+                 session)
+      }
+    },
+    blocking_level = "warning"
+  )
+  
+  # Add slider input for other parameters  
+  shinyCatch(
+    if (nrow(globalVariable$paraSelection) > 1){
+      lapply(1:(nrow(globalVariable$paraSelection)-1), FUN = function(i) {
+        if (check_null_na_empty(globalVariable$paraSelection$Min[i+1]) &
+            check_null_na_empty(globalVariable$paraSelection$Max[i+1])){
+          
+          # Min and max value
+          minVal <- as.numeric(globalVariable$paraSelection$Min[i+1])
+          maxVal <- as.numeric(globalVariable$paraSelection$Max[i+1])
+          
+          # Insert Slider input for other parameters
+          insertUI(
+            selector = "#parameter1",
+            where = "afterEnd",
+            ui = sliderInput(
+              inputId = paste0("parameter", i+1),
+              label = globalVariable$paraSelection$Parameter[i+1],
+              min = minVal, 
+              max = maxVal, 
+              value = minVal,
+              step = (maxVal - minVal)/50
+            )
+          )
+        }
+      })
+    }, 
+    blocking_level = "error"
+  )
+
+    
+  # ****************************************************************************
+  # Help button R-SWAT Education select parameter value
   # ****************************************************************************
   observe({
-    req(input$savePlotVariableNumber)
-
-    # Display window for saving plot
-    showModal(
-      modalDialog(
-        textInput("savePlotVariableNumberFileName", "File name (must have .pdf)",
-                  placeholder = 'RSWATPlot.pdf'
-        ),
-
-        # User defined setting for figure width
-        numericInput("savePlotVariableNumberWidth", "Width in cm", 10,
-                     min = 1, max = 100),
-
-        # User defined setting for figure height
-        numericInput("savePlotVariableNumberHeight", "Height in cm", 10,
-                     min = 1, max = 100),
-
-        # Display instruction
-        span('Press OK to save plot as .pdf file in the working folder'),
-
-        # Set displayed texts for the the modal and action button
-        footer = tagList(
-          modalButton("Cancel"),
-          actionButton("savePlotVariableNumberok", "OK")
-        )
-      )
-    )
-
-  })
-
-  # Saving figure only when user press the OK button
-  observeEvent(input$savePlotVariableNumberok, {
-
-    # Set working directory, which is the working folder
-    setwd(globalVariable$workingFolder)
-
-    # Now save the plot as pdf file
-    ggsave(input$savePlotVariableNumberFileName,
-           plot = globalVariable$PlotVariableNumber,
-           device = "pdf",
-           width = input$savePlotVariableNumberWidth,
-           height = input$savePlotVariableNumberHeight,
-           units = c("cm"))
-
-    # print message
+    req(input$helpSwatEduSelectParam)
+    
     showModal(modalDialog(
-      title = " ",
-      "Plot was saved as .pdf file in the working folder",
-      easyClose = TRUE,
-      size = "l"
-    ))
+      title = "1. Selecting parameter values",
+      renderUI(HTML(readLines(paste(globalVariable$HTMLdir,
+                                    "/HTML/selectParameterValue.html",
+                                    sep = "")))),
+      easyClose = TRUE
+    ))    
   })
 
+  # ****************************************************************************
+  # Help button R-SWAT Education run model and model perforamnce
+  # ****************************************************************************
+  observe({
+    req(input$helpModelRunPerf)
+    
+    showModal(modalDialog(
+      title = "2. Model run",
+      renderUI(HTML(readLines(paste(globalVariable$HTMLdir,
+                                    "/HTML/modelRun.html",
+                                    sep = "")))),
+      easyClose = TRUE
+    ))    
+    
+  })
+
+  # ****************************************************************************
+  # 5.2. Run SWAT for manual calibration
+  # ****************************************************************************
+  observeEvent(input$runSwatEdu, {
+    shinyCatch(
+      for (ii in 1:1){
+        
+        # Load all files that are going to be updated
+        globalVariable$caliParam <<- loadParamChangeFileContent(globalVariable$HRUinfo,
+                                                                globalVariable$paraSelection,
+                                                                globalVariable$SWATParam,
+                                                                globalVariable$TxtInOutFolder)
+        
+        # Get prameter value
+        selecParameterValue <- c()
+        for (i in 1:nrow(globalVariable$paraSelection)){
+          temp <- eval(parse(text = "paste0('input$parameter', i)"))
+          selecParameterValue <- c(selecParameterValue, 
+                                   eval(parse(text = temp)))
+        }
+        parameterValue <- c(1, selecParameterValue)
+        
+        # Copy unchange file
+        createDirCopyUnchangeFile(globalVariable$workingFolder, 
+                                  1, 
+                                  globalVariable$TxtInOutFolder,
+                                  globalVariable$caliParam$file,
+                                  globalVariable$SWATexeFile,
+                                  TRUE)
+        
+        # Run SWAT
+        withProgress(message = 'SWAT is running', {
+        runSWATSequential(1, 
+                          globalVariable$workingFolder, 
+                          globalVariable$SWATexeFile, 
+                          globalVariable$caliParam,
+                          globalVariable$paraSelection,
+                          parameterValue, 
+                          globalVariable$outputExtraction, 
+                          globalVariable$fileCioInfo,
+                          globalVariable$dateRangeCali,
+                          TRUE)
+          incProgress(1/2)
+        })
+        
+        # Read output data
+        globalVariable$SwatEduSimData <<- list()
+        for (i in 1:globalVariable$nOutputVar){
+          globalVariable$SwatEduSimData[[i]] <<- read.csv(file = paste0(globalVariable$workingFolder, 
+                                         "/Output/Core_1/out_var_", i, ".txt"),
+                           header = TRUE)[,1]
+        }
+        
+        # Calculate objective function
+        temp <- calObjFunction(as.data.frame(0),
+                               1,
+                               globalVariable$nOutputVar,
+                               globalVariable$userReadSwatOutput,
+                               globalVariable$observedData,
+                               globalVariable$workingFolder,
+                               globalVariable$objFunction)
+        
+        #Update model performance
+        rnames <- c()
+        for (i in 1:globalVariable$nOutputVar){
+          if (i == 1) {
+            swatEduModelPerf <- temp$perCriteriaCali[[i]][[1]]
+          } else {
+            swatEduModelPerf <- rbind(swatEduModelPerf, temp$perCriteriaCali[[i]][[1]])
+          }
+          swatEduModelPerf <- rbind(swatEduModelPerf, temp$perCriteriaValid[[i]][[1]])
+          rnames <- c(rnames, paste0("cali_var_", i), paste0("valid_var_", i))
+        }
+        rownames(swatEduModelPerf) <- rnames
+        
+        #not include column 4 and 5 => table too long - TODO improve GUI later
+        output$swatEduModelPerf <- renderTable({swatEduModelPerf[,-c(4,5)]}, 
+                                               rownames = TRUE,
+                                               width = "100%",
+                                               digits = 2)
+        
+        # convert to ggplotly with legend on top
+        lapply(1:globalVariable$nOutputVar, function(i) {
+          temp_plot <- ggplotly(plotSwatEdu(globalVariable, i)) %>% 
+            layout(legend = list(orientation = "h", x = 0.0, y = 1.1))
+          outID <- paste0("SwatEduPlot", i)
+          output[[outID]] <- renderPlotly(temp_plot)
+        })
+
+        globalVariable$runManualCaliSuccess <<- TRUE
+        
+        # Get water balance and nutrient balance
+        if (globalVariable$SWATProject){
+          output_std <- paste0(globalVariable$workingFolder, "/TxtInOut_1/output.std")
+          output_std <- read_output_std(output_std)
+          output$swatEduWaterBalance <- renderDataTable(output_std$waterbalance,
+                                                        options = list(scrollX = TRUE, searching = FALSE))
+          output$swatEduNutrientBalance <- renderDataTable(output_std$nutrientblance,
+                                                           options = list(scrollX = TRUE, searching = FALSE))
+        } else {
+          # TODO
+        }
+
+      }, 
+      blocking_level = "error"
+    )
+  })
+  
+  # ****************************************************************************
+  # Plot simulated variables
+  # ****************************************************************************
+  observe({
+    
+    req(input$showPlotVariables)
+    print("THIS was run")
+    if (is.null(input$showPlotVariables)) temp <- "variable 1"
+    
+    if(globalVariable$runManualCaliSuccess){
+      
+      # Convert string to numeric
+      temp <- input$showPlotVariables
+      temp <- as.numeric(gsub("variable", "", temp))
+      temp <- sort(temp, decreasing = FALSE)
+      
+      lapply(1:20, function(i) {
+        outputId <- paste0("SwatEduPlot", i)
+        output[[outputId]] <- NULL
+      })    
+      
+      lapply(1:length(temp), function(i) {
+        temp_plot <-  ggplotly(plotSwatEdu(globalVariable, temp[i])) %>% 
+          layout(legend = list(orientation = "h", x = 0.0, y = 1.1))
+        outputId <- paste0("SwatEduPlot", i)
+        output[[outputId]] <- renderPlotly(temp_plot)
+      })
+
+    } 
+  })
   #-----------------------------------------------------------------------------
 }
