@@ -178,12 +178,12 @@ server <- function(input, output, session) {
         
         # Update working folder
         updateTextInput(session, "workingFolder",
-                        label = "1. Working folder",
+                        label = "2. Working folder",
                         value = globalVariable$workingFolder)
         
         # Update TxtInOut folder
         updateTextInput(session, "TxtInOutFolder",
-                        label = "2. TxtInOut folder",
+                        label = "3. TxtInOut folder",
                         value = globalVariable$TxtInOutFolder)
         
         
