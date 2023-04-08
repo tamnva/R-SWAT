@@ -242,7 +242,7 @@ plotSimulated <- function(inputDataFrame){
     myplot <- ggplot(inputDataFrame) + 
       #95 PPU
       geom_ribbon(aes(x = date, ymin = lower, ymax = upper, color = "95PPU"), 
-                  size = 0.0, fill = "red", alpha = 0.3) +
+                  linewidth = 0.0, fill = "red", alpha = 0.3) +
       # Best simulation
       geom_line(aes(x = date, y = best, color = "Best simulation"), alpha = 0.6) +
       # Observed data
@@ -258,7 +258,7 @@ plotSimulated <- function(inputDataFrame){
     myplot <- ggplot(inputDataFrame) + 
       #95 PPU
       geom_ribbon(aes(x = date, ymin = lower, ymax = upper, color = "95PPU"), 
-                  size = 0.0, fill = "red", alpha = 0.3) +
+                  linewidth = 0.0, fill = "red", alpha = 0.3) +
       # Best simulation
       geom_line(aes(x = date, y = best, color = "Best simulation"), alpha = 0.6) +
       # Observed data
