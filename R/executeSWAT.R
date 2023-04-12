@@ -49,7 +49,7 @@
       exeFile <- strsplit(swatExe, split="/")[[1]]
       if(!file.exists(exeFile[length(exeFile)])) file.copy(swatExe, toDir)
       
-      system(trimws(exeFile[length(exeFile)]))
+      system(paste0(toDir,'/',exeFile[length(exeFile)]))
 
       # Check first run
       if ((nrow(subParameterSet) > 1) & (i > 1)){
