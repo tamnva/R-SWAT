@@ -46,7 +46,7 @@
       updateMultiFile(toDir, caliParam, subParameterSet[i,2:nParam], paraSelection)        
 
       # Call swat.exe file
-      exeFile <- strsplit(swatExe, split="/")[[1]]
+      exeFile <- strsplit(swatExe, split="\\\\")[[1]]
       if(!file.exists(exeFile[length(exeFile)])) file.copy(swatExe, toDir)
       
       system(trimws(exeFile[length(exeFile)]))
