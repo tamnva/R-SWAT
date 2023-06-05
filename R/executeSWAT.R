@@ -141,6 +141,7 @@
                                                       "updateCalibrationFile",
                                                       "readChannelFile",
                                                       "readOutputRchFile",
+                                                      "yearlyOutputLoc",
                                                       "getRchNumber")) %dopar% {
                                                         
                                                         runSWATSequential(i, 
