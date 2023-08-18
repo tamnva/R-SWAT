@@ -2298,31 +2298,34 @@ server <- function(input, output, session) {
     globalVariable$isBehThresholdValid <<- FALSE
 
     # Check if the user-defined behavioral threshold is in a valid range
-    if(!is.null(input$behThreshold)){
-      if(!is.null(globalVariable$objValueCali)){
-        
-        if (!is.numeric(input$behThreshold)){
-          output$printMaxBehThreshold <- renderText("please input numeric value")
-        } else {
-          if (input$behThreshold > max(globalVariable$objValueCali)){
-            
-            # Display check message
-            output$printMaxBehThreshold <- renderText(paste("The selected value is ",
-                                                            "greater than the maximum value ",
-                                                            max(globalVariable$objValueCali),
-                                                            sep =""))
+    shinyCatch(
+      if(!is.null(input$behThreshold)){
+        if(!is.null(globalVariable$objValueCali)){
+          
+          if (!is.numeric(input$behThreshold)){
+            output$printMaxBehThreshold <- renderText("please input numeric value")
           } else {
-            # Display check message
-            globalVariable$isBehThresholdValid <<- TRUE
-            output$printMaxBehThreshold <- renderText("check threshold value OK")
-          }         
+            if (input$behThreshold > max(globalVariable$objValueCali)){
+              
+              # Display check message
+              output$printMaxBehThreshold <- renderText(paste("The selected value is ",
+                                                              "greater than the maximum value ",
+                                                              max(globalVariable$objValueCali),
+                                                              sep =""))
+            } else {
+              # Display check message
+              globalVariable$isBehThresholdValid <<- TRUE
+              output$printMaxBehThreshold <- renderText("check threshold value OK")
+            }         
+          }
+        } else {
+          output$printMaxBehThreshold <- NULL
         }
       } else {
         output$printMaxBehThreshold <- NULL
-      }
-    } else {
-      output$printMaxBehThreshold <- NULL
-    }
+      },
+      blocking_level = "error"
+    )
   })
 
   # ****************************************************************************
