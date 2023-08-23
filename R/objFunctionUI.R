@@ -186,6 +186,10 @@ objFunctionUI <- function(id) {
       
       conditionalPanel(
         condition = "input.ObjEachVar == 1",
+        column(width = 10, 
+               checkboxInput('stackTable', 'Reshape table', 
+                             value = FALSE, width = NULL),
+        ),
         column(width = 10,
                excelOutput("tableObjEachVar", 
                            width = "100%", 

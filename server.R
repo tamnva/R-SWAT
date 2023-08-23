@@ -2169,6 +2169,35 @@ server <- function(input, output, session) {
                                                        wordWrap = FALSE)),
       blocking_level = "none")
     
+    shinyCatch(
+      
+      if (input$stackTable + input$ObjEachVar == 2){
+        
+        stackTable <- cbind(tableParaObjEachVar[1:1], stack(
+          tableParaObjEachVar[2:ncol(tableParaObjEachVar)]))
+        idx <- sort(stackTable$SimNr, decreasing = FALSE, index.return=TRUE)$ix
+        stackTable <- stackTable[idx,]
+        
+        
+        columnStackTable <- data.frame(title = colnames(stackTable),
+                                       source = rep(NA, 3),
+                                       width = rep(900, 3),
+                                       type = rep('text', 3))
+        
+        output$tableObjEachVar <- renderExcel(excelTable(data = stackTable,
+                                                         columns = columnStackTable,
+                                                         editable = FALSE,
+                                                         allowInsertRow = FALSE,
+                                                         allowInsertColumn = FALSE,
+                                                         allowDeleteColumn = FALSE,
+                                                         allowDeleteRow = FALSE,
+                                                         rowDrag = FALSE,
+                                                         columnResize = FALSE,
+                                                         wordWrap = FALSE))
+        
+      },
+      blocking_level = "none")
+    
   })
   
   # 4.2. Sensitivity Analysis
