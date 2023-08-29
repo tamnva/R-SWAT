@@ -1788,27 +1788,22 @@ server <- function(input, output, session) {
     # Check if the parameterValue exists
     if (!is.null(globalVariable$parameterValue)){
 
-      # Collumn setting of the parameter value table
-      columnsParameterValue <- data.frame(
-        title = c("Simulation Nr.", globalVariable$paraSelection$Parameter),
-        source = rep(NA, ncol(globalVariable$parameterValue)),
-        width = rep(300, ncol(globalVariable$parameterValue)),
-        type = rep('numeric', ncol(globalVariable$parameterValue))
-        )
-
-      # Fill the parameter table with content (parameter values)
-      output$tableDisplayParameterSet <- renderExcel(
-        excelTable(data = globalVariable$parameterValue,
-                   columns = columnsParameterValue,
-                   editable = FALSE,
-                   allowInsertRow = FALSE,
-                   allowInsertColumn = FALSE,
-                   allowDeleteColumn = FALSE,
-                   allowDeleteRow = FALSE,
-                   rowDrag = FALSE,
-                   columnResize = FALSE,
-                   wordWrap = FALSE)
-        )
+      # Column names, round up to 3 decimal digits
+      colnames(globalVariable$parameterValue) = c("Simulation Nr.", 
+                                                  globalVariable$paraSelection$Parameter)
+      
+      # Display output table
+      output$tableDisplayParameterSet <- renderDataTable(
+        round(globalVariable$parameterValue, 3),
+        server = FALSE,
+        extensions = c("Buttons"),
+        rownames = FALSE,
+        options = list(dom = 'Bfrtip',
+                       scroller = TRUE,
+                       scrollX = TRUE,
+                       searching = TRUE,
+                       fixedHeader = TRUE,
+                       buttons = c('csv', 'excel')))
     } else {
 
       # If there is no parameter, don't display anything
@@ -1963,9 +1958,23 @@ server <- function(input, output, session) {
     req(input$checkDisplayObsVar)
 
     # Display content of the observed data files
-    output$tableObsVarDisplay <- renderDataTable(
-      mergeDataFrameDiffRow(globalVariable$observedData)
-      )
+    observedData <- mergeDataFrameDiffRow(globalVariable$observedData)
+    
+    # Display observed data in table
+    shinyCatch(
+      output$tableObsVarDisplay <- renderDataTable(observedData,
+                                                   server = FALSE,
+                                                   extensions = c("Buttons"),
+                                                   rownames = FALSE,
+                                                   options = list(dom = 'Bfrtip',
+                                                                  scroller = TRUE,
+                                                                  scrollX = TRUE,
+                                                                  searching = FALSE,
+                                                                  fixedHeader = TRUE,
+                                                                  buttons = c('csv', 'excel'))
+      ), 
+      blocking_level = "error"
+    )
   })
 
   # ****************************************************************************
@@ -2111,23 +2120,18 @@ server <- function(input, output, session) {
         is.num <- sapply(tableParaObj, is.numeric)
         tableParaObj[is.num] <- lapply(tableParaObj[is.num], round, 3)
         
-        # Visual setting for the output table
-        columnsCalObjFunction <- data.frame(title = colnames(tableParaObj),
-                                            source = rep(NA, ncol(tableParaObj)),
-                                            width = rep(300, ncol(tableParaObj)),
-                                            type = rep('text', ncol(tableParaObj)))
-        
         # Fill output tables with parameter and objective function values
-        output$tableCalObjFunction <- renderExcel(excelTable(data = tableParaObj,
-                                                             columns = columnsCalObjFunction,
-                                                             editable = FALSE,
-                                                             allowInsertRow = FALSE,
-                                                             allowInsertColumn = FALSE,
-                                                             allowDeleteColumn = FALSE,
-                                                             allowDeleteRow = FALSE,
-                                                             rowDrag = FALSE,
-                                                             columnResize = FALSE,
-                                                             wordWrap = FALSE))
+        output$tableCalObjFunction <- renderDataTable(tableParaObj, 
+                                                      server = FALSE,
+                                                      extensions = c("Buttons"),
+                                                      rownames = FALSE,
+                                                      options = list(dom = 'Bfrtip',
+                                                                     scroller = TRUE,
+                                                                     scrollX = TRUE,
+                                                                     searching = TRUE,
+                                                                     fixedHeader = TRUE,
+                                                                     buttons = c('csv', 'excel')
+                                                      ))
       } else {
         output$tableCalObjFunction <- NULL
       }, 
@@ -2147,55 +2151,20 @@ server <- function(input, output, session) {
                                                          globalVariable$perCriteriaValid),
       blocking_level = "none")
     
-    # Visual setting for the output table
-    shinyCatch(
-      columnsTableObjEachVar <- data.frame(title = colnames(tableParaObjEachVar),
-                                           source = rep(NA, ncol(tableParaObjEachVar)),
-                                           width = rep(300, ncol(tableParaObjEachVar)),
-                                           type = rep('text', ncol(tableParaObjEachVar))),
-      blocking_level = "none")
     
     # Fill output tables with parameter and objective function values
     shinyCatch(
-      output$tableObjEachVar <- renderExcel(excelTable(data = tableParaObjEachVar,
-                                                       columns = columnsTableObjEachVar,
-                                                       editable = FALSE,
-                                                       allowInsertRow = FALSE,
-                                                       allowInsertColumn = FALSE,
-                                                       allowDeleteColumn = FALSE,
-                                                       allowDeleteRow = FALSE,
-                                                       rowDrag = FALSE,
-                                                       columnResize = FALSE,
-                                                       wordWrap = FALSE)),
-      blocking_level = "none")
-    
-    shinyCatch(
-      
-      if (input$stackTable + input$ObjEachVar == 2){
-        
-        stackTable <- cbind(tableParaObjEachVar[1:1], stack(
-          tableParaObjEachVar[2:ncol(tableParaObjEachVar)]))
-        idx <- sort(stackTable$SimNr, decreasing = FALSE, index.return=TRUE)$ix
-        stackTable <- stackTable[idx,]
-        
-        
-        columnStackTable <- data.frame(title = colnames(stackTable),
-                                       source = rep(NA, 3),
-                                       width = rep(900, 3),
-                                       type = rep('text', 3))
-        
-        output$tableObjEachVar <- renderExcel(excelTable(data = stackTable,
-                                                         columns = columnStackTable,
-                                                         editable = FALSE,
-                                                         allowInsertRow = FALSE,
-                                                         allowInsertColumn = FALSE,
-                                                         allowDeleteColumn = FALSE,
-                                                         allowDeleteRow = FALSE,
-                                                         rowDrag = FALSE,
-                                                         columnResize = FALSE,
-                                                         wordWrap = FALSE))
-        
-      },
+      output$tableObjEachVar <- renderDataTable(tableParaObjEachVar, 
+                                                server = FALSE,
+                                                extensions = c("Buttons"),
+                                                rownames = FALSE,
+                                                options = list(dom = 'Bfrtip',
+                                                               scroller = TRUE,
+                                                               scrollX = TRUE,
+                                                               searching = TRUE,
+                                                               fixedHeader = TRUE,
+                                                               buttons = c('csv', 'excel')
+                                                )),
       blocking_level = "none")
     
   })

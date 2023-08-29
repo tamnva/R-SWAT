@@ -7,12 +7,13 @@
 # The required package versions will be automatically satisfied by running line 33 
 
 requiredPackages <- c('foreach',         # version >= 1.5.2
-                      'doParallel',      # version >= 1.0.17     
+                      'doParallel',      # version >= 1.0.17
+                      'DT',              # version >= 0.26
                       'lhs',             # version >= 1.1.4
                       'plotly',          # version >= 4.10.0
                       'ggplot2',         # version >= 3.5-15 
                       'shiny',           # version >= 1.7.1
-                      'shinyjs',
+                      'shinyjs',         # version >= 2.1.0
                       'shinydashboard',  # version >= 0.7.2
                       'shinyFiles',      # version >= 0.9.1
                       'tippy',           # version >= 0.1.0

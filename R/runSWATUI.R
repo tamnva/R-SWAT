@@ -163,7 +163,7 @@ runSwatUI <- function(id) {
       conditionalPanel(
         condition = "input.checkDisplayParameterSet == 1",
         column(width = 10,
-               excelOutput("tableDisplayParameterSet", 
+               dataTableOutput("tableDisplayParameterSet", 
                            width = "100%", 
                            height = "1px"),
         ),
