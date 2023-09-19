@@ -21,6 +21,7 @@
 <h4><span style="color: #ff9900;">SWAT+</span> project</h4>
 <ul>
 <li>Currently, R-SWAT can extract output from different channel files (e.g., channel_sd_day.txt, channel_sd_month.txt, and so on). The <span style="color: #ff00ff;">Column</span> number indicates <span style="color: #0000ff;">which columns</span> in this output file you want to extract and the <span style="color: #ff00ff;">Reach</span> number indicates <span style="color: #0000ff;">which reaches</span> you want to extract. For example, if you want to extract from column <span style="color: #0000ff;">48</span> and for reach numbers <span style="color: #ff0000;">1</span> and <span style="color: #ff0000;">2</span>, and column <span style="color: #339966;">53</span> for reach numbers <span style="color: #339966;">1,2,3</span>. You write in the Column '<span style="color: #0000ff;">48</span>, <span style="color: #339966;">53</span>' and in the Reach '<span style="color: #ff0000;">1, 2</span> * <span style="color: #339966;">1, 2, 3</span>'</li>
+<li>IMPORTANT: <strong> <span style="color: #3366ff;">Reach number is the "unit" in column 5 of the output file, you can see this when open the output file for in SWAT+ documentation https://swatplus.gitbook.io/io-docs/swat+-output-files/channel</span></strong></li>
 <li>You can also read from other files by modifying the source code file<strong> <span style="color: #3366ff;">./R/userReadSwatOutput.R</span></strong></li>
 </ul>
 
