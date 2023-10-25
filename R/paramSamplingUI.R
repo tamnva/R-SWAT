@@ -82,7 +82,6 @@ paramSamplingUI <- function(id) {
                                      'Sensi_(from_sensitivity_package)',
                                      'Sensi_(from_userDefined_package)',
                                      'Cali_(from_optimization_package)',
-                                     'Cali_(from_hydroPSO_package)',
                                      'Cali_(from_nloptr_package)',
                                      'Cali_(Dynamically_Dimensioned_Search)',
                                      'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',

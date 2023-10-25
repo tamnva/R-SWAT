@@ -237,7 +237,6 @@ server <- function(input, output, session) {
                                       'Sensi_(from_sensitivity_package)',
                                       'Sensi_(from_userDefined_package)',
                                       'Cali_(from_optimization_package)',
-                                      'Cali_(from_hydroPSO_package)',
                                       'Cali_(from_nloptr_package)',
                                       'Cali_(Dynamically_Dimensioned_Search)',
                                       'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
@@ -989,16 +988,7 @@ server <- function(input, output, session) {
                           "nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7)))"))
       outputText <- helpTextCali
       
-    # From hydroPSO package
-    } else if (input$samplingApproach == 'Cali_(from_hydroPSO_package)'){
-      
-      updateTextAreaInput(session, "inputInfo", 
-                          paste("3. Additional infomation about the selected",
-                          "sensitivity/calibration approach"),
-                          paste("hydroPSO(fn = SWAT, lower=minCol, upper=maxCol,",
-                          "control=list(maxit=1))"))
-      outputText <- helpTextCali
-      
+    # From nloptr_package 
     } else if (input$samplingApproach == 'Cali_(from_nloptr_package)'){
       
       updateTextAreaInput(session, "inputInfo", 
@@ -1104,7 +1094,6 @@ server <- function(input, output, session) {
     # Check if user need to input R command
     if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
         input$samplingApproach == 'Cali_(from_optimization_package)' |
-        input$samplingApproach == 'Cali_(from_hydroPSO_package)' |
         input$samplingApproach == 'Cali_(from_nloptr_package)' |
         input$samplingApproach == 'Sensi_(from_userDefined_package)' |
         input$samplingApproach == 'Cali_(from_userDefined_package)' ){
@@ -1989,7 +1978,6 @@ server <- function(input, output, session) {
       if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)' |
           globalVariable$samplingApproach == 'Cali_(from_userDefined_package)'  |
           globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
-          globalVariable$samplingApproach == 'Cali_(from_hydroPSO_package)' |
           globalVariable$samplingApproach == 'Cali_(from_nloptr_package)' |
           globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
           globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' ){

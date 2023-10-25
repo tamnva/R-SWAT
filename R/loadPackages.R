@@ -20,8 +20,7 @@ requiredPackages <- c('foreach',         # version >= 1.5.2
                       'excelR',          # version >= 0.4.0
                       'sensitivity',     # version >= 1.27.0
                       'boot',            # version >= 1.3-24
-                      'optimization',    # version >= 1.0-9  
-                      'hydroPSO',        # version >= 0.5-1
+                      'optimization',    # version >= 1.0-9
                       'nloptr',          # version >= 2.0.0
                       'spsComps')        # version >= 0.3.2.1)
                      
@@ -33,4 +32,3 @@ update.packages(requiredPackages, ask = FALSE)
   
 # Load dependency packages
 suppressMessages(suppressWarnings(lapply(requiredPackages, library, character.only = TRUE)))
-
