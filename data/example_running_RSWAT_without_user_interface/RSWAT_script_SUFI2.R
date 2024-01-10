@@ -87,7 +87,7 @@ observedDataFile <- c("C:/RSWAT_demo/R-SWAT-master/data/example_SWAT/obs_var_1.t
 # Load R-SWAT functions
 # Require packages
 requiredPackages <- c('foreach', 'doParallel', 'lhs', 'sensitivity', 'boot', 
-                      'optimization', 'hydroPSO','nloptr','spsComps')
+                      'optimization', 'nloptr','spsComps')
 
 # Check and install only missing packages
 install.packages(setdiff(requiredPackages,rownames(installed.packages())), dependencies = TRUE) 
