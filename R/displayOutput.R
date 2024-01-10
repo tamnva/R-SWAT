@@ -41,10 +41,11 @@ mergeDataFrameDiffRow <- function(inputDataFrameList){
     }
     
     for (i in 1:length(inputDataFrameList)){
+      colnames(inputDataFrameList[[i]]) <- c("Date", "Value", "Flag")
+      inputDataFrameList[[i]]$Date <- paste0(as.character(inputDataFrameList[[i]]$Date))
       if (nrow(inputDataFrameList[[i]]) < maxVal){
         temp <- matrix(rep(NA,(maxVal - nrow(inputDataFrameList[[i]]))*3), 
                        ncol = 3)
-        colnames(temp) <- c("Date", "Value", "Flag")
         inputDataFrameList[[i]] <- rbind(inputDataFrameList[[i]], temp) 
       }
       if (i == 1) {
@@ -52,9 +53,11 @@ mergeDataFrameDiffRow <- function(inputDataFrameList){
       } else {
         out <- cbind(out, inputDataFrameList[[i]])
       }
-    }    
+    }
   } else {
     out <- inputDataFrameList[[1]]
+    colnames(out) <- c("Date", "Value", "Flag")
+    out$Date <- paste0(as.character(out$Date))
   }
   
   return(out)
