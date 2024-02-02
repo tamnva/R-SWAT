@@ -1,2 +1,0 @@
-GW_DELAY.gw  CN2.mgt    SOL_K.sol   ALPHA_BF.gw   ESCO.hru  SURLAG.hru   CH_K2.rte   SURLAG.bsn
-120.0        -0.1       -0.1        0.3           0.7       2.0          0.3         4.0

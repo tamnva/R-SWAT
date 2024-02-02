@@ -1,6 +1,0 @@
- .sdr file Watershed HRU:6 Subbasin:2 HRU:1 Luse:FRSE Soil: Fr333ab4494 Slope 0-5 9/21/2021 12:00:00 AM ArcSWAT 2012.10_5.21
-     50.00    | RE: Effective radius of drains (mm)
-  15000.00    | SDRAIN: Distance bwtween two drain tubes or tiles (mm)
-     10.00    | DRAIN_CO: Drainage coefficient (mm/day)
-      1.00    | PC: Pump capacity (def pump cap - 1.042mm/hr or 25mm/day)
-      1.00    | LATKSATF: Multiplication factor to determine conk(j1,j) from sol_k(j1,k) for HRU
