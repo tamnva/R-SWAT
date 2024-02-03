@@ -1,5 +1,5 @@
 ---
-title: 'RSWAT: An extenstion of R-SWAT for parameter parameter calibration with SWAT
+title: 'RSWAT: An extension of the R-SWAT app for SWAT modelling
   and its modified versions'
 tags:
 - R
@@ -17,7 +17,7 @@ authors:
   affiliation: '1'
 bibliography: joss_manuscript.bib
 affiliations:
-- name: Tam V. Nguyen, Helmholtz Centre for Environmental Research – UFZ,Germany
+- name: Tam V. Nguyen, Helmholtz Centre for Environmental Research - UFZ,Germany
   index: 1
 ---
 
@@ -27,7 +27,9 @@ write some text here
 
 # Statement of need
 
-The Soil and Water Assessment Tool (SWAT) is one of the most widely used and tested hydro-ecological models. SWAT has been constantly modified for different purposes, such as to adapt to certain hydrological conditions or to extend its functionalities. Most of the modifications are minor, additional input/output files but no changes in the model input/output file structures (e.g., ), there is also major changes in SWAT structures such as the 
+The Soil and Water Assessment Tool, SWAT [@arnold1998], is one of the most widely used and tested hydro-ecological models (@gassman2007; @aloui2023). SWAT has been constantly developed since its development due to our improved understanding of hydro-ecological processes (e.g., @nguyen2018; @ilampooranan2019) and to solve new challenges. On the other hand, SWAT also enhances our understanding of reality and contributes to water resources management at both local and regional scales (@gassman2007). While most of the changes in SWAT are minors, there are major changes [@bieger2017]. Many technical challenges arise when working with models that are constantly undergoing changes. For example, model parameter calibration, sensitivity and uncertainty analyses are not easy as (1) SWAT has numerous inputs files and parameters and (2) there is a lack of a standard tool that can cope with these changes.
+
+Various tools have developed to support SWAT parameter calibration and/or parameter sensitivity and uncertainty analyses, for example, ArcSWAT, QSWAT, R-SWAT, SWAT-CUP, SWATrunR, SWAT+ Toolbox. Among those, R-SWAT is the only R-based tool with a graphical user interface. In addition, R-SWAT can be cope with minor changes of SWAT without modifying it code. However, SWAT+ is completely restructured version of SWAT and R-SWAT was not designed to work with SWAT+. Due the increasing used of SWAT+ and R-SWAT, there is a growing demand to modify R-SWAT for SWAT+. In addition, developing an interactive manual calibration of both SWAT and SWAT+ in R-SWAT is required, especially for 
 
 
 
@@ -35,52 +37,7 @@ The Soil and Water Assessment Tool (SWAT) is one of the most widely used and tes
 `RSWAT` is an R package designed for parameter calib
 
 
-Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
 
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
-
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
-
-# Mathematics
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
 
 For a quick reference, the following citation commands can be used:
 - `@author:2001`  ->  "Author et al. (2001)"

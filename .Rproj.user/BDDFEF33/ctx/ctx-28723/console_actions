@@ -1,0 +1,16 @@
+{
+    "type": [
+        2,
+        2,
+        0,
+        1,
+        2
+    ],
+    "data": [
+        "\nR version 4.1.2 (2021-11-01) -- \"Bird Hippie\"\nCopyright (C) 2021 The R Foundation for Statistical Computing\nPlatform: x86_64-w64-mingw32/x64 (64-bit)\n\nR is free software and comes with ABSOLUTELY NO WARRANTY.\nYou are welcome to redistribute it under certain conditions.\nType 'license()' or 'licence()' for distribution details.\n\nR is a collaborative project with many contributors.\nType 'contributors()' for more information and\n'citation()' on how to cite R or R packages in publications.\n\nType 'demo()' for some demos, 'help()' for on-line help, or\n'help.start()' for an HTML browser interface to help.\nType 'q()' to quit R.\n\n",
+        "\nRestarting R session...\n\n",
+        "> ",
+        "library(RSWAT)",
+        "\nRestarting R session...\n\n"
+    ]
+}
