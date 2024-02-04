@@ -8,6 +8,7 @@
 #' @return no return, copied files will be saved in toDir
 #'
 #' @examples
+#'
 #' \donttest{
 #' # Create a directory and populate with TxtInOut of SWAT+
 #' extracExampleData(exampleData,"swatPlusTxtInOut", tempdir())

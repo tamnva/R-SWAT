@@ -46,7 +46,17 @@
 #'
 #' @importFrom stats quantile
 #'
+#' @examples
+#'
+#' \donttest{
+#' # Please see RSWAT Vignettes
+#' vignette("SUFI2_without_GUI",package="RSWAT")
+#' }
+#'
+#'
 #' @export
+#'
+#'
 #'
 
 behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
