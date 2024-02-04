@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+<h4>Please select the date range for sensitivity analysis/calibration. The min and maximum dates are automatically detected by R-SWAT by reading information from the <span style="color: #ff9900;">file.cio</span> file in case of <span style="color: #ff9900;">SWAT</span> or <span style="color: #339966;">time.sim</span> and <span style="color: #339966;">print.prt</span> files in case of <span style="color: #339966;">SWAT+</span> in the TxtInOut folder. Feel free to select any dates within the given range of R-SWAT</h4>
+<h4><span style="color: #3366ff;">SWAT</span> project</h4>
+<ul>
+<li>Currently, only reading daily output is possible. To read monthly, yearly or other output time steps, please use the option "userReadSwatOutput". In this case, the date range of extraction will not have any effect since it is defined by the user within the "userReadSwatOutput" option</li>
+</ul>
+<h4><span style="color: #ff9900;">SWAT+</span> project</h4>
+<ul>
+<li>When user select "userReadSwatOutput" option, the date range defined in here will not have any effect.</li>
+<li>When reading from the <span style="color: #0000ff;">monthly outputs</span> (e.g., channel_sd_mon.txt, channel_sdmorph_mon.txt) <span style="color: #0000ff;">only the month and year selected in here will be taken</span> (e.g., if user selects extracting output from 01 Jan 2000 or from 31 Jan 2000, the program will extract from Jan, 2000).</li>
+<li>When reading from the <span style="color: #ff0000;">monthly outputs</span> (e.g., channel_sd_yr.txt, channel_sdmorph_yr.txt) <span style="color: #ff0000;">only the year selected in here will be taken</span></li>
+</ul>
+
+</span>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+<h4><span style="color: #3366ff;">SWAT</span> project &rarr; Select '<span style="color: #3366ff;">swatParam.txt</span>' file</h4>
+<ul>
+<li>This file is provided along with this tool, it is located in <strong><span style="color: #339966;">./data/swatParam.txt</span></strong></li>
+<li>This file contains information about the location SWAT parameter in SWAT input file and its format as well as its theoretical range.</li>
+<li>For example (the HRU_FR parameter in all .hru files is located at line 2, column 1 to 16 with a precision of 7 digits after the decimal.</li>
+<li>The columns <strong><span style="color: #339966;">AbsoluteMin</span></strong> and <strong><span style="color: #339966;">AbsoluteMax</span></strong> in this files means the absolute min and max, R-SWAT will check and make sure that<strong><span style="color: #339966;"> updated parameter values will always be within this range</span></strong> (if the updated values out of this range, e.g., higher than the AbsoluteMax, R-SWAT will use the AbsoluteMax , if the updated values smaller than AbsoluteMin, R-SWAT will use the AbsoluteMin.</li>
+<li><span style="color: #ff0000;">Please check if the AbsoluteMin and AbsoluteMax for the parameters that you are going to calibrate/change are reasonable</span>.</li>
+<li>If there is a parameter that is missing, simply add it to this file at any line (using text editor to open the file and edit manually) and then load to R-SWAT</li>
+</ul>
+<h4><span style="color: #ff9900;">SWAT+</span> project &rarr; Select '<span style="color: #ff9900;">cal_parms.cal</span>' file</h4>
+<ul>
+<li>This file can be found in your TxtInOut folder. If you cannot find it, you can also download from <a href="https://bitbucket.org/blacklandgrasslandmodels/modular_swatplus/src/master/data/Little_River_Tifton/" target="_blank">here </a></li>
+</ul>
+
+</body>
+</html>
