@@ -14,7 +14,7 @@ authors:
   orcid: 0000-0001-9111-4393
   equal-contrib: yes
   affiliation: '1'
-bibliography: joss_manuscript.bib
+bibliography: paper.bib
 affiliations:
 - name: Tam V. Nguyen, Helmholtz Centre for Environmental Research - UFZ,Germany
   index: 1
