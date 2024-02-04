@@ -11,7 +11,7 @@
 
 ## Quick Start!
 
-RSWAT is an R package hosted on GitHub (to be submitted to CRAN soon). First, you need to install  https://cloud.r-project.org/,  [RStudio](https://posit.co/download/rstudio-desktop/), then **run** the following commands **in RStudio** (if you run in R, package vignettes cannot be built).
+RSWAT is an R package hosted on GitHub (to be submitted to CRAN soon). First, you need to install [R](https://cloud.r-project.org/), and  [RStudio](https://posit.co/download/rstudio-desktop/), then **run** the following commands **in RStudio** (if you run in R, package vignettes cannot be built).
 
 ```R
 # First install remotes package if you have not installed
@@ -33,23 +33,21 @@ If you don't know which input is required, simply click "Help?" on the right sid
 # Command to extract all example dataset (3.6 MB of storage)
 # Example: extracExampleData(exampleData, "all", "C:/example")
 
-extracExampleData(exampleData, "all", "replace_with_your_desired_path")
-
-
+extracExampleData(exampleData, "all", "replace_with_your_path")
 ```
 
 Data extracted from the above command are stored in this path "replace_with_your_desired_path" which include:
 
 | Data | Description |
 | --- | ----------- |
-| swatTxtInOut folder| TxtInOut folder with associated files SWAT
+| swatTxtInOut folder| TxtInOut folder with associated files of SWAT+ |
 | swatParam.txt | Parameter file of SWAT |
 | observedSWAT | Observed streamflow at the catchment outlet of SWAT |
-| swatPlusTxtInOut | TxtInOut folder with associated files of an example SWAT project |
-| cal_parms.cal | Parameter file of SWAT |
+| swatPlusTxtInOut | TxtInOut folder with associated files of SWAT+ |
+| cal_parms.cal | Parameter file of SWAT+ |
 | observedSWATPlus | Observed streamflow at the catchment outlet of SWAT+ |
 
-For examples of working without the user interface, please see RSWAT vignettes:
+Example of working without the user interface, please see the RSWAT vignettes:
 
 ```R
 vignette("SUFI2_without_GUI",package="RSWAT")
@@ -62,7 +60,7 @@ vignette("SUFI2_without_GUI",package="RSWAT")
 
 **Nguyen, T. V.** (2024). RSWAT: An R package for the Soil and Water Assessment Tool models. Submitted to The Journal of Open Source Software.
 
-
+# GUI of RSWAT
 
 
 (NOTE: in the latest version, the user interface could be slightly difference)

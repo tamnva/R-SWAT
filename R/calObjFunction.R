@@ -12,7 +12,10 @@
 #' @importFrom utils read.table
 #' @examples
 #'
-#' # Please see RSWAT vignettes "SUFI2_without_GUI"
+#' \donttest{
+#' # Please see RSWAT Vignettes
+#' vignette("SUFI2_without_GUI",package="RSWAT")
+#' }
 #'
 #' @export
 

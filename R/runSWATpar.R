@@ -266,7 +266,7 @@ getParameterValue <- function(parameter, parameterValue){
 #' @examples
 #'
 #'\donttest{
-#' updateMultiFile <-  function(toDir, caliParam, parameterValue, paraSelection)
+#' updateMultiFile(toDir, caliParam, parameterValue, paraSelection)
 #'}
 #'
 #' @export
