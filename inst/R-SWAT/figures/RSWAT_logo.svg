@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="55mm"
+   height="14mm"
+   viewBox="0 0 55 14"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="R-SWAT_logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="3.1643096"
+     inkscape:cx="118.19324"
+     inkscape:cy="74.58183"
+     inkscape:window-width="1600"
+     inkscape:window-height="837"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#180678;fill-opacity:1;fill-rule:evenodd;stroke-width:0.15;stroke-linejoin:round;stroke-miterlimit:10"
+       id="rect4337"
+       width="54.047794"
+       height="12.235105"
+       x="0.34469649"
+       y="0.67199451" />
+    <text
+       xml:space="preserve"
+       style="font-size:14.1111px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="2.6828594"
+       y="11.941831"
+       id="text1537"><tspan
+         sodipodi:role="line"
+         id="tspan1535"
+         style="font-weight:bold;font-size:14.1111px;stroke-width:0.264583"
+         x="2.6828594"
+         y="11.941831"><tspan
+           style="font-weight:bold;fill:#ffffff;fill-opacity:1"
+           id="tspan4912">RSWAT</tspan></tspan></text>
+  </g>
+</svg>

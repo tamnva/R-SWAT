@@ -1,9 +1,0 @@
-1
-    SWAT Sep 7    VER 2018/Rev 670                                                                       0/ 0/   0      0: 0: 0
-
-    General Input/Output section (file.cio):                                        
-    9/21/2021 12:00:00 AM ARCGIS-SWAT interface AV                                  
-                                                                                    
-
-
-           RES  MON    VOLUMEm3  FLOW_INcms FLOW_OUTcms    PRECIPm3      EVAPm3   SEEPAGEm3  SED_INtons SED_OUTtons SED_CONCppm   ORGN_INkg  ORGN_OUTkg RES_ORGNppm   ORGP_INkg  ORGP_OUTkg RES_ORGPppm    NO3_INkg   NO3_OUTkg  RES_NO3ppm    NO2_INkg   NO2_OUTkg  RES_NO2ppm    NH3_INkg   NH3_OUTkg  RES_NH3ppm   MINP_INkg  MINP_OUTkg RES_MINPppm   CHLA_INkg  CHLA_OUTkgSECCHIDEPTHm   PEST_INmg  REACTPSTmg    VOLPSTmg  SETTLPSTmgRESUSP_PSTmgDIFFUSEPSTmgREACBEDPSTmg   BURYPSTmg  PEST_OUTmgPSTCNCWmg/m3PSTCNCBmg/m3

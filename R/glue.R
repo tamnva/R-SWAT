@@ -1,70 +1,56 @@
-# GLUE approach
-
+#'
+#' Generalized likelihood uncertainty estimation (GLUE)
+#'
+#' @description
+#' Calculate the percentiles according Generalized likelihood uncertainty
+#' estimation (GLUE). The code was taken from
+#' \url{http://www.uncertain-future.org.uk/wp-content/uploads/2016/06/R-GLUE.zip}
+#'
+#'
+#' @param perc percentiles
+#' @param x values (numeric vector). In R-SWAT x is simulated values at a specific
+#' time step (only from behavioral simulations). So to get, for example, the 95PPU
+#' of all time step, need to put this function into a loop.
+#'
+#' @param w weights (numeric vector, sum = 1). This is the objective function values
+#' of behavioral simulations, this must be positive number, current code does not
+#' support negative objective function values when calculating 95PPU using GLUE.
+#' In other works, the behavioral threshold should be positive in this case.
+#'
+#' @return the value of x at given percentiles
+#'
+#' @examples
+#' # Simulated streamflow Qt at day t = t from 100 behavioral simulations
+#' Qt = runif(100)
+#'
+#' # NSE of 100 behavioral simulations
+#' NSE = runif(100)
+#' normalize_NSE = NSE/sum(NSE)
+#'
+#'# Want to have streamflow at 2.5 and 97.5 percentiles according to GLUE
+#'
+#' percentiles = c(0.025, 0.975)
+#'
+#' glue(perc=percentiles, x = Qt, w = normalize_NSE)
+#'
+#' @export
+#'
+#'
 #-------------------------------------------------------------------------------
-# 1.Draw a sample of points specified prior distribution (e.g., uniform distr.)
-#-------------------------------------------------------------------------------
-runifSampling <- function(nsample, xmin, xmax){
-
-  # Random generator within [0,1] (matrix format)
-  nparam <- length(xmin)
-  
-  for (i in 1:nsample){
-    if (i == 1){
-      output <- matrix(runif(nparam), nrow = 1)
-    } else {
-      output <- rbind(output, runif(nparam))
-    }
-  }
-  
-  # Parameter range conversion 
-  for (i in 1:nparam){
-    output[,i] <- xmin[i] + (xmax[i] - xmin[i]) * output[,i]
-  }
-  
-  # Add number of simulation in the first column
-  output <- cbind(c(1:nrow(output)), output)
-  
-  # Remove row name and column name
-  colnames(output) <- NULL
-  rownames(output) <- NULL
-  
-  return(output)
- 
-}
-
-#-------------------------------------------------------------------------------
-# 2.Compute the likelihood values for each parameter sample (Run model -> get e.g., NSE)
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
-# 3. Normalize the likelihood values of the behavioral solutions (sum = 1)
-#-------------------------------------------------------------------------------
-normLik <- function(lik, threshold){
-  
-  output <- list()
-  # Get index of behavioral simulations
-  output$idx <- which(lik >= threshold)
-  output$normLik <- lik[idx]/sum(lik[idx])
-  
-  return(output)
-  
-}
-
-#-------------------------------------------------------------------------------
-# 4. 95% GLUE prediction uncertainty, x is only behavioral simulation 
+# 95% GLUE prediction uncertainty, x is only behavioral simulation
 # Please see the original code in this link
 # http://www.uncertain-future.org.uk/wp-content/uploads/2016/06/R-GLUE.zip
 #-------------------------------------------------------------------------------
-ecdf.pred <- function(perc,x,w){
+glue <- function(perc,x,w){
 
   #perc = percentile
   #x = values
   #w = weights - sum to 1
-  
+
   # trim x so only have values with positive weights
   x <- x[w > 0]
   w <- w[w > 0]
-  
+
   # form the empirical cdf
   sort.x <- sort(x,index=TRUE)
   ecdf <- cumsum(w[sort.x$ix])
@@ -81,7 +67,7 @@ ecdf.pred <- function(perc,x,w){
             flag <- FALSE
           } else {
             jj = jj - 1
-          }         
+          }
         }else{
           flag <- FALSE
         }
@@ -99,8 +85,6 @@ ecdf.pred <- function(perc,x,w){
     }
     out[ii] <- sort.x$x[jj]
   }
-  
+
   return(out)
 }
-
-
