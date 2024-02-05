@@ -1,7 +1,6 @@
-[![R-CMD-check](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml)
 ## RSWAT <a href="https://github.com/tamnva/R-SWAT/tree/master/inst/R-SWAT/figures/RSWAT_logo.svg"><img src="inst/R-SWAT/figures/RSWAT_logo.svg" align="right" height="50" /></a>
 
-[![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/tamnva/R-SWAT/blob/master/LICENSE) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases)
+[![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/tamnva/R-SWAT/blob/master/LICENSE) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases) [![R-CMD-check](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml)
 
 - This is an R package with a graphical user interface (GUI) for parallel parameter calibration, sensitivity, and uncertainty analyses with the Soil and Water Assessment Tool models (e.g., [SWAT](https://swat.tamu.edu/), [SWAT+](https://swat.tamu.edu/software/plus/), [SWAT-Carbon](https://sites.google.com/view/swat-carbon), and its other modified versions). 
 - RSWAT can also be used without the GUI, please see the RSWAT vignettes (see Quick Start section).
