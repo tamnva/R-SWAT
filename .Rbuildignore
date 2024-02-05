@@ -2,6 +2,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^CHANGELOG\.md$
 ^doc$
 ^Meta$
 ^\.github$
