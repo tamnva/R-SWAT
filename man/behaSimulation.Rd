@@ -66,3 +66,12 @@ p-factor, and r-factor.
 Calculate the median, 95PPU, p-factor, r-factor of simulated variables and
 parameters
 }
+\examples{
+
+\donttest{
+# Please see RSWAT Vignettes
+vignette("SUFI2_without_GUI",package="RSWAT")
+}
+
+
+}

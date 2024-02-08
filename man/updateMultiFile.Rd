@@ -27,7 +27,7 @@ Rewrite the TxtInOut with new parameter values
 \examples{
 
 \donttest{
-updateMultiFile <-  function(toDir, caliParam, parameterValue, paraSelection)
+updateMultiFile(toDir, caliParam, parameterValue, paraSelection)
 }
 
 }

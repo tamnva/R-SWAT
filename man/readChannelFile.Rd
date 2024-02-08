@@ -44,6 +44,9 @@ file (any file starts with lsuni_wd) of SWAT+
 }
 \examples{
 
-# Please see in the
+\donttest{
+# Please see RSWAT Vignettes
+vignette("SUFI2_without_GUI",package="RSWAT")
+}
 
 }
