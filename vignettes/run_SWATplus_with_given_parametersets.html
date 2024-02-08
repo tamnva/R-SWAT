@@ -474,7 +474,7 @@ change by users</p>
 <span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Now calculate the 95PPU (SUFI2 approach) for each output variables, example for variable 1</span></span>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: change variable and percentiles as your wish</span></span>
 <span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>variable <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>percentiles <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>percentiles <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)</span>
 <span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
 <span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="cf">for</span> (itime <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(output[[variable]])){</span>
 <span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>  ppu <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">quantile</span>(output[[variable]][itime,],percentiles))</span>
