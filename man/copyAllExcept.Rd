@@ -20,6 +20,7 @@ no return, copied files will be saved in toDir
 Copy all files from one folder to another folder except some files
 }
 \examples{
+
 \donttest{
 # Create a directory and populate with TxtInOut of SWAT+
 extracExampleData(exampleData,"swatPlusTxtInOut", tempdir())
