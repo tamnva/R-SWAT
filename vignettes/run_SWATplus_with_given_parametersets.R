@@ -116,7 +116,7 @@ knitr::opts_chunk$set(
 #  # Now calculate the 95PPU (SUFI2 approach) for each output variables, example for variable 1
 #  # TODO: change variable and percentiles as your wish
 #  variable <- 1
-#  percentiles <- c(0.0025, 0.5, 0.975)
+#  percentiles <- c(0.025, 0.5, 0.975)
 #  
 #  for (itime in 1:nrow(output[[variable]])){
 #    ppu <- as.numeric(quantile(output[[variable]][itime,],percentiles))
