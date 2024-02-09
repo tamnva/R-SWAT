@@ -29,7 +29,7 @@ getSimTime <- function(TxtInOut){
   if(substr(TxtInOut,(nchar(TxtInOut)-3), nchar(TxtInOut)) == ".cio"){
     fileCio <- readLines(TxtInOut, 60)
   } else {
-    fileCio <- readLines(paste(TxtInOut, "/file.cio", sep = ""), 60)
+    fileCio <- readLines(file.path(TxtInOut, "file.cio"), 60)
   }
 
   # Check whether this is TxtInOut of SWAT or SWAT+
@@ -73,7 +73,7 @@ getSimTime <- function(TxtInOut){
   } else {
 
     # Read simulation time information from the time.sim file
-    simTime <- read.table(paste(TxtInOut, "/", "time.sim", sep = ""), skip = 2, sep = "")
+    simTime <- read.table(file.path(TxtInOut, "time.sim"), skip = 2, sep = "")
 
     # Find the starting date of simulation
     startSim <- as.Date(paste(toString(as.numeric(simTime[2])),"0101",
@@ -93,7 +93,7 @@ getSimTime <- function(TxtInOut){
     timeStepCode <- as.numeric(simTime[5])
 
     # Find start of eval or printing
-    printTime <- readLines(paste(TxtInOut, "/print.prt", sep = ""), 3)
+    printTime <- readLines(file.path(TxtInOut, "print.prt"), 3)
     printTime <- as.numeric(strsplit(trimws(printTime[3]), " +")[[1]])
 
     startPrint <- max(printTime[1] + as.numeric(simTime[2]) , printTime[3])

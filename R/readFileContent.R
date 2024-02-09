@@ -16,7 +16,7 @@
 
 readFileContent <- function(fileDirectory, files){
 
-  files <- paste(fileDirectory, "/", files, sep = "")
+  files <- file.path(fileDirectory, files)
   fileContent <- list()
 
   for (i in 1:length(files)){

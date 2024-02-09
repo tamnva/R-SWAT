@@ -1096,11 +1096,11 @@ server <- function(input, output, session) {
     req(input$inputInfo)
 
     # Check if user need to input R command
-    if (input$samplingApproach == 'Sensi_(from_sensitivity_package)' |
-        input$samplingApproach == 'Cali_(from_optimization_package)' |
-        input$samplingApproach == 'Cali_(from_nloptr_package)' |
-        input$samplingApproach == 'Sensi_(from_userDefined_package)' |
-        input$samplingApproach == 'Cali_(from_userDefined_package)' ){
+    if (input$samplingApproach %in% c('Sensi_(from_sensitivity_package)',
+                                      'Cali_(from_optimization_package)',
+                                      'Cali_(from_nloptr_package)',
+                                      'Sensi_(from_userDefined_package)',
+                                      'Cali_(from_userDefined_package)')){
 
       # Save input as text
       globalVariable$sensCaliCommand <<- input$inputInfo
@@ -1371,9 +1371,9 @@ server <- function(input, output, session) {
       firstRun <- TRUE
 
       # Run SWAT for all iteration ---------------------------------------------
-      if ((globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)') |
-          (globalVariable$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)') |
-        (globalVariable$samplingApproach == 'Read_User_Parameter_File')){
+      if (globalVariable$samplingApproach %in% c('Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
+                                                 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
+                                                 'Read_User_Parameter_File')){
 
         # Generate parameter values
         if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
@@ -1653,12 +1653,12 @@ server <- function(input, output, session) {
                           max = globalVariable$nOutputVar,
                           step = 1)
 
-      } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
-                 globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' |
-                 globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
-                 globalVariable$samplingApproach == 'Cali_(from_hydroPSO_package)' |
-                 globalVariable$samplingApproach == 'Cali_(from_nloptr_package)' |
-                 globalVariable$samplingApproach == 'Cali_(from_userDefined_package)') {
+      } else if (globalVariable$samplingApproach %in% c('Sensi_(from_sensitivity_package)',
+                                                        'Sensi_(from_userDefined_package)',
+                                                        'Cali_(from_optimization_package)',
+                                                        'Cali_(from_hydroPSO_package)',
+                                                        'Cali_(from_nloptr_package)',
+                                                        'Cali_(from_userDefined_package)')){
 
         if(is.null(globalVariable$observedData)){
 
@@ -1813,12 +1813,11 @@ server <- function(input, output, session) {
     globalVariable$objFunction  <<- input$objFunction
 
     # Check when the objective function needs to be maximize or minimize
-    if (input$objFunction == 'NSE' | input$objFunction == 'KGE' |
-        input$objFunction == 'R2'){
+    if (input$objFunction %in% c('NSE', 'KGE', 'R2')){
       updateSelectInput(session, 'minOrmax',
                         label = 'Minimize or maximize the objective function?',
                         selected = 'Maximize')
-    } else if (input$objFunction == 'aBIAS' | input$objFunction == 'RMSE'){
+    } else if (input$objFunction %in% c('aBIAS', 'RMSE')){
       updateSelectInput(session, 'minOrmax',
                         label = 'Minimize or maximize the objective function?',
                         selected = 'Minimize')
@@ -1975,12 +1974,12 @@ server <- function(input, output, session) {
     if (globalVariable$checkSimComplete){
 
       # check which parameter sampling approach is selected
-      if (globalVariable$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)' |
-          globalVariable$samplingApproach == 'Cali_(from_userDefined_package)'  |
-          globalVariable$samplingApproach == 'Cali_(from_optimization_package)' |
-          globalVariable$samplingApproach == 'Cali_(from_nloptr_package)' |
-          globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)' |
-          globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)' ){
+      if (globalVariable$samplingApproach %in% c('Cali_(Dynamically_Dimensioned_Search)',
+                                                 'Cali_(from_userDefined_package)',
+                                                 'Cali_(from_optimization_package)',
+                                                 'Cali_(from_nloptr_package)',
+                                                 'Sensi_(from_sensitivity_package)',
+                                                 'Sensi_(from_userDefined_package)')){
 
         # Display message
         showModal(modalDialog(
@@ -1991,9 +1990,9 @@ server <- function(input, output, session) {
         ))
 
       # If the below approaches are selected, then calculate objective function
-      } else if (globalVariable$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'|
-                 globalVariable$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'|
-                 globalVariable$samplingApproach == 'Read_User_Parameter_File'){
+      } else if (globalVariable$samplingApproach %in% c('Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
+                                                        'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
+                                                        'Read_User_Parameter_File')){
 
         withProgress(message = 'Calculating objective function...', {
 
@@ -2214,8 +2213,8 @@ server <- function(input, output, session) {
         })
 
       # Check if users do sensi. analysis with R packages
-      } else if (globalVariable$samplingApproach == 'Sensi_(from_sensitivity_package)'|
-                 globalVariable$samplingApproach == 'Sensi_(from_userDefined_package)'){
+      } else if (globalVariable$samplingApproach %in% c('Sensi_(from_sensitivity_package)',
+                                                        'Sensi_(from_userDefined_package)')){
 
         # Text for the progress bar
         withProgress(message = 'Performing sensitivity analysis...', {

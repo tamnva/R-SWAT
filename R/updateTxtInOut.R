@@ -175,5 +175,5 @@ updateCalibrationFile <- function(paraSelection, parameterValue, currentDirector
 
   }
 
-  writeLines(fileContent, paste(currentDirectory, "/", "calibration.cal", sep = ""))
+  writeLines(fileContent, file.path(currentDirectory, "calibration.cal"))
 }

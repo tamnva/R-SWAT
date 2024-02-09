@@ -43,6 +43,14 @@ saveOutput <- function(workingDirectory,
   # Set output as list object
   output <- list()
 
+  # SWAT+ output files
+  swatPlusFiles <- c("channel_sd_day.txt", "channel_sd_mon.txt",
+                     "channel_sd_yr.txt", "channel_sdmorph_day.txt",
+                     "channel_sdmorph_mon.txt", "channel_sdmorph_yr.txt",
+                     "lsunit_wb_day.txt", "lsunit_wb_mon.txt",
+                     "lsunit_wb_yr.txt","basin_wb_day.txt",
+                     "basin_wb_mon.txt", "basin_wb_yr.txt")
+
   for (i in 1:length(fileType)){
 
     if (fileType[i] == "watout.dat"){
@@ -56,9 +64,7 @@ saveOutput <- function(workingDirectory,
                                fileCioInfo,
                                output)
 
-    } else if (fileType[i] == "output.rch" |
-               fileType[i] == "output.sub" |
-               fileType[i] == "output.hru" ){
+    } else if (fileType[i] %in% c("output.rch", "output.sub", "output.hru")){
       output <- readOutputRchFile(workingDirectory,
                                   coreNumber,
                                   fileName[i],
@@ -68,18 +74,8 @@ saveOutput <- function(workingDirectory,
                                   getRchNumber(rchNumber[i]),
                                   output)
 
-    } else if (fileType[i] == "channel_sd_day.txt"      |
-               fileType[i] == "channel_sd_mon.txt"      |
-               fileType[i] == "channel_sd_yr.txt"       |
-               fileType[i] == "channel_sdmorph_day.txt" |
-               fileType[i] == "channel_sdmorph_mon.txt" |
-               fileType[i] == "channel_sdmorph_yr.txt"  |
-               fileType[i] == "lsunit_wb_day.txt"       |
-               fileType[i] == "lsunit_wb_mon.txt"       |
-               fileType[i] == "lsunit_wb_yr.txt"        |
-               fileType[i] == "basin_wb_day.txt"       |
-               fileType[i] == "basin_wb_mon.txt"       |
-               fileType[i] == "basin_wb_yr.txt"){
+    } else if (fileType[i] %in% swatPlusFiles){
+
       output <- readChannelFile(workingDirectory,
                                 coreNumber,
                                 fileName[i],
@@ -90,7 +86,7 @@ saveOutput <- function(workingDirectory,
                                 output)
 
     } else if (fileType[i] == "userReadSwatOutput"){
-      workingDir <- paste(workingDirectory, "/TxtInOut_", coreNumber, sep = "")
+      workingDir <- file.path(workingDirectory, "TxtInOut_", coreNumber)
       setwd(workingDir)
       userExtractData <- userReadSwatOutput()
       output <- c(output, userExtractData)
@@ -101,14 +97,13 @@ saveOutput <- function(workingDirectory,
   }
 
   # Save output
-  outputDirectory <- paste(workingDirectory, "/Output/Core_", coreNumber, sep = "")
+  outputDirectory <- file.path(workingDirectory, "Output", "Core_", coreNumber)
 
   # Create directory if it does not exist
   if(!dir.exists(outputDirectory)) dir.create(outputDirectory)
 
   for (i in 1:length(output)){
-    OutputFileName <- paste(outputDirectory, '/out_var_', i,
-                            '.txt', sep ='')
+    OutputFileName <- file.path(outputDirectory, 'out_var_', i, '.txt')
 
     if (firstRun){file.create(OutputFileName)}
 

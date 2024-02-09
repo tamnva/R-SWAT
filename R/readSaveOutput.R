@@ -23,8 +23,7 @@ readOutputRchFile <- function(workingDirectory,
                            output){
 
 
-  fileName <- paste(workingDirectory, "/TxtInOut_", coreNumber, "/",
-                    fileName, sep = "")
+  fileName <- file.path(workingDirectory, "TxtInOut_", coreNumber, fileName)
 
   getOutputRsvData <- read.table(fileName, header = FALSE, sep = "", skip = 9)
 

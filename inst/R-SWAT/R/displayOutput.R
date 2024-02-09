@@ -65,23 +65,23 @@ printVariableNameObservedFiles <- function(outputExtraction){
         output$observedFile[counter] <- paste("obs_var_", counter ,
                                               ".txt", sep = "")
       }
-    }else if ((outputExtraction$FileType[i] == "output.rsv") | 
-              (outputExtraction$FileType[i] == "output.rch") |
-              (outputExtraction$FileType[i] == "channel_sd_day.txt") |
-              (outputExtraction$FileType[i] == "channel_sd_mon.txt") |
-              (outputExtraction$FileType[i] == "channel_sd_yr.txt") |
-              (outputExtraction$FileType[i] == "channel_sdmorph_day.txt") |
-              (outputExtraction$FileType[i] == "channel_sdmorph_mon.txt") |
-              (outputExtraction$FileType[i] == "channel_sdmorph_yr.txt") |
-              (outputExtraction$FileType[i] == "lsunit_wb_day.txt") |
-              (outputExtraction$FileType[i] == "lsunit_wb_mon.txt") |
-              (outputExtraction$FileType[i] == "lsunit_wb_yr.txt") |
-              (outputExtraction$FileType[i] == "basin_wb_day.txt") |
-              (outputExtraction$FileType[i] == "basin_wb_mon.txt") |
-              (outputExtraction$FileType[i] == "basin_wb_yr.txt") |
-              (outputExtraction$FileType[i] == "output.hru") | 
-              (outputExtraction$FileType[i] == "output.sub") | 
-              (outputExtraction$FileType[i] == "output.swr")){
+    }else if (outputExtraction$FileType[i] %in% c("output.rsv", 
+                                                  "output.rch",
+                                                  "channel_sd_day.txt",
+                                                  "channel_sd_mon.txt",
+                                                  "channel_sd_yr.txt",
+                                                  "channel_sdmorph_day.txt",
+                                                  "channel_sdmorph_mon.txt",
+                                                  "channel_sdmorph_yr.txt",
+                                                  "lsunit_wb_day.txt",
+                                                  "lsunit_wb_mon.txt",
+                                                  "lsunit_wb_yr.txt",
+                                                  "basin_wb_day.txt",
+                                                  "basin_wb_mon.txt",
+                                                  "basin_wb_yr.txt",
+                                                  "output.hru",
+                                                  "output.sub",
+                                                  "output.swr")){
       columnNr <- strsplit(outputExtraction$Column[i], split = ",")[[1]]
       rsvNr <- getRchNumber(outputExtraction$Reach[i])
       
