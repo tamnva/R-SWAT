@@ -156,8 +156,7 @@ runSWATSequential <- function(coreNumber,
                               firstRun){
 
   # Set working directory
-  setwd(file.path(workingDirectory, 'TxtInOut_', coreNumber))
-
+  setwd(file.path(workingDirectory, paste0('TxtInOut_', coreNumber)))
   # Get directory where new TxtInOut files are saved
   toDir <- getwd()
 

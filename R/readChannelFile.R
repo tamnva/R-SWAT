@@ -38,7 +38,7 @@ readChannelFile <- function(workingDirectory,
                 "lsunit_wb_mon.txt",
                 "lsunit_wb_yr.txt")
 
-  filePath <- file.path(workingDirectory, "TxtInOut_", coreNumber, fileName)
+  filePath <- file.path(workingDirectory, paste0("TxtInOut_", coreNumber), fileName)
 
   # Get file content/data
   channelData <- read.table(filePath, header = FALSE, sep = "", skip = 3)

@@ -86,7 +86,7 @@ saveOutput <- function(workingDirectory,
                                 output)
 
     } else if (fileType[i] == "userReadSwatOutput"){
-      workingDir <- file.path(workingDirectory, "TxtInOut_", coreNumber)
+      workingDir <- file.path(workingDirectory, paste0("TxtInOut_", coreNumber))
       setwd(workingDir)
       userExtractData <- userReadSwatOutput()
       output <- c(output, userExtractData)
@@ -97,13 +97,13 @@ saveOutput <- function(workingDirectory,
   }
 
   # Save output
-  outputDirectory <- file.path(workingDirectory, "Output", "Core_", coreNumber)
+  outputDirectory <- file.path(workingDirectory, "Output", paste0("Core_", coreNumber))
 
   # Create directory if it does not exist
   if(!dir.exists(outputDirectory)) dir.create(outputDirectory)
 
   for (i in 1:length(output)){
-    OutputFileName <- file.path(outputDirectory, 'out_var_', i, '.txt')
+    OutputFileName <- file.path(outputDirectory, paste0('out_var_', i, '.txt'))
 
     if (firstRun){file.create(OutputFileName)}
 

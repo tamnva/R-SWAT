@@ -18,7 +18,7 @@ readWatoutFile <- function(workingDirectory,
                            fileCioInfo,
                            output){
 
-  fileName <- file.path(workingDirectory, "TxtInOut_", coreNumber, fileName)
+  fileName <- file.path(workingDirectory, paste0("TxtInOut_", coreNumber), fileName)
 
   getWatoutData <- read.table(fileName, header = FALSE, sep = "", skip = 6)
 

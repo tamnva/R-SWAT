@@ -54,8 +54,8 @@ calObjFunction <- function(parameterValue, ncores,
       }
 
       #Loop over number of simulation
-      fileNameSimData <- file.path(workingDirectory, "Output", "Core_", i,
-                                   "out_var_", j, ".txt")
+      fileNameSimData <- file.path(workingDirectory, "Output", paste0("Core_", i),
+                                   paste0("out_var_", j, ".txt"))
       tempSimData <- read.table(fileNameSimData, header = FALSE, sep = "")
 
       #Check if length of observed and simulated data are the same or not
