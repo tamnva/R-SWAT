@@ -77,10 +77,6 @@ outputExtraction <- data.frame(
    Column = c("48"),
    Reach = c("1") # E.g., for 100 reaches use: Reach = paste(as.character(c(1:100)), collapse  = ",")
  )
-# NOTE: if you want to extract for many reaches (e.g., for the first 100 reaches), create variable for th
-
-reach <- paste(as.character(c(1:100)), collapse  = ",")
-
 
 # 10. Date range for extraction (TODO: change this)
 dateRangeCali <- as.Date(c("2003-01-01", "2012-12-31"), format = "%Y-%m-%d")
