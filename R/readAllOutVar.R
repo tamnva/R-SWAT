@@ -45,7 +45,7 @@ readAllOutVar <- function(workingFolder, numTimesteps){
   outVarFiles <- list.files(coreFolders[1], full.names = TRUE)
 
   output <- list()
-  for (ifolder in 1:length(coreFolder)){
+  for (ifolder in 1:length(coreFolders)){
     # Loop over each outVarfiles
     for (var in 1:length(outVarFiles)){
       # Read content of each file and store
