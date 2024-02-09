@@ -410,33 +410,29 @@ change by users</p>
 <span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a>   <span class="at">Column =</span> <span class="fu">c</span>(<span class="st">&quot;48&quot;</span>),</span>
 <span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a>   <span class="at">Reach =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>) <span class="co"># E.g., for 100 reaches use: Reach = paste(as.character(c(1:100)), collapse  = &quot;,&quot;)</span></span>
 <span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a> )</span>
-<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: if you want to extract for many reaches (e.g., for the first 100 reaches), create variable for th</span></span>
-<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a>reach <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="fu">as.character</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>)), <span class="at">collapse  =</span> <span class="st">&quot;,&quot;</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a><span class="co"># 10. Date range for extraction (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
+<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a>dateRangeCali <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;2003-01-01&quot;</span>, <span class="st">&quot;2012-12-31&quot;</span>), <span class="at">format =</span> <span class="st">&quot;%Y-%m-%d&quot;</span>)</span>
 <span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a></span>
-<span id="cb1-53"><a href="#cb1-53" tabindex="-1"></a></span>
-<span id="cb1-54"><a href="#cb1-54" tabindex="-1"></a><span class="co"># 10. Date range for extraction (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
-<span id="cb1-55"><a href="#cb1-55" tabindex="-1"></a>dateRangeCali <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;2003-01-01&quot;</span>, <span class="st">&quot;2012-12-31&quot;</span>), <span class="at">format =</span> <span class="st">&quot;%Y-%m-%d&quot;</span>)</span>
-<span id="cb1-56"><a href="#cb1-56" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" tabindex="-1"></a><span class="co"># 11. Number of parallel runs  (</span><span class="al">TODO</span><span class="co">: change  this)</span></span>
-<span id="cb1-58"><a href="#cb1-58" tabindex="-1"></a>ncores <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb1-53"><a href="#cb1-53" tabindex="-1"></a><span class="co"># 11. Number of parallel runs  (</span><span class="al">TODO</span><span class="co">: change  this)</span></span>
+<span id="cb1-54"><a href="#cb1-54" tabindex="-1"></a>ncores <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb1-55"><a href="#cb1-55" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" tabindex="-1"></a><span class="co"># 12.  Generate parameter samples using Latin Hypercube Sampling (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
+<span id="cb1-57"><a href="#cb1-57" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">&quot;C:/data/user_parameter_values.txt&quot;</span>,</span>
+<span id="cb1-58"><a href="#cb1-58" tabindex="-1"></a>                                       <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span><span class="st">&quot;&quot;</span>))</span>
 <span id="cb1-59"><a href="#cb1-59" tabindex="-1"></a></span>
-<span id="cb1-60"><a href="#cb1-60" tabindex="-1"></a><span class="co"># 12.  Generate parameter samples using Latin Hypercube Sampling (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
-<span id="cb1-61"><a href="#cb1-61" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">&quot;C:/data/user_parameter_values.txt&quot;</span>,</span>
-<span id="cb1-62"><a href="#cb1-62" tabindex="-1"></a>                                       <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span><span class="st">&quot;&quot;</span>))</span>
-<span id="cb1-63"><a href="#cb1-63" tabindex="-1"></a></span>
-<span id="cb1-64"><a href="#cb1-64" tabindex="-1"></a><span class="co"># Here is the content of my user_parameter_values.txt&quot;</span></span>
-<span id="cb1-65"><a href="#cb1-65" tabindex="-1"></a><span class="co">#cn2.hru         canmax.hru</span></span>
-<span id="cb1-66"><a href="#cb1-66" tabindex="-1"></a><span class="co">#0.10            1.5</span></span>
-<span id="cb1-67"><a href="#cb1-67" tabindex="-1"></a><span class="co">#-0.20           3.0</span></span>
-<span id="cb1-68"><a href="#cb1-68" tabindex="-1"></a><span class="co">#-0.10           0.2</span></span>
-<span id="cb1-69"><a href="#cb1-69" tabindex="-1"></a><span class="co">#0.22            1.0</span></span>
-<span id="cb1-70"><a href="#cb1-70" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb1-71"><a href="#cb1-71" tabindex="-1"></a></span>
-<span id="cb1-72"><a href="#cb1-72" tabindex="-1"></a><span class="co"># Remove the column names and number these parametersets from 1 to n. DONOT change this</span></span>
-<span id="cb1-73"><a href="#cb1-73" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(parameterValue)),parameterValue)</span>
-<span id="cb1-74"><a href="#cb1-74" tabindex="-1"></a><span class="fu">colnames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb1-75"><a href="#cb1-75" tabindex="-1"></a><span class="fu">rownames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<span id="cb1-60"><a href="#cb1-60" tabindex="-1"></a><span class="co"># Here is the content of my user_parameter_values.txt&quot;</span></span>
+<span id="cb1-61"><a href="#cb1-61" tabindex="-1"></a><span class="co">#cn2.hru         canmax.hru</span></span>
+<span id="cb1-62"><a href="#cb1-62" tabindex="-1"></a><span class="co">#0.10            1.5</span></span>
+<span id="cb1-63"><a href="#cb1-63" tabindex="-1"></a><span class="co">#-0.20           3.0</span></span>
+<span id="cb1-64"><a href="#cb1-64" tabindex="-1"></a><span class="co">#-0.10           0.2</span></span>
+<span id="cb1-65"><a href="#cb1-65" tabindex="-1"></a><span class="co">#0.22            1.0</span></span>
+<span id="cb1-66"><a href="#cb1-66" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-67"><a href="#cb1-67" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" tabindex="-1"></a><span class="co"># Remove the column names and number these parametersets from 1 to n. DONOT change this</span></span>
+<span id="cb1-69"><a href="#cb1-69" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(parameterValue)),parameterValue)</span>
+<span id="cb1-70"><a href="#cb1-70" tabindex="-1"></a><span class="fu">colnames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1-71"><a href="#cb1-71" tabindex="-1"></a><span class="fu">rownames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
 </div>
 <div id="run-swat" class="section level3">
 <h3>4. Run SWAT+</h3>
