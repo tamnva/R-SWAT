@@ -53,17 +53,52 @@ Example of working without the user interface, please see the RSWAT vignettes:
 vignette("SUFI2_without_GUI",package="RSWAT")
 ```
 
+# Quick demo (streamflow calibration with SWAT)
+
+```R
+# Call RSWAT graphical user interface: DO NOT use RSWAT:showRSWAT()
+library(RSWAT) 
+
+# Extract example data (TODO: replace C:/example with your folder)
+extracExampleData(exampleData, "all", "C:/example")
+
+# We still need SWAT executable for this demo
+# which can be downloaded from https://swat.tamu.edu/software/swat-executables/
+
+# Now show the interface and run with example data (detail of each step are shown below)
+showRSWAT()
+
+```
+
+(NOTE: in the latest version, the user interface could be slightly difference)
+<p align="center">
+  <img src="inst/R-SWAT/figures/1.PNG" width=100% title="hover text">
+</p>
+
+<p align="center">
+  <img src="inst/R-SWAT/figures/2.PNG" width=100% title="hover text">
+</p>
+
+<p align="center">
+  <img src="inst/R-SWAT/figures/3.PNG" width=100% title="hover text">
+</p>
+
+<p align="center">
+  <img src="inst/R-SWAT/figures/41.PNG" width=100% title="hover text">
+</p>
+
+<p align="center">
+  <img src="inst/R-SWAT/figures/42.PNG" width=100% title="hover text">
+</p>
+
+<p align="center">
+  <img src="inst/R-SWAT/figures/43.PNG" width=100% title="hover text">
+</p>
+
+
 
 ## Citing RSWAT
 
 **Nguyen, T. V.**, Dietrich, J., Dang, D. T., Tran, D. A., Doan, B. V., Sarrazin, F. J., Abbaspour, K., Srinivasan, R. (2022). An interactive graphical interface tool for parameter calibration, sensitivity analysis, uncertainty analysis, and visualization for the Soil and Water Assessment Tool. Environmental Modelling & Software, 156, 105497. https://doi.org/10.1016/j.envsoft.2022.105497.
 
 **Nguyen, T. V.** (2024). RSWAT: An R package for the Soil and Water Assessment Tool models. Submitted to The Journal of Open Source Software.
-
-# GUI of RSWAT
-
-
-(NOTE: in the latest version, the user interface could be slightly difference)
-<p align="center">
-  <img src="inst/R-SWAT/figures/RSWAT.gif" width=100% title="hover text">
-</p>
