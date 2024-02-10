@@ -14,38 +14,26 @@
 
 <title>Run SWATplus with given parametersets</title>
 
-<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
-// be compatible with the behavior of Pandoc < 2.8).
-document.addEventListener('DOMContentLoaded', function(e) {
-  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
-  var i, h, a;
-  for (i = 0; i < hs.length; i++) {
-    h = hs[i];
-    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
-    a = h.attributes;
-    while (a.length > 0) h.removeAttribute(a[0].name);
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
   }
-});
-</script>
-
-<style type="text/css">
-code{white-space: pre-wrap;}
-span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
-div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-ul.task-list{list-style: none;}
-</style>
-
-
-
-<style type="text/css">
-code {
-white-space: pre;
-}
-.sourceCode {
-overflow: visible;
-}
+  .sourceCode {
+    overflow: visible;
+  }
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
@@ -63,54 +51,55 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-{ counter-reset: source-line 0; }
+  { counter-reset: source-line 0; }
 pre.numberSource code > span
-{ position: relative; left: -4em; counter-increment: source-line; }
+  { position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-{ content: counter(source-line);
-position: relative; left: -1em; text-align: right; vertical-align: baseline;
-border: none; display: inline-block;
--webkit-touch-callout: none; -webkit-user-select: none;
--khtml-user-select: none; -moz-user-select: none;
--ms-user-select: none; user-select: none;
-padding: 0 4px; width: 4em;
-color: #aaaaaa;
-}
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-{ }
+  {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } 
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
-code span.at { color: #7d9029; } 
-code span.bn { color: #40a070; } 
-code span.bu { color: #008000; } 
-code span.cf { color: #007020; font-weight: bold; } 
-code span.ch { color: #4070a0; } 
-code span.cn { color: #880000; } 
-code span.co { color: #60a0b0; font-style: italic; } 
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
-code span.do { color: #ba2121; font-style: italic; } 
-code span.dt { color: #902000; } 
-code span.dv { color: #40a070; } 
-code span.er { color: #ff0000; font-weight: bold; } 
-code span.ex { } 
-code span.fl { color: #40a070; } 
-code span.fu { color: #06287e; } 
-code span.im { color: #008000; font-weight: bold; } 
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
-code span.kw { color: #007020; font-weight: bold; } 
-code span.op { color: #666666; } 
-code span.ot { color: #007020; } 
-code span.pp { color: #bc7a00; } 
-code span.sc { color: #4070a0; } 
-code span.ss { color: #bb6688; } 
-code span.st { color: #4070a0; } 
-code span.va { color: #19177c; } 
-code span.vs { color: #4070a0; } 
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -144,187 +133,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 
 
 
-<style type="text/css">body {
-background-color: #fff;
-margin: 1em auto;
-max-width: 700px;
-overflow: visible;
-padding-left: 2em;
-padding-right: 2em;
-font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 14px;
-line-height: 1.35;
-}
-#TOC {
-clear: both;
-margin: 0 0 10px 10px;
-padding: 4px;
-width: 400px;
-border: 1px solid #CCCCCC;
-border-radius: 5px;
-background-color: #f6f6f6;
-font-size: 13px;
-line-height: 1.3;
-}
-#TOC .toctitle {
-font-weight: bold;
-font-size: 15px;
-margin-left: 5px;
-}
-#TOC ul {
-padding-left: 40px;
-margin-left: -1.5em;
-margin-top: 5px;
-margin-bottom: 5px;
-}
-#TOC ul ul {
-margin-left: -2em;
-}
-#TOC li {
-line-height: 16px;
-}
-table {
-margin: 1em auto;
-border-width: 1px;
-border-color: #DDDDDD;
-border-style: outset;
-border-collapse: collapse;
-}
-table th {
-border-width: 2px;
-padding: 5px;
-border-style: inset;
-}
-table td {
-border-width: 1px;
-border-style: inset;
-line-height: 18px;
-padding: 5px 5px;
-}
-table, table th, table td {
-border-left-style: none;
-border-right-style: none;
-}
-table thead, table tr.even {
-background-color: #f7f7f7;
-}
-p {
-margin: 0.5em 0;
-}
-blockquote {
-background-color: #f6f6f6;
-padding: 0.25em 0.75em;
-}
-hr {
-border-style: solid;
-border: none;
-border-top: 1px solid #777;
-margin: 28px 0;
-}
-dl {
-margin-left: 0;
-}
-dl dd {
-margin-bottom: 13px;
-margin-left: 13px;
-}
-dl dt {
-font-weight: bold;
-}
-ul {
-margin-top: 0;
-}
-ul li {
-list-style: circle outside;
-}
-ul ul {
-margin-bottom: 0;
-}
-pre, code {
-background-color: #f7f7f7;
-border-radius: 3px;
-color: #333;
-white-space: pre-wrap; 
-}
-pre {
-border-radius: 3px;
-margin: 5px 0px 10px 0px;
-padding: 10px;
-}
-pre:not([class]) {
-background-color: #f7f7f7;
-}
-code {
-font-family: Consolas, Monaco, 'Courier New', monospace;
-font-size: 85%;
-}
-p > code, li > code {
-padding: 2px 0px;
-}
-div.figure {
-text-align: center;
-}
-img {
-background-color: #FFFFFF;
-padding: 2px;
-border: 1px solid #DDDDDD;
-border-radius: 3px;
-border: 1px solid #CCCCCC;
-margin: 0 5px;
-}
-h1 {
-margin-top: 0;
-font-size: 35px;
-line-height: 40px;
-}
-h2 {
-border-bottom: 4px solid #f7f7f7;
-padding-top: 10px;
-padding-bottom: 2px;
-font-size: 145%;
-}
-h3 {
-border-bottom: 2px solid #f7f7f7;
-padding-top: 10px;
-font-size: 120%;
-}
-h4 {
-border-bottom: 1px solid #f7f7f7;
-margin-left: 8px;
-font-size: 105%;
-}
-h5, h6 {
-border-bottom: 1px solid #ccc;
-font-size: 105%;
-}
-a {
-color: #0033dd;
-text-decoration: none;
-}
-a:hover {
-color: #6666ff; }
-a:visited {
-color: #800080; }
-a:visited:hover {
-color: #BB00BB; }
-a[href^="http:"] {
-text-decoration: underline; }
-a[href^="https:"] {
-text-decoration: underline; }
-
-code > span.kw { color: #555; font-weight: bold; } 
-code > span.dt { color: #902000; } 
-code > span.dv { color: #40a070; } 
-code > span.bn { color: #d14; } 
-code > span.fl { color: #d14; } 
-code > span.ch { color: #d14; } 
-code > span.st { color: #d14; } 
-code > span.co { color: #888888; font-style: italic; } 
-code > span.ot { color: #007020; } 
-code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; } 
-code > span.er { color: #a61717; background-color: #e3d2d2; } 
-</style>
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
 
 
 
@@ -342,12 +151,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div id="overview" class="section level3">
 <h3>1. Overview</h3>
-<p>This vignette describes how to perform forward runs (without
-calibration) of SWAT+ with given parameter sets. This could be used, for
-example, (1) to run the model with behavioral parameter sets for a
-specific scenario, (2) to re-run the model with the best parameter set
-to examine all other model outputs that were not extracted during model
-calibration, etc.</p>
+<p>This vignette describes how to perform forward runs (without calibration) of SWAT+ with given parameter sets. This could be used, for example, (1) to run the model with behavioral parameter sets for a specific scenario, (2) to re-run the model with the best parameter set to examine all other model outputs that were not extracted during model calibration, etc.</p>
 </div>
 <div id="require-data" class="section level3">
 <h3>2. Require data</h3>
@@ -360,134 +164,133 @@ calibration, etc.</p>
 </div>
 <div id="input-configuration" class="section level3">
 <h3>3. Input configuration</h3>
-<p>In the following R Script, the lines start with “TODO” need to be
-change by users</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(RSWAT)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># 1.Create an example TxtInOut of SWAT+ (</span><span class="al">TODO</span><span class="co">: remove this command if you already # had the TxtInOut folder of SWAT+)</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">extracExampleData</span>(exampleData, <span class="st">&quot;swatPlusTxtInOut&quot;</span>, <span class="fu">tempdir</span>())</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co"># 2.Path to the TxtInOut folder (</span><span class="al">TODO</span><span class="co">: replace with your TxtInOut path)</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>TxtInOutFolder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">&quot;swatPlusTxtInOut&quot;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co"># 3.This is a SWAT+ project, therefore</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>SWATproject <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co"># 4.My working directory (</span><span class="al">TODO</span><span class="co">: change to your desired working directory)</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co"># dir.create(file.path(tempdir(), &quot;workingFolder&quot;))</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>workingFolder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">&quot;workingFolder&quot;</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co"># 5.Path of the SWAT executable file (</span><span class="al">TODO</span><span class="co">: replace with your path)</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>SWATexeFile <span class="ot">&lt;-</span> <span class="st">&quot;C:/data/rev60.5.7_64rel.exe&quot;</span></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co"># 6.Path of the SWAT+ parameter file cal_parms.cal (</span><span class="al">TODO</span><span class="co">: replace with your path)</span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>SWATParamFile <span class="ot">&lt;-</span> <span class="fu">file.path</span>(TxtInOutFolder, <span class="st">&quot;cal_parms.cal&quot;</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co"># 7.The parameters that I previously used for model calibration (</span><span class="al">TODO</span><span class="co">: change to your paraSelection)</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>paraSelection <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>   <span class="at">Parameter =</span> <span class="fu">c</span>(<span class="st">&quot;cn2.hru&quot;</span>   , <span class="st">&quot;canmx.hru&quot;</span>),</span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>   <span class="at">Change =</span>    <span class="fu">c</span>(<span class="st">&quot;relative&quot;</span>  , <span class="st">&quot;replace&quot;</span>),</span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>   <span class="at">Min =</span>       <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.25</span>       , <span class="fl">1.0</span>),</span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>   <span class="at">Max =</span>       <span class="fu">c</span>(<span class="fl">0.25</span>        , <span class="fl">10.0</span>),</span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>   <span class="at">Object  =</span>   <span class="fu">c</span>(<span class="st">&quot;All&quot;</span>       , <span class="st">&quot;All&quot;</span>),</span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>   <span class="at">Conditions =</span> <span class="fu">c</span>(<span class="st">&quot;All&quot;</span>      , <span class="st">&quot;All&quot;</span>)</span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>   )</span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co"># You can also create these above table by the interface of R-SWAT then save </span></span>
-<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="co"># the  project. If you do so, you can extract that table from the RSWATproject.rds </span></span>
-<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="co"># file in the working folder (</span><span class="al">TODO</span><span class="co">: Delete if you don&#39;t read from RSWATproject.rds)</span></span>
-<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co"># RSWATproject &lt;- readRDS(&quot;C:/data/RSWATproject.rds&quot;)</span></span>
-<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co"># paraSelection &lt;- RSWATproject$paraSelection</span></span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a>  </span>
-<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co"># 8. How parameters should be generated</span></span>
-<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a>samplingApproach <span class="ot">&lt;-</span> <span class="st">&quot;Read_User_Parameter_File&quot;</span>  <span class="co"># Do not change this line</span></span>
-<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a></span>
-<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="co"># 9. Output extraction for SWAT+ can be created manually or by the GUI (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
-<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a>outputExtraction <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a>   <span class="at">FileType =</span> <span class="fu">c</span>(<span class="st">&quot;channel_sd_day.txt&quot;</span>),</span>
-<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a>   <span class="at">FileName =</span> <span class="fu">c</span>(<span class="st">&quot;channel_sd_day.txt&quot;</span>),</span>
-<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a>   <span class="at">Column =</span> <span class="fu">c</span>(<span class="st">&quot;48&quot;</span>),</span>
-<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a>   <span class="at">Reach =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>) <span class="co"># E.g., for 100 reaches use: Reach = paste(as.character(c(1:100)), collapse  = &quot;,&quot;)</span></span>
-<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a> )</span>
-<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a><span class="co"># 10. Date range for extraction (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
-<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a>dateRangeCali <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;2003-01-01&quot;</span>, <span class="st">&quot;2012-12-31&quot;</span>), <span class="at">format =</span> <span class="st">&quot;%Y-%m-%d&quot;</span>)</span>
-<span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a></span>
-<span id="cb1-53"><a href="#cb1-53" tabindex="-1"></a><span class="co"># 11. Number of parallel runs  (</span><span class="al">TODO</span><span class="co">: change  this)</span></span>
-<span id="cb1-54"><a href="#cb1-54" tabindex="-1"></a>ncores <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb1-55"><a href="#cb1-55" tabindex="-1"></a></span>
-<span id="cb1-56"><a href="#cb1-56" tabindex="-1"></a><span class="co"># 12.  Generate parameter samples using Latin Hypercube Sampling (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
-<span id="cb1-57"><a href="#cb1-57" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">&quot;C:/data/user_parameter_values.txt&quot;</span>,</span>
-<span id="cb1-58"><a href="#cb1-58" tabindex="-1"></a>                                       <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span><span class="st">&quot;&quot;</span>))</span>
-<span id="cb1-59"><a href="#cb1-59" tabindex="-1"></a></span>
-<span id="cb1-60"><a href="#cb1-60" tabindex="-1"></a><span class="co"># Here is the content of my user_parameter_values.txt&quot;</span></span>
-<span id="cb1-61"><a href="#cb1-61" tabindex="-1"></a><span class="co">#cn2.hru         canmax.hru</span></span>
-<span id="cb1-62"><a href="#cb1-62" tabindex="-1"></a><span class="co">#0.10            1.5</span></span>
-<span id="cb1-63"><a href="#cb1-63" tabindex="-1"></a><span class="co">#-0.20           3.0</span></span>
-<span id="cb1-64"><a href="#cb1-64" tabindex="-1"></a><span class="co">#-0.10           0.2</span></span>
-<span id="cb1-65"><a href="#cb1-65" tabindex="-1"></a><span class="co">#0.22            1.0</span></span>
-<span id="cb1-66"><a href="#cb1-66" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb1-67"><a href="#cb1-67" tabindex="-1"></a></span>
-<span id="cb1-68"><a href="#cb1-68" tabindex="-1"></a><span class="co"># Remove the column names and number these parametersets from 1 to n. DONOT change this</span></span>
-<span id="cb1-69"><a href="#cb1-69" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(parameterValue)),parameterValue)</span>
-<span id="cb1-70"><a href="#cb1-70" tabindex="-1"></a><span class="fu">colnames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb1-71"><a href="#cb1-71" tabindex="-1"></a><span class="fu">rownames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<p>In the following R Script, the lines start with “TODO” need to be change by users</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RSWAT)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1.Create an example TxtInOut of SWAT+ (</span><span class="al">TODO</span><span class="co">: remove this command if you already # had the TxtInOut folder of SWAT+)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">extracExampleData</span>(exampleData, <span class="st">&quot;swatPlusTxtInOut&quot;</span>, <span class="fu">tempdir</span>())</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2.Path to the TxtInOut folder (</span><span class="al">TODO</span><span class="co">: replace with your TxtInOut path)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>TxtInOutFolder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">&quot;swatPlusTxtInOut&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 3.This is a SWAT+ project, therefore</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>SWATproject <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 4.My working directory (</span><span class="al">TODO</span><span class="co">: change to your desired working directory)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># dir.create(file.path(tempdir(), &quot;workingFolder&quot;))</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>workingFolder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">&quot;workingFolder&quot;</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 5.Path of the SWAT executable file (</span><span class="al">TODO</span><span class="co">: replace with your path)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>SWATexeFile <span class="ot">&lt;-</span> <span class="st">&quot;C:/data/rev60.5.7_64rel.exe&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 6.Path of the SWAT+ parameter file cal_parms.cal (</span><span class="al">TODO</span><span class="co">: replace with your path)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>SWATParamFile <span class="ot">&lt;-</span> <span class="fu">file.path</span>(TxtInOutFolder, <span class="st">&quot;cal_parms.cal&quot;</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 7.The parameters that I previously used for model calibration (</span><span class="al">TODO</span><span class="co">: change to your paraSelection)</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>paraSelection <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>   <span class="at">Parameter =</span> <span class="fu">c</span>(<span class="st">&quot;cn2.hru&quot;</span>   , <span class="st">&quot;canmx.hru&quot;</span>),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>   <span class="at">Change =</span>    <span class="fu">c</span>(<span class="st">&quot;relative&quot;</span>  , <span class="st">&quot;replace&quot;</span>),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>   <span class="at">Min =</span>       <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.25</span>       , <span class="fl">1.0</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>   <span class="at">Max =</span>       <span class="fu">c</span>(<span class="fl">0.25</span>        , <span class="fl">10.0</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>   <span class="at">Object  =</span>   <span class="fu">c</span>(<span class="st">&quot;All&quot;</span>       , <span class="st">&quot;All&quot;</span>),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>   <span class="at">Conditions =</span> <span class="fu">c</span>(<span class="st">&quot;All&quot;</span>      , <span class="st">&quot;All&quot;</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># You can also create these above table by the interface of R-SWAT then save </span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># the  project. If you do so, you can extract that table from the RSWATproject.rds </span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># file in the working folder (</span><span class="al">TODO</span><span class="co">: Delete if you don&#39;t read from RSWATproject.rds)</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># RSWATproject &lt;- readRDS(&quot;C:/data/RSWATproject.rds&quot;)</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># paraSelection &lt;- RSWATproject$paraSelection</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 8. How parameters should be generated</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>samplingApproach <span class="ot">&lt;-</span> <span class="st">&quot;Read_User_Parameter_File&quot;</span>  <span class="co"># Do not change this line</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="co"># 9. Output extraction for SWAT+ can be created manually or by the GUI (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>outputExtraction <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>   <span class="at">FileType =</span> <span class="fu">c</span>(<span class="st">&quot;channel_sd_day.txt&quot;</span>),</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>   <span class="at">FileName =</span> <span class="fu">c</span>(<span class="st">&quot;channel_sd_day.txt&quot;</span>),</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>   <span class="at">Column =</span> <span class="fu">c</span>(<span class="st">&quot;48&quot;</span>),</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>   <span class="at">Reach =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>) <span class="co"># E.g., for 100 reaches use: Reach = paste(as.character(c(1:100)), collapse  = &quot;,&quot;)</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a> )</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co"># 10. Date range for extraction (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>dateRangeCali <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;2003-01-01&quot;</span>, <span class="st">&quot;2012-12-31&quot;</span>), <span class="at">format =</span> <span class="st">&quot;%Y-%m-%d&quot;</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="co"># 11. Number of parallel runs  (</span><span class="al">TODO</span><span class="co">: change  this)</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>ncores <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="co"># 12.  Generate parameter samples using Latin Hypercube Sampling (</span><span class="al">TODO</span><span class="co">: change this)</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">&quot;C:/data/user_parameter_values.txt&quot;</span>,</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="co"># Here is the content of my user_parameter_values.txt&quot;</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="co">#cn2.hru         canmax.hru</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="co">#0.10            1.5</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="co">#-0.20           3.0</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="co">#-0.10           0.2</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="co">#0.22            1.0</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove the column names and number these parametersets from 1 to n. DONOT change this</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>parameterValue <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(parameterValue)),parameterValue)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(parameterValue) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
 </div>
 <div id="run-swat" class="section level3">
 <h3>4. Run SWAT+</h3>
 <p>Now run SWAT+ with the above settings</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Get HRU infor (HRU names, landuse, soil, slope, subbasin)</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>HRUinfo <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="fu">file.path</span>(TxtInOutFolder, <span class="st">&quot;hru-data.hru&quot;</span>), </span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                      <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">skip =</span> <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Read SWAT parameter</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>SWATParam <span class="ot">&lt;-</span> <span class="fu">loadSwatParam</span>(SWATParamFile)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Get location of parameters in TxtInOut files and load TxtInOut file content</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>caliParam <span class="ot">&lt;-</span> <span class="fu">updatedFileContent</span>(HRUinfo,paraSelection,SWATParam,</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                                TxtInOutFolder)</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co"># Set first run is true so R-SWAT will delete previous simulation</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>firstRun <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>copyUnchangeFiles <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co"># Get content of the file.cio file (about simulation time)</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>fileCioInfo <span class="ot">&lt;-</span> <span class="fu">getSimTime</span>(TxtInOutFolder)</span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co"># Now start to run SWAT</span></span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="fu">runSWATpar</span>(workingFolder,TxtInOutFolder,outputExtraction,ncores,SWATexeFile,</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>           parameterValue,paraSelection,caliParam,copyUnchangeFiles,fileCioInfo,</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>           dateRangeCali,firstRun)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get HRU infor (HRU names, landuse, soil, slope, subbasin)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>HRUinfo <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="fu">file.path</span>(TxtInOutFolder, <span class="st">&quot;hru-data.hru&quot;</span>), </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">skip =</span> <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Read SWAT parameter</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>SWATParam <span class="ot">&lt;-</span> <span class="fu">loadSwatParam</span>(SWATParamFile)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Get location of parameters in TxtInOut files and load TxtInOut file content</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>caliParam <span class="ot">&lt;-</span> <span class="fu">updatedFileContent</span>(HRUinfo,paraSelection,SWATParam,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                                TxtInOutFolder)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Set first run is true so R-SWAT will delete previous simulation</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>firstRun <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>copyUnchangeFiles <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Get content of the file.cio file (about simulation time)</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>fileCioInfo <span class="ot">&lt;-</span> <span class="fu">getSimTime</span>(TxtInOutFolder)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Now start to run SWAT</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">runSWATpar</span>(workingFolder,TxtInOutFolder,outputExtraction,ncores,SWATexeFile,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>           parameterValue,paraSelection,caliParam,copyUnchangeFiles,fileCioInfo,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>           dateRangeCali,firstRun)</span></code></pre></div>
 </div>
 <div id="processing-model-output" class="section level3">
 <h3>4. Processing model output</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># Read all output_var_xx.txt files in the workingFolder/Output/Core_xx</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># First you need to you how many output time steps for each variables </span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># You can open the out_var_xx.txt and check, below lets assume I only have one </span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># output variable, for more detail see function readAllOutVar</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: change numTimesteps</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>numTimesteps <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3653</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">readAllOutVar</span>(workingFolder, numTimesteps)</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Now calculate the 95PPU (SUFI2 approach) for each output variables, example for variable 1</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: change variable and percentiles as your wish</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>variable <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>percentiles <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="cf">for</span> (itime <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(output[[variable]])){</span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>  ppu <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">quantile</span>(output[[variable]][itime,],percentiles))</span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>  <span class="cf">if</span> (itime <span class="sc">==</span> <span class="dv">1</span>){</span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>    ppu95 <span class="ot">&lt;-</span> ppu</span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>    ppu95 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(ppu95, ppu)</span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>  }</span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>}</span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a></span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co"># Give it a column names</span></span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="fu">colnames</span>(ppu95) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;lower95PPU&quot;</span>, <span class="st">&quot;median95PPU&quot;</span>, <span class="st">&quot;upper95PPU&quot;</span>)</span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="fu">row.names</span>(ppu95) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Read all output_var_xx.txt files in the workingFolder/Output/Core_xx</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># First you need to you how many output time steps for each variables </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># You can open the out_var_xx.txt and check, below lets assume I only have one </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># output variable, for more detail see function readAllOutVar</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: change numTimesteps</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>numTimesteps <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3653</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">readAllOutVar</span>(workingFolder, numTimesteps)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Now calculate the 95PPU (SUFI2 approach) for each output variables, example for variable 1</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: change variable and percentiles as your wish</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>variable <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>percentiles <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (itime <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(output[[variable]])){</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  ppu <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">quantile</span>(output[[variable]][itime,],percentiles))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (itime <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    ppu95 <span class="ot">&lt;-</span> ppu</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    ppu95 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(ppu95, ppu)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Give it a column names</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ppu95) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;lower95PPU&quot;</span>, <span class="st">&quot;median95PPU&quot;</span>, <span class="st">&quot;upper95PPU&quot;</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(ppu95) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
 </div>
 <div id="references" class="section level3">
 <h3>References</h3>

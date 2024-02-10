@@ -1840,6 +1840,29 @@ server <- function(input, output, session) {
   })
 
   # ****************************************************************************
+  # Get executable SWAT file
+  # ****************************************************************************
+  observe({
+
+    req(input$getUserObjFunction)
+
+    # Get full path to SWAT exe file
+    shinyjs::disable("getUserObjFunction")
+    spsComps::shinyCatch(globalVariable$getUserObjFunction <<- file.choose(),
+                         blocking_level = "none")
+    shinyjs::enable("getUserObjFunction")
+
+    spsComps::shinyCatch(
+      if (grepl(".R", globalVariable$getUserObjFunction, fixed = TRUE)){
+        output$userObjFunctionFile <- renderText(globalVariable$getUserObjFunction)
+        source(globalVariable$getUserObjFunction)
+      } else {
+        output$userObjFunctionFile <- renderText("Error: The selected file must have '.R' extention")
+      },
+      blocking_level = "error")
+  })
+
+  # ****************************************************************************
   # Get observed data files
   # ****************************************************************************
   observe({
@@ -2601,7 +2624,7 @@ server <- function(input, output, session) {
 
         # convert to ggplotly with legend on top
         lapply(1:globalVariable$nOutputVar, function(i) {
-          temp_plot <- plotly::ggplotly(plotSwatEdu(globalVariable, i)) 
+          temp_plot <- plotly::ggplotly(plotSwatEdu(globalVariable, i))
           outID <- paste0("SwatEduPlot", i)
           output[[outID]] <- plotly::renderPlotly(temp_plot)
         })
