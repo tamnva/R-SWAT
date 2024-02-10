@@ -49,13 +49,13 @@ function used in here, for example:
  RMSE: "Minimize"}
 
 \item{samplingApproach}{the parameter sampling approach, possible values are:
-'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
-'Cali_(from_optimization_package)',
-'Cali_(from_nloptr_package)'),
-'Cali_(Dynamically_Dimensioned_Search)',
-'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
-'Read_User_Parameter_File',
-'Sensi_(from_userDefined_package)',
+'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)' \cr
+'Cali_(from_optimization_package)'\cr
+'Cali_(from_nloptr_package)')\cr
+'Cali_(Dynamically_Dimensioned_Search)'\cr
+'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'\cr
+'Read_User_Parameter_File'\cr
+'Sensi_(from_userDefined_package)'\cr
 'Cali_(from_userDefined_package)'}
 }
 \value{
@@ -70,7 +70,6 @@ parameters
 
 \donttest{
 # Please see RSWAT Vignettes
-vignette("SUFI2_without_GUI",package="RSWAT")
 }
 
 

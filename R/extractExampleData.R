@@ -29,7 +29,7 @@
 
 extracExampleData <- function(exampleData, dataName, toDir){
 
-  if(dataName =="swatTxtInOut" | dataName =="all"){
+  if(dataName %in% c("swatTxtInOut", "all")){
     dir.create(file.path(toDir, "swatTxtInOut"))
     for (i in 1:length(exampleData$swatTxtInOut)){
       writeLines(exampleData$swatTxtInOut[[i]],
@@ -45,7 +45,7 @@ extracExampleData <- function(exampleData, dataName, toDir){
   }
 
 
-  if(dataName =="swatPlusTxtInOut" | dataName =="all"){
+  if(dataName %in% c("swatPlusTxtInOut", "all")){
     dir.create(file.path(toDir, "swatPlusTxtInOut"))
     for (i in 1:length(exampleData$swatPlusTxtInOut)){
       writeLines(exampleData$swatPlusTxtInOut[[i]],
@@ -60,13 +60,13 @@ extracExampleData <- function(exampleData, dataName, toDir){
 
   }
 
-  if(dataName =="swatParam" | dataName =="all"){
+  if(dataName %in% c("swatParam", "all")){
     writeLines(exampleData$swatParam, file.path(toDir, "swatParam.txt"))
     message("Created swatParam.txt file in  ", file.path(toDir, "swatParam.txt"))
 
   }
 
-  if(dataName =="swatObservedData" | dataName =="all"){
+  if(dataName %in% c("swatObservedData", "all")){
     dir.create(file.path(toDir, "observedSWAT"))
     writeLines(exampleData$swatObservedData, file.path(toDir,
                                                        "observedSWAT",
@@ -77,7 +77,7 @@ extracExampleData <- function(exampleData, dataName, toDir){
 
   }
 
-  if(dataName =="swatPlusObservedData" | dataName =="all"){
+  if(dataName %in% c("swatPlusObservedData", "all")){
     dir.create(file.path(toDir, "observedSWATPlus"))
     writeLines(exampleData$swatPlusObservedData, file.path(toDir,
                                                            "observedSWATPlus",
@@ -88,7 +88,7 @@ extracExampleData <- function(exampleData, dataName, toDir){
 
   }
 
-  if(dataName =="swatPlusParam" | dataName =="all"){
+  if(dataName %in% c("swatPlusParam", "all")){
     writeLines(exampleData$swatPlusParam, file.path(toDir, "cal_parms.cal"))
     message("Created cal_parms.cal file in ", file.path(toDir, "cal_parms.cal"))
   }

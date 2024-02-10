@@ -21,7 +21,7 @@ or SWAT+}
 
 \item{ncores}{number of threads for parallel execution}
 
-\item{nOutputVar}{number of output variables}
+\item{nOutputVar}{integer - number of output variables}
 
 \item{userReadSwatOutput}{TODO}
 
@@ -43,7 +43,6 @@ calibration and validation period and for each variable
 
 \donttest{
 # Please see RSWAT Vignettes
-vignette("SUFI2_without_GUI",package="RSWAT")
 }
 
 }

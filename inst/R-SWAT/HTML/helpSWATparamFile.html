@@ -6,7 +6,7 @@
 
 <h4><span style="color: #3366ff;">SWAT</span> project &rarr; Select '<span style="color: #3366ff;">swatParam.txt</span>' file</h4>
 <ul>
-<li>This file is provided along with this tool, it is located in <strong><span style="color: #339966;">./data/swatParam.txt</span></strong></li>
+<li>This file is provided along with this tool, it can be extracted to your local folder by typing "extracExampleData(exampleData, "swatParam", tempdir())" in R or can be downloaded from <a href="https://github.com/tamnva/R-SWAT/blob/4d49ac6a2e153a34081d7d7b24958af0127f4ed3/data/example_SWAT/swatParam.txt">here.</a></li>
 <li>This file contains information about the location SWAT parameter in SWAT input file and its format as well as its theoretical range.</li>
 <li>For example (the HRU_FR parameter in all .hru files is located at line 2, column 1 to 16 with a precision of 7 digits after the decimal.</li>
 <li>The columns <strong><span style="color: #339966;">AbsoluteMin</span></strong> and <strong><span style="color: #339966;">AbsoluteMax</span></strong> in this files means the absolute min and max, R-SWAT will check and make sure that<strong><span style="color: #339966;"> updated parameter values will always be within this range</span></strong> (if the updated values out of this range, e.g., higher than the AbsoluteMax, R-SWAT will use the AbsoluteMax , if the updated values smaller than AbsoluteMin, R-SWAT will use the AbsoluteMin.</li>

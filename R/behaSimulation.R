@@ -32,13 +32,13 @@
 #'  RMSE: "Minimize"
 #'
 #' @param samplingApproach the parameter sampling approach, possible values are:
-#' 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)',
-#' 'Cali_(from_optimization_package)',
-#' 'Cali_(from_nloptr_package)'),
-#' 'Cali_(Dynamically_Dimensioned_Search)',
-#' 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)',
-#' 'Read_User_Parameter_File',
-#' 'Sensi_(from_userDefined_package)',
+#' 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)' \cr
+#' 'Cali_(from_optimization_package)'\cr
+#' 'Cali_(from_nloptr_package)')\cr
+#' 'Cali_(Dynamically_Dimensioned_Search)'\cr
+#' 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'\cr
+#' 'Read_User_Parameter_File'\cr
+#' 'Sensi_(from_userDefined_package)'\cr
 #' 'Cali_(from_userDefined_package)'
 #'
 #' @return a list of dataframes showing the 95PPU, median,
@@ -50,7 +50,6 @@
 #'
 #' \donttest{
 #' # Please see RSWAT Vignettes
-#' vignette("SUFI2_without_GUI",package="RSWAT")
 #' }
 #'
 #'
@@ -64,9 +63,9 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
                            samplingApproach){
 
   # find index of simulations which are behavioral simulations
-  if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
+  if (statIndex %in% c("NSE", "KGE", "R2")){
     behaIndex <- which(objValue >= behThreshold)
-  } else if(statIndex == "aBIAS" | statIndex == "RMSE") {
+  } else if(statIndex %in% c("aBIAS", "RMSE")) {
     behaIndex <- which(objValue <= abs(behThreshold))
   } else {
     if (minOrmax == "Maximize"){
@@ -114,10 +113,10 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   }
 
   # find the best simulation
-  if ((statIndex == "NSE") | (statIndex == "KGE") | (statIndex == "R2")){
+  if (statIndex %in% c("NSE", "KGE", "R2")){
     ppuSimData[,4] <- simData[[varNumber]][[which(objValue == max(objValue))[1]]]
 
-  } else if(statIndex == "aBIAS" | statIndex == "RMSE") {
+  } else if(statIndex %in% c("aBIAS","RMSE")) {
     ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))[1]]]
 
   } else {

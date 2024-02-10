@@ -21,7 +21,7 @@ ui <- shinydashboard::dashboardPage(
             # Load project button
             actionButton(inputId = "loadProject",
                          label = "Load project" ,
-                         icon = icon("upload"),
+                         icon = icon("download"),
                          style="background-color: #fafa87; border-color: #2e6da4")
             )
   ),

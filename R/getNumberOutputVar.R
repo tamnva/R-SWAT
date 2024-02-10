@@ -19,8 +19,18 @@
 #' @export
 #'
 getNumberOutputVar <- function(outputExtraction){
+  
   nOutputVar <- 0
   userReadSwatOutput <- c()
+  
+  # output.rch file tpye
+  outputRchType <- c("output.rch", "channel_sd_day.txt", 'channel_sd_mon.txt', 
+                     'channel_sd_yr.txt', 'channel_sdmorph_day.txt',
+                     'channel_sdmorph_mon.txt','channel_sdmorph_yr.txt',
+                     'lsunit_wb_day.txt','lsunit_wb_mon.txt','lsunit_wb_yr.txt', 
+                     'basin_wb_day.txt','basin_wb_mon.txt','basin_wb_yr.txt',
+                     "output.hru","output.sub","output.rsv")
+  
   for (i in 1:nrow(outputExtraction)) {
     if (outputExtraction[i,1] == "watout.dat"){
       temp <- length(strsplit(as.character(outputExtraction[i,3]), ",")[[1]])
@@ -34,22 +44,7 @@ getNumberOutputVar <- function(outputExtraction){
         }
       }
 
-    } else if(outputExtraction[i,1] == "output.rch" |
-              outputExtraction[i,1] == "channel_sd_day.txt" |
-              outputExtraction[i,1] == 'channel_sd_mon.txt' |
-              outputExtraction[i,1] == 'channel_sd_yr.txt'  |
-              outputExtraction[i,1] == 'channel_sdmorph_day.txt' |
-              outputExtraction[i,1] == 'channel_sdmorph_mon.txt' |
-              outputExtraction[i,1] == 'channel_sdmorph_yr.txt'  |
-              outputExtraction[i,1] == 'lsunit_wb_day.txt' |
-              outputExtraction[i,1] == 'lsunit_wb_mon.txt' |
-              outputExtraction[i,1] == 'lsunit_wb_yr.txt'  |
-              outputExtraction[i,1] == 'basin_wb_day.txt' |
-              outputExtraction[i,1] == 'basin_wb_mon.txt' |
-              outputExtraction[i,1] == 'basin_wb_yr.txt'  |
-              outputExtraction[i,1] == "output.hru" |
-              outputExtraction[i,1] == "output.sub" |
-              outputExtraction[i,1] == "output.rsv"){
+    } else if(outputExtraction[i,1] %in% outputRchType){
       if ((nchar(outputExtraction[i,3]) > 0) & (nchar(outputExtraction[i,4]) > 0)){
         temp <- sum(lengths(getRchNumber(outputExtraction[i,4])))
         nOutputVar <- nOutputVar + temp

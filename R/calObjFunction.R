@@ -3,7 +3,7 @@
 #' calibration and validation period and for each variable
 #'
 #' @inheritParams runSWATpar
-#' @param nOutputVar number of output variables
+#' @param nOutputVar integer - number of output variables
 #' @param userReadSwatOutput TODO
 #' @param observedData list of observed data, each observed data is a data frame
 #' @param index performance criteria (NSE, KGE, RMSE, R2, or aBIAS)
@@ -14,7 +14,6 @@
 #'
 #' \donttest{
 #' # Please see RSWAT Vignettes
-#' vignette("SUFI2_without_GUI",package="RSWAT")
 #' }
 #'
 #' @export
@@ -35,7 +34,7 @@ calObjFunction <- function(parameterValue, ncores,
   simData <- list()
 
   counter <- rep(0, nOutputVar)
-  output$objValueCali <-  rep(0, nrow(parameterValue))
+  output$objValueCali <- rep(0, nrow(parameterValue))
   output$objValueValid <-  rep(0, nrow(parameterValue))
   output$error <- FALSE
 
@@ -55,8 +54,8 @@ calObjFunction <- function(parameterValue, ncores,
       }
 
       #Loop over number of simulation
-      fileNameSimData <- paste(workingDirectory, "/Output/Core_",
-                               i, "/out_var_", j, ".txt", sep = "")
+      fileNameSimData <- file.path(workingDirectory, "Output", paste0("Core_", i),
+                                   paste0("out_var_", j, ".txt"))
       tempSimData <- read.table(fileNameSimData, header = FALSE, sep = "")
 
       #Check if length of observed and simulated data are the same or not
