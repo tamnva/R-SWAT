@@ -15,12 +15,14 @@ knitr::opts_chunk$set(
 ```
 
 ### 1. Overview
-When the build-in objective functions of RSWAT (e.g., NSE, KGE, PBIAS, ...) does not suit your need, here is the place you can define a custom objective function.
+When the build-in objective functions of RSWAT (e.g., NSE, KGE, PBIAS, ...) do not suit your need, here is the place you can define a custom objective function.
 
 ### 2. Import your design objective function into RSWAT
 Depending on whether you use RSWAT with our without the GUI
- - Case 1: When you used the GUI of RSWAT, the user objective function can be imported in step 4.1. Objective function &rarr; 1. Select objective function (userObjFunction) &rarr; Load userObjFunction.R
- - Case 2: When using RSWAT without the GUI, user need to add the following lines to their script:
+
+* Case 1: When you used the GUI of RSWAT, the user objective function can be imported in step 4.1. Objective function &rarr; 1. Select objective function (userObjFunction) &rarr; Load userObjFunction.R
+
+* Case 2: When using RSWAT without the GUI, user needs to add the following line to their script:
  
 ```{r, message=FALSE, eval = FALSE}
 # TODO change file path to your userObjFunction.R file
@@ -29,7 +31,7 @@ source("C:/example/userObjFunction.R")
 
 ### 3. How to create userObjFunction.R file?
 
-Below is a minimum example of a user defined objective function. Lets say we simulated for streamflow (Q) in two gauging stations (station 1 and station 2). In the first gauging stations, we use the Root Mean Square Error (RMSE) as an objective function but put more weight on streamflow of the second gauging station. Our final RMSE should has the following form:
+Below is a minimum example of a user defined objective function. Lets say we simulate for streamflow (Q) in two gauging stations (station 1 and station 2). In the first gauging stations, we use the Root Mean Square Error (RMSE) as an objective function but put more weight on streamflow of the second gauging station. Our final RMSE should has the following form:
 
 $$ R^2 = \frac{1 \cdot R^2_{Q_1} + 2 \cdot R^2_{Q_2}}{1 + 2} $$
 Here is the content of the "userObjFunction.R" file
@@ -125,6 +127,11 @@ userObjFunction <- function(obs, sim){
 
   return(output)
 }
+
+
+# Overwrite the userObjFunction with our updatedUserObjFunction
+environment(updatedUserObjFunction) <- asNamespace('RSWAT')
+assignInNamespace("userObjFunction", updatedUserObjFunction, ns = "RSWAT")
 
 ```
 

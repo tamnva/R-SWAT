@@ -698,7 +698,8 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 4. Select executable SWAT",
-      "Select the executable SWAT or SWAT+ file, for example, swat_32debug.exe",
+      "Select the executable SWAT or SWAT+ file, for example, swat_32debug.exe,
+      you could download these files here https://swat.tamu.edu/software/",
       easyClose = TRUE
     ))
   })
@@ -1195,6 +1196,20 @@ server <- function(input, output, session) {
     # Check if this option is activated
     globalVariable$userReadSwatOutput <<- OutputVar$userReadSwatOutput
 
+    # Display message
+    spsComps::shinyCatch(
+      if (TRUE %in% globalVariable$userReadSwatOutput){
+        output$messageUserReadSwatOutput <- renderText(
+          "MUST check the box below to load 'userReadSwatOutput.R' file")
+        output$userReadSwatOutputFile <- renderText(
+          "Please load 'userReadSwatOutput.R' file")
+      } else {
+        output$messageUserReadSwatOutput <- renderText(" ")
+        output$userReadSwatOutputFile <- renderText(
+          "No input file is needed")
+      },
+      blocking_level = "error")
+
     # Display table of observed file names needed for calibration/optimization
     output$tableOutputExtractionDisplayOnly <- renderDataTable(
       printVariableNameObservedFiles(outputExtraction)
@@ -1209,6 +1224,41 @@ server <- function(input, output, session) {
                         selected = 1),
       blocking_level = "error")
 
+  })
+
+  # ****************************************************************************
+  # Get userObjFunction.R file file
+  # ****************************************************************************
+  observe({
+
+    req(input$getUserReadSwatOutput)
+
+    # Display message
+    spsComps::shinyCatch(
+      if (TRUE %in% globalVariable$userReadSwatOutput){
+        output$userReadSwatOutputFile <- renderText(
+          "Please load 'userReadSwatOutput.R' file")
+      } else {
+        output$userReadSwatOutputFile <- renderText(
+          "No input file is needed")
+      },
+      blocking_level = "error")
+
+
+    # Get full path to userObjFunction.R file
+    shinyjs::disable("getUserReadSwatOutput")
+    spsComps::shinyCatch(globalVariable$getUserReadSwatOutput <<- file.choose(),
+                         blocking_level = "none")
+    shinyjs::enable("getUserReadSwatOutput")
+
+    spsComps::shinyCatch(
+      if (grepl(".R", globalVariable$getUserReadSwatOutput, fixed = TRUE)){
+        output$userReadSwatOutputFile <- renderText(globalVariable$getUserReadSwatOutput)
+        source(globalVariable$getUserReadSwatOutput)
+      } else {
+        output$userReadSwatOutputFile <- renderText("Error: The selected file must be '.R' extention")
+      },
+      blocking_level = "error")
   })
 
   # ****************************************************************************
@@ -1264,6 +1314,19 @@ server <- function(input, output, session) {
     globalVariable$dateRangeCali <<- input$dateRangeCali
   })
 
+  # ****************************************************************************
+  # Help button select file SWAT (or SWAT+) parameter file
+  # ****************************************************************************
+  observe({
+    req(input$helpDateRangeCali)
+
+    showModal(modalDialog(
+      title = "Help: 2. Select date range for calibration",
+      HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+                               "helpDateRangeCali.html"),warn=FALSE)),
+      easyClose = TRUE
+    ))
+  })
 
   # ****************************************************************************
   # Help button select file SWAT (or SWAT+) parameter file
@@ -1302,6 +1365,33 @@ server <- function(input, output, session) {
     ))
   })
 
+  # ****************************************************************************
+  # Help button helpRunSWAT
+  # ****************************************************************************
+  observe({
+    req(input$helpRunSWAT)
+
+    showModal(modalDialog(
+      title = "Help: 4. Run SWAT",
+      HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+                               "helpRunSWAT.html"),warn=FALSE)),
+      easyClose = TRUE
+    ))
+  })
+
+  # ****************************************************************************
+  # Help button helpCheckCurrentSimulation
+  # ****************************************************************************
+  observe({
+    req(input$helpCheckCurrentSimulation)
+
+    showModal(modalDialog(
+      title = "Help: 5. See Simulation report",
+      HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+                               "helpCheckCurrentSimulation.html"),warn=FALSE)),
+      easyClose = TRUE
+    ))
+  })
   # ****************************************************************************
   # Run SWAT
   # ****************************************************************************
@@ -1840,13 +1930,13 @@ server <- function(input, output, session) {
   })
 
   # ****************************************************************************
-  # Get executable SWAT file
+  # Get userObjFunction.R file file
   # ****************************************************************************
   observe({
 
     req(input$getUserObjFunction)
 
-    # Get full path to SWAT exe file
+    # Get full path to userObjFunction.R file
     shinyjs::disable("getUserObjFunction")
     spsComps::shinyCatch(globalVariable$getUserObjFunction <<- file.choose(),
                          blocking_level = "none")
@@ -1968,12 +2058,9 @@ server <- function(input, output, session) {
   observe({
     req(input$checkDisplayObsVar)
 
-    # Display content of the observed data files
-    observedData <- mergeDataFrameDiffRow(globalVariable$observedData)
-
     # Display observed data in table
     spsComps::shinyCatch(
-      output$tableObsVarDisplay <- renderDataTable(observedData,
+      output$tableObsVarDisplay <- renderDataTable(mergeDataFrameDiffRow(globalVariable$observedData),
                                                    server = FALSE,
                                                    extensions = c("Buttons"),
                                                    rownames = FALSE,

@@ -68,7 +68,7 @@ knitr::opts_chunk$set(
 #    output$perCriteria <- list()
 #  
 #    # -------------------------------------------------------------------------#
-#    #       Delete the existing code below and add your code below this line   #
+#    #  TODO: MODIFY the existing code below and add your code below this line  #
 #    #                 START TO CHANGE FROM HERE                                #
 #    # -------------------------------------------------------------------------#
 #    # In this example, lets say you extracted two outputs and want to calculate
@@ -99,5 +99,10 @@ knitr::opts_chunk$set(
 #  
 #    return(output)
 #  }
+#  
+#  
+#  # Overwrite the userObjFunction with our updatedUserObjFunction
+#  environment(updatedUserObjFunction) <- asNamespace('RSWAT')
+#  assignInNamespace("userObjFunction", updatedUserObjFunction, ns = "RSWAT")
 #  
 

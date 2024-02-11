@@ -1,0 +1,98 @@
+## ----include = FALSE----------------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+## ----message=FALSE, eval = FALSE----------------------------------------------
+#  # TODO change file path to your userObjFunction.R file
+#  source("C:/example/userReadSwatOutput.R")
+
+## ----message=FALSE, eval = FALSE----------------------------------------------
+#  
+#  #' User-defined function for reading SWAT/SWAT+
+#  #'
+#  #' @description
+#  #' This is a user-defined function for reading SWAT/SWAt+ outputs, do not use
+#  #' as it is now, please modify the source code of this function if you use
+#  #' according to your need and then install RSWAT app again from your local
+#  #' folder to update this function.DO NOT CHANGE the name of this function
+#  #' (mus be updateUserReadSwatOutput). ONLY CHANGE the code at the place where indicates
+#  #' "START TO CHANGE FROM HERE" and STOP at "END OF CHANGE". This functions
+#  #' must NOT receive any input. By default, you are NOW INSIDE the TxtInOut folder
+#  #' and you can read any output files there by just using the file name.
+#  #' RSWAT will use this function to get SWAT outputs (from the respective core)
+#  #' after each model run and save it in combination with other outputs.
+#  #'
+#  #' Please TEST your function before running R-SWAT
+#  #'
+#  #' @return a list of vector (of simulated data)
+#  #' @importFrom stats aggregate
+#  #'
+#  #'
+#  #' @export
+#  #'
+#  
+#  updateUserReadSwatOutput <- function(){
+#  
+#    output <- list()
+#    # -------------------------------------------------------------------------#
+#    #       Delete the existing code below and add your code below this line   #
+#    #                 START TO CHANGE FROM HERE                                #
+#    # -------------------------------------------------------------------------#
+#    # Example: This function extracts data in the 7th column of the file  output.rch
+#    #          and aggregate to monthly
+#  
+#    # --------------------------------------------------------------------------
+#    date <- seq(from = as.Date("2010-01-01", "%Y-%m-%d"),
+#                to = as.Date("2020-12-31", "%Y-%m-%d"),
+#                by = 1)
+#    year <- as.numeric(format(date, "%Y"))
+#    month <- as.numeric(format(date, "%m"))
+#  
+#    # Reach number to extract
+#    reachNumber <- c(17, 42, 48, 61)
+#  
+#    # --------------------------------------------------------------------------
+#  
+#    # Read all data from output.rch
+#    getOutputRsvData <- read.table("output.rch", header = FALSE, sep = "", skip = 9)
+#  
+#    # Only select column 7 (this is the outflow column)
+#    flowOut <- getOutputRsvData[,7]
+#  
+#    # Total number of reach
+#    totalNumberOfReach <- max(getOutputRsvData[,2])
+#  
+#    # Get daily outflow of each reach and aggregate to monthly flow (unit m3/month)
+#    for (i in 1:length(reachNumber)){
+#  
+#      # Get daily outflow of reach reachNumber[i]
+#      output[[i]] <- flowOut[seq(reachNumber[i], length(flowOut), totalNumberOfReach)]
+#  
+#      # Put daily outflow to a data frame of 3 columns (month, year, and daily Q)
+#      dataFrame <- data.frame(month = month,
+#                              year = year,
+#                              Q = output[[i]])
+#  
+#      # Aggregate to monthly
+#      dataFrameMonthly <- aggregate(.~ month + year, dataFrame, FUN = sum)
+#  
+#      # Only get the values of Q
+#      output[[i]] <- dataFrameMonthly$Q
+#  
+#    }
+#  
+#    # ----------------------------------------------------------------------------
+#    # END OF CHANGE: Don't modify anything after this line
+#    # ----------------------------------------------------------------------------
+#  
+#    return(output)
+#  
+#  }
+#  
+#  # Overwrite the userReadSwatOutput with our updateUserReadSwatOutput
+#  environment(updateUserReadSwatOutput) <- asNamespace('RSWAT')
+#  assignInNamespace("userReadSwatOutput", updateUserReadSwatOutput, ns = "RSWAT")
+#  
+
