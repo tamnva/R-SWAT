@@ -151,17 +151,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div id="overview" class="section level3">
 <h3>1. Overview</h3>
-<p>When the build-in objective functions of RSWAT (e.g., NSE, KGE, PBIAS, …) does not suit your need, here is the place you can define a custom objective function.</p>
+<p>When the build-in objective functions of RSWAT (e.g., NSE, KGE, PBIAS, …) do not suit your need, here is the place you can define a custom objective function.</p>
 </div>
 <div id="import-your-design-objective-function-into-rswat" class="section level3">
 <h3>2. Import your design objective function into RSWAT</h3>
-<p>Depending on whether you use RSWAT with our without the GUI - Case 1: When you used the GUI of RSWAT, the user objective function can be imported in step 4.1. Objective function → 1. Select objective function (userObjFunction) → Load userObjFunction.R - Case 2: When using RSWAT without the GUI, user need to add the following lines to their script:</p>
+<p>Depending on whether you use RSWAT with our without the GUI</p>
+<ul>
+<li><p>Case 1: When you used the GUI of RSWAT, the user objective function can be imported in step 4.1. Objective function → 1. Select objective function (userObjFunction) → Load userObjFunction.R</p></li>
+<li><p>Case 2: When using RSWAT without the GUI, user needs to add the following line to their script:</p></li>
+</ul>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co"> change file path to your userObjFunction.R file</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;C:/example/userObjFunction.R&quot;</span>)</span></code></pre></div>
 </div>
 <div id="how-to-create-userobjfunction.r-file" class="section level3">
 <h3>3. How to create userObjFunction.R file?</h3>
-<p>Below is a minimum example of a user defined objective function. Lets say we simulated for streamflow (Q) in two gauging stations (station 1 and station 2). In the first gauging stations, we use the Root Mean Square Error (RMSE) as an objective function but put more weight on streamflow of the second gauging station. Our final RMSE should has the following form:</p>
+<p>Below is a minimum example of a user defined objective function. Lets say we simulate for streamflow (Q) in two gauging stations (station 1 and station 2). In the first gauging stations, we use the Root Mean Square Error (RMSE) as an objective function but put more weight on streamflow of the second gauging station. Our final RMSE should has the following form:</p>
 <p><span class="math display">\[ R^2 = \frac{1 \cdot R^2_{Q_1} + 2 \cdot R^2_{Q_2}}{1 + 2} \]</span> Here is the content of the “userObjFunction.R” file</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; User-defined objective function - DO NOT USE AS IT IS NOW</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
@@ -222,7 +226,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>perCriteria <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># -------------------------------------------------------------------------#</span></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>  <span class="co">#       Delete the existing code below and add your code below this line   #</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  </span><span class="al">TODO</span><span class="co">: MODIFY the existing code below and add your code below this line  #</span></span>
 <span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>  <span class="co">#                 START TO CHANGE FROM HERE                                #</span></span>
 <span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>  <span class="co"># -------------------------------------------------------------------------#</span></span>
 <span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>  <span class="co"># In this example, lets say you extracted two outputs and want to calculate</span></span>
@@ -252,7 +256,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
-<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="co"># Overwrite the userObjFunction with our updatedUserObjFunction</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a><span class="fu">environment</span>(updatedUserObjFunction) <span class="ot">&lt;-</span> <span class="fu">asNamespace</span>(<span class="st">&#39;RSWAT&#39;</span>)</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="fu">assignInNamespace</span>(<span class="st">&quot;userObjFunction&quot;</span>, updatedUserObjFunction, <span class="at">ns =</span> <span class="st">&quot;RSWAT&quot;</span>)</span></code></pre></div>
 </div>
 
 
