@@ -143,8 +143,10 @@ runSWATpar(workingFolder,TxtInOutFolder,outputExtraction,ncores,SWATexeFile,
 # First you need to you how many output time steps for each variables 
 # You can open the out_var_xx.txt and check, below lets assume I only have one 
 # output variable, for more detail see function readAllOutVar
-# TODO: change numTimesteps
-numTimesteps <- c(3653)
+# TODO: change numTimesteps. Example, for 100 output variables with the same time 
+#                            steps of 24 please use: numTimesteps <- rep(24,100)
+
+numTimesteps <- c(3653) 
 output <- readAllOutVar(workingFolder, numTimesteps)
 
 # Now calculate the 95PPU (SUFI2 approach) for each output variables, example for variable 1

@@ -1,14 +1,14 @@
-## ----include = FALSE----------------------------------------------------------
+## ---- include = FALSE---------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ----message=FALSE, eval = FALSE----------------------------------------------
+## ---- message=FALSE, eval = FALSE---------------------------------------------
 #  # TODO change file path to your userObjFunction.R file
 #  source("C:/example/userObjFunction.R")
 
-## ----message=FALSE, eval = FALSE----------------------------------------------
+## ---- message=FALSE, eval = FALSE---------------------------------------------
 #  #' User-defined objective function - DO NOT USE AS IT IS NOW
 #  #'
 #  #' @description

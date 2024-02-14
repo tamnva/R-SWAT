@@ -19,7 +19,7 @@ Imports:
     stats (>= 4.1.2),
     utils (>= 4.1.2),
     foreach (>= 1.2.0),
-	  htmltools (>= 0.5.7),
+    htmltools (>= 0.5.7),
     parallel (>= 4.1.2),
     lhs (>= 1.1.4),
     plotly (>= 4.10.0),

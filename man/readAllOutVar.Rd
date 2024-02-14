@@ -17,7 +17,8 @@ numTimesteps <- c(3000,4000)}
 \value{
 a list of data frame for each output variable. Each data frame has n
 rows (number of rows are number of time steps) and m columns (m is the number
-of iterations)
+of iterations: column 1 = result from iteration 1 and column i = result from
+iteration i)
 }
 \description{
 When running RSWAT, output files will be saved in the working folder/Output/Core
@@ -35,7 +36,7 @@ numTimesteps <- c(3000)
 #  if you have two output variables with different number of time steps
 #  numTimesteps <- c(3000, 4000)
 
-readAllOutVar("C:/data/workingFolder")
+output <- readAllOutVar("C:/data/workingFolder", numTimesteps)
 }
 
 }
