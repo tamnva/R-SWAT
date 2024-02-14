@@ -29,11 +29,9 @@ Depending on whether you use RSWAT with our without the GUI
 source("C:/example/userReadSwatOutput.R")
 ```
 
-### 3. How to create userObjFunction.R file?
+### 3. How to create the userReadSwatOutput.R file?
 
-Below is a minimum example of a user defined output extraction. Lets say we run SWAT model and want to extract data in the 7th column of the file  output.rch and aggregate to monthly.
-
-Here is the content of the "userReadSwatOutput.R" file for such a task
+Below is a minimum example of a user defined output extraction. Lets say we run SWAT model and want to extract data in the 7th column of the file  output.rch and aggregate to monthly. In this example, the content of the "userReadSwatOutput.R" file is as follows:
 
 ```{r, message=FALSE, eval = FALSE}
 
