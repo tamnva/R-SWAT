@@ -3,40 +3,41 @@
 [![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/tamnva/R-SWAT/blob/master/LICENSE) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases) [![R-CMD-check](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml) [![status](https://joss.theoj.org/papers/89a04bc6f9a2a2b08cbac33fcd91c0c6/status.svg)](https://joss.theoj.org/papers/89a04bc6f9a2a2b08cbac33fcd91c0c6)
 
 - This is an R package with a graphical user interface (GUI) for parallel parameter calibration, sensitivity, and uncertainty analyses with the Soil and Water Assessment Tool models (e.g., [SWAT](https://swat.tamu.edu/), [SWAT+](https://swat.tamu.edu/software/plus/), [SWAT-Carbon](https://sites.google.com/view/swat-carbon), and its other modified versions). 
-- RSWAT can also be used without the GUI, please see the RSWAT vignettes (see Quick Start section).
+- RSWAT can also be used without the GUI, please see the RSWAT vignettes.
 - The latest version of this app is always in the [development](https://github.com/tamnva/R-SWAT/tree/development) branch.
-- If you would like to contribute to the code, have any suggestions, want to report errors, or have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the [Google group](https://groups.google.com/g/R-SWAT) specially designed for this app. Tutorial videos can be found on the [RSWAT YouTube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
+- If you would like to contribute to the code, have any suggestions, want to report errors, or have scientific collaboration, please contact [me](https://www.ufz.de/index.php?en=46415). The best way to contact me is via the [Google group](https://groups.google.com/g/R-SWAT) specially designed for this app or creating issues in RSWAT GitHub repository. Tutorial videos can be found on the [RSWAT YouTube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - RSWAT will be constantly developed to serve the SWAT community. Please feel free to contribute to this package, together we can make this package much better.
 - **IMPORTANT: The older version of this package, called the R-SWAT app, [can be found here](https://github.com/tamnva/R-SWAT/tree/4d49ac6a2e153a34081d7d7b24958af0127f4ed3).**
 
 ## Quick Start!
 
-RSWAT is an R package hosted on GitHub (to be submitted to CRAN soon). First, you need to install [R](https://cloud.r-project.org/), and  [RStudio](https://posit.co/download/rstudio-desktop/), then **run** the following commands **in RStudio** (if you run in R, package vignettes cannot be built).
+RSWAT is an R package hosted on GitHub (to be submitted to CRAN soon). First, you need to install [R](https://cloud.r-project.org/), and [RStudio](https://posit.co/download/rstudio-desktop/) (installing RStudio is recommended, not a MUST) then **run** the following commands **in RStudio**. If you run in R, package vignettes cannot be built, however, this DOES NOT affect the functionalities of RSWAT.
 
 ```R
 # First install remotes package if you have not installed
 install.packages("remotes")
 
-# Then install RSWAT package 
+# Then install RSWAT package (if you run with RStudio)
+# IMPORTANT: if you run in R, please set "build_vignettes = FALSE"
 remotes::install_github("tamnva/R-SWAT", force = TRUE, dependencies = TRUE, build_vignettes = TRUE)
 
-# Call RSWAT graphical user interface: DO NOT use RSWAT:showRSWAT()
-library(RSWAT) 
+# Load RSWAT
+library(RSWAT)
+
+# Extract example data (3.6 MB of storage). TODO: replace tempdir() with your path, e.g., "C:/example"
+extracExampleData(exampleData, "all", tempdir())
+
+# Call RSWAT graphical user interface: DO NOT use RSWAT::showRSWAT()
 showRSWAT()
 ```
 
-The following interface (attached screenshot at the end of this document) will appear and you can start using this app. Start with Tab '1. General setting' => '2. Parameter sampling' => and so on. On each tab there are subitems (e.g., in the first figure, start with '1. Working folder' => '2. TxtInOut folder' => and so on)
+
+
+The following interface (attached screenshot at the end of this document) will appear and you can start using this app. Start with Tab '1. General setting' => '2. Parameter sampling' => and so on. On each tab there are subitems (e.g., in the first figure, start with '1. Working folder' => '2. TxtInOut folder' => and so on).
 
 If you don't know which input is required, simply click "Help?" on the right side of each respective input field. A sample of data for running this app can be downloaded from the [R-SWAT/data](https://github.com/tamnva/R-SWAT/tree/4d49ac6a2e153a34081d7d7b24958af0127f4ed3) or by typing the following command in R:
 
-```R
-# Command to extract all example dataset (3.6 MB of storage)
-# Example: extracExampleData(exampleData, "all", "C:/example")
-
-extracExampleData(exampleData, "all", "replace_with_your_path")
-```
-
-Data extracted from the above command are stored in this path "replace_with_your_desired_path" which include:
+Data extracted from the above command are stored in the temporal directory (or your defined directory), which include:
 
 | Data | Description |
 | --- | ----------- |
@@ -47,30 +48,12 @@ Data extracted from the above command are stored in this path "replace_with_your
 | cal_parms.cal | Parameter file of SWAT+ |
 | observedSWATPlus | Observed streamflow at the catchment outlet of SWAT+ |
 
-Example of working without the user interface, please see the RSWAT vignettes:
 
-```R
-vignette("SUFI2_without_GUI",package="RSWAT")
-```
 
 # Quick demo (streamflow calibration with SWAT)
 
-```R
-# Call RSWAT graphical user interface: DO NOT use RSWAT:showRSWAT()
-library(RSWAT) 
+You need to run the aforementioned R script (in section Quick Start) to call the GUI of RSWAT. In the latest version, the GUI could be slightly difference with the one showing below
 
-# Extract example data (TODO: replace C:/example with your folder)
-extracExampleData(exampleData, "all", "C:/example")
-
-# We still need SWAT executable for this demo
-# which can be downloaded from https://swat.tamu.edu/software/swat-executables/
-
-# Now show the interface and run with example data (detail of each step are shown below)
-showRSWAT()
-
-```
-
-(NOTE: in the latest version, the user interface could be slightly difference)
 <p align="center">
   <img src="inst/R-SWAT/figures/1.PNG" width=100% title="hover text">
 </p>
