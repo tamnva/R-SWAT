@@ -365,6 +365,21 @@ server <- function(input, output, session) {
             }
           })
         }
+		
+		# update output extraction reminder text
+		spsComps::shinyCatch(
+          if (TRUE %in% globalVariable$userReadSwatOutput){
+            output$messageUserReadSwatOutput <- renderText(
+            "MUST check the box below to load 'userReadSwatOutput.R' file")
+            output$userReadSwatOutputFile <- renderText(
+          "Please load 'userReadSwatOutput.R' file")
+          } else {
+            output$messageUserReadSwatOutput <- renderText(" ")
+            output$userReadSwatOutputFile <- renderText(
+              "No input file is needed")
+        },
+        blocking_level = "error")
+	  
 
         # Show meesage
         showNotification("All project settings were loaded",
