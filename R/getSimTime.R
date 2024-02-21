@@ -76,16 +76,16 @@ getSimTime <- function(TxtInOut){
     simTime <- read.table(file.path(TxtInOut, "time.sim"), skip = 2, sep = "")
 
     # Find the starting date of simulation
-    startSim <- as.Date(paste(toString(as.numeric(simTime[2])),"0101",
-                              sep=""), "%Y%m%d") + as.numeric(simTime[1])
+    startSim <- as.Date(paste0(toString(as.numeric(simTime[2])), "0101"),
+                        "%Y%m%d") + as.numeric(simTime[1])
 
     # Find the ending date of simulation
     if(as.numeric(simTime[3]) == 0){
-      endSim <- as.Date(paste(toString(as.numeric(simTime[4])),"1231",
-                              sep=""), "%Y%m%d")
+      endSim <- as.Date(paste0(toString(as.numeric(simTime[4])),"1231"),
+                        "%Y%m%d")
     } else {
-      endSim <- as.Date(paste(toString(as.numeric(simTime[4])),"0101",
-                              sep=""), "%Y%m%d") + as.numeric(simTime[3]) - 1
+      endSim <- as.Date(paste0(toString(as.numeric(simTime[4])),"0101"),
+                        "%Y%m%d") + as.numeric(simTime[3]) - 1
     }
 
 
@@ -97,23 +97,23 @@ getSimTime <- function(TxtInOut){
     printTime <- as.numeric(strsplit(trimws(printTime[3]), " +")[[1]])
 
     startPrint <- max(printTime[1] + as.numeric(simTime[2]) , printTime[3])
-    startPrint <- as.Date(paste(startPrint, "0101", sep = ""), "%Y%m%d") +
+    startPrint <- as.Date(paste0(startPrint, "0101"), "%Y%m%d") +
       max(1, printTime[2]) - 1
 
     if ((printTime[4] > 0) & (printTime[5] > 0)) {
-      endPrint <- min(endSim, as.Date(paste(printTime[5], "0101", sep = ""), "%Y%m%d") +
+      endPrint <- min(endSim, as.Date(paste0(printTime[5], "0101"), "%Y%m%d") +
                         max(1, printTime[4]) - 1)
     } else {
       if (printTime[5] == 0){
         if (printTime[4] == 0){
           endPrint <- endSim
         } else {
-          endPrint <- as.Date(paste(toString(as.numeric(simTime[4])),"0101",
-                                    sep=""), "%Y%m%d") + as.numeric(printTime[4]) - 1
+          endPrint <- as.Date(paste0(toString(as.numeric(simTime[4])),"0101"),
+                              "%Y%m%d") + as.numeric(printTime[4]) - 1
         }
       } else {
-        endPrint <- min(endSim, as.Date(paste(printTime[5], "0101", sep = ""), "%Y%m%d") +
-                          max(1, printTime[4]) - 1)
+        endPrint <- min(endSim, as.Date(paste0(printTime[5], "0101"),
+                                        "%Y%m%d") + max(1, printTime[4]) - 1)
       }
     }
 

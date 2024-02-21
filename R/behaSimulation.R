@@ -58,16 +58,25 @@
 #'
 #'
 
-behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
-                           varNumber, statIndex, observedData, minOrmax,
+behaSimulation <- function(objValue,
+                           simData,
+                           parameterValue,
+                           behThreshold,
+                           varNumber,
+                           statIndex,
+                           observedData,
+                           minOrmax,
                            samplingApproach){
 
   # find index of simulations which are behavioral simulations
   if (statIndex %in% c("NSE", "KGE", "R2")){
     behaIndex <- which(objValue >= behThreshold)
+
   } else if(statIndex %in% c("aBIAS", "RMSE")) {
     behaIndex <- which(objValue <= abs(behThreshold))
+
   } else {
+
     if (minOrmax == "Maximize"){
       behaIndex <- which(objValue >= behThreshold)
     } else {
@@ -75,10 +84,12 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
     }
   }
 
-  # create a matrix to store behavioral simulations/parameters
+  # create a matrix to store behavioral simulations
   ncol <- length(behaIndex)
   nrow <- length(simData[[varNumber]][[1]])
   behaSimData <- matrix(rep(NA, ncol*nrow), ncol = ncol)
+
+  # create a matrix to store behavioral parameters
   behaParameter <- parameterValue[behaIndex, ]
 
   # loop over number of behavioral simulations
@@ -86,7 +97,7 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
     behaSimData[,i] <- simData[[varNumber]][[behaIndex[[i]]]]
   }
 
-  # calculate 2.5% and 97.5% percentiles
+  # calculate 2.5% and 97.5% percentiles, first initialize the 95ppu
   ppuSimData <- matrix(rep(NA, 4*nrow), ncol = 4)
 
   # check which approach is used for calculate the 2.5% and 97.5% percentiles
@@ -117,14 +128,14 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
     ppuSimData[,4] <- simData[[varNumber]][[which(objValue == max(objValue))[1]]]
 
   } else if(statIndex %in% c("aBIAS","RMSE")) {
-    ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))[1]]]
+    ppuSimData[,4] <- simData[[varNumber]][[which(objValue == min(objValue))[1]]]
 
   } else {
     if (minOrmax == "Maximize"){
-      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == max(objValue))[1]]]
+      ppuSimData[,4] <- simData[[varNumber]][[which(objValue == max(objValue))[1]]]
 
     } else {
-      ppuSimData[,4] <- simData[[varNumber]][[which (objValue == min(objValue))[1]]]
+      ppuSimData[,4] <- simData[[varNumber]][[which(objValue == min(objValue))[1]]]
     }
   }
 
@@ -135,8 +146,7 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   ppuSimData <- cbind(observedData[[varNumber]]$Date, ppuSimData)
 
   # add column names
-  colnames(ppuSimData) <- c('Date','lower_95PPU', 'median',
-                            'upper_95PPU', 'bestSim')
+  colnames(ppuSimData) <- c('Date','lower_95PPU', 'median', 'upper_95PPU', 'bestSim')
 
   # find behavioral parameter range (2.5%, 50%, and 97.5% percentiles)
   ppuParaRange <- matrix(rep(NA, (ncol(parameterValue)-1)*4), ncol = 4)
@@ -166,18 +176,21 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
   # behavioral parameter range
   output$ppuParaRange <- ppuParaRange
 
-  # p- and r-factors
-  # Calibration period
+  # index of calibration period
   iloc <- which(observedData[[varNumber]]$Flag %in% c("C", "c"))
-  output$prFactorCali <- prFactor(observedData[[varNumber]]$Value[iloc],
-                              ppuSimData$lower_95PPU[iloc],
-                              ppuSimData$upper_95PPU[iloc])
 
-  # Calibration period
+  # p- and r-factors calibration period
+  output$prFactorCali <- prFactor(observedData[[varNumber]]$Value[iloc],
+                                  ppuSimData$lower_95PPU[iloc],
+                                  ppuSimData$upper_95PPU[iloc])
+
+  # index of validation period
   iloc <- which(observedData[[varNumber]]$Flag %in% c("V", "v"))
+
+  # p- and r-factors validation perio
   output$prFactorValid <- prFactor(observedData[[varNumber]]$Value[iloc],
-                              ppuSimData$lower_95PPU[iloc],
-                              ppuSimData$upper_95PPU[iloc])
+                                   ppuSimData$lower_95PPU[iloc],
+                                   ppuSimData$upper_95PPU[iloc])
 
   return(output)
 }

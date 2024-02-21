@@ -25,7 +25,12 @@
 #' @export
 #'
 #'
-dds <- function(para, ncores, iter, nIters, r, parallelMode){
+dds <- function(para,
+                ncores,
+                iter,
+                nIters,
+                r,
+                parallelMode){
 
   # Number of parameters
   nPara <- nrow(para)
@@ -33,6 +38,8 @@ dds <- function(para, ncores, iter, nIters, r, parallelMode){
 
   # Probability for including in the perturbation list
   p <- 1 - log(iter)/log(nIters)
+
+  # output parameters
   outPara <- matrix(rep(NA, ncores*nPara), nrow = ncores)
 
   for (core in 1:ncores){
@@ -80,20 +87,7 @@ dds <- function(para, ncores, iter, nIters, r, parallelMode){
     }
 
   }
+
   outPara <- cbind(c(1:nrow(outPara)), outPara)
   return(outPara)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

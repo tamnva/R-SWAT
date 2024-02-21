@@ -77,13 +77,3 @@ prFactor <- function(obs, low, up){
 
   return(c(pfactor, rfactor))
 }
-
-
-
-
-
-
-
-
-
-

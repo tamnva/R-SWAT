@@ -18,9 +18,12 @@
 #'
 #' @export
 
-calObjFunction <- function(parameterValue, ncores,
-                           nOutputVar, userReadSwatOutput,
-                           observedData, workingDirectory,
+calObjFunction <- function(parameterValue,
+                           ncores,
+                           nOutputVar,
+                           userReadSwatOutput,
+                           observedData,
+                           workingDirectory,
                            index){
 
   output <- list()
@@ -53,19 +56,22 @@ calObjFunction <- function(parameterValue, ncores,
         output$simData[[j]] <- list()
       }
 
-      #Loop over number of simulation
+      # Loop over number of simulation
       fileNameSimData <- file.path(workingDirectory, "Output", paste0("Core_", i),
                                    paste0("out_var_", j, ".txt"))
+
       tempSimData <- read.table(fileNameSimData, header = FALSE, sep = "")
 
-      #Check if length of observed and simulated data are the same or not
+      # check if length of observed and simulated data are the same or not
       if (nrow(tempSimData) %% ntimestep > 0){
+
         warnings(" Error: length of observed data # length of the extracted variable")
         message(fileNameSimData)
         message(" Please load the corrected observed data and rerun this step")
         output$objValueCali[] <- -999999
         output$objValueValid[] <- -999999
         output$error <- TRUE
+
       } else {
         for (k in 1:nSim[i]){
           sIndex <- (k-1)*ntimestep + 1
@@ -144,116 +150,5 @@ calObjFunction <- function(parameterValue, ncores,
     output$objValueValid <- output$objValueValid/nOutputVar
   }
 
-
-
   return(output)
 }
-
-
-#------------------------------------------------------------------------------#
-#                         Calculate performance criteria                       #
-#------------------------------------------------------------------------------#
-#' Calculate NSE, KGE, RMSE, R2, and aBIAS
-#'
-#' @param obs vector of observed data (NA values are allowed)
-#' @param sim vector of simulated data (NA values are allowed)
-#' @return dataframe with 5 columns (NSE, KGE, RMSE, R2, and aBIAS) and 1 row
-#'
-#' @examples
-#'
-#' perCriteria(obs=runif(10), sim=runif(10))
-#'
-#' @importFrom stats cor
-#' @importFrom stats sd
-#'
-#' @export
-#'
-perCriteria <- function(obs, sim){
-
-  missingValue <- which(is.na(obs))
-
-  if (length(missingValue) == length(obs)){
-    NSE <- NA
-    R2 <- NA
-    aBIAS <- NA
-    KGE <- NA
-    RMSE <- NA
-  } else {
-    if (length(missingValue) > 0){
-      obs <- obs[-missingValue]
-      sim <- sim[-missingValue]
-    }
-
-    mObs <- mean(obs)
-    mSim <- mean(sim)
-    obs_mObs <- obs - mObs
-    sim_mSim <- sim - mSim
-    sim_obs <-  sim - obs
-    sumSim <- sum(sim)
-    sumObs <- sum(obs)
-    correlation <- cor(obs, sim)
-    sdObs <- sd(obs)
-    sdSim <- sd(sim)
-
-
-    NSE <- 1 - sum(sim_obs**2)/sum(obs_mObs**2)
-    R2 <- correlation ** 2
-    aBIAS <- abs((sumObs - sumSim)/sumObs)
-    KGE <- 1 - sqrt((correlation - 1)**2  + (sdSim/sdObs - 1)**2 + (mSim/mObs - 1)**2)
-    RMSE <- sqrt(mean(sim_obs**2))
-  }
-
-  result <- matrix(c(NSE, KGE, R2, RMSE, aBIAS), nrow = 1)
-  colnames(result) <- c('NSE', 'KGE', 'R2', 'RMSE', 'aBIAS')
-
-  return(result)
-}
-
-#------------------------------------------------------------------------------#
-#                       Subset of observed data according to flag              #
-#------------------------------------------------------------------------------#
-#' Subset of observed data according to flag
-#'
-#' @inheritParams calObjFunction
-#' @param flag character ("C" for calibration and "V" for validation)
-#' @return list of calibrated or validated data
-#' @keywords internal
-#' @examples
-#' \donttest{
-#' observedToList(observedData, flag)
-#' }
-#'
-observedToList <- function(observedData, flag){
-  output <- list()
-  for (i in 1:length(observedData)){
-    output[[i]] <- observedData[[i]][which(observedData[[i]][,3] %in% flag),2]
-  }
-  return(output)
-}
-
-
-#------------------------------------------------------------------------------#
-#                       Subset of observed data according to flag              #
-#------------------------------------------------------------------------------#
-#' Subset of simulated data according to flag
-#'
-#' @inheritParams observedToList
-#' @inheritParams calObjFunction
-#' @param k column number of simulated data
-#' @return list of simulated data  for the calibration or validation period
-#' @keywords internal
-#' @examples
-#' \donttest{
-#' simToList(simData, k, observedData, flag)
-#' }
-#'
-#'
-simToList <- function(simData, k, observedData, flag){
-  output <- list()
-  for (i in 1:length(simData)){
-    output[[i]] <- simData[[i]][[k]][which(observedData[[i]][,3] %in% flag)]
-  }
-  return(output)
-}
-
-
