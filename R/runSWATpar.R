@@ -186,7 +186,11 @@ runSWATSequential <- function(coreNumber,
     exeFile <- strsplit(swatExe, split="\\\\")[[1]]
     if(!file.exists(exeFile[length(exeFile)])) file.copy(swatExe, toDir)
 
-    system(trimws(exeFile[length(exeFile)]))
+    if(.Platform$OS.type == "unix") {
+      system(paste0("./", trimws(exeFile[length(exeFile)])))
+    } else {
+      system(trimws(exeFile[length(exeFile)]))
+    }
 
     # Check first run
     if ((nrow(subParameterSet) > 1) & (i > 1)){
