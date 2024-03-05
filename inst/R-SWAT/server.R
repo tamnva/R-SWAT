@@ -26,7 +26,7 @@ server <- function(input, output, session) {
   globalVariable$TxtInOutSWATPlus <<- FALSE
   globalVariable$SWATProject <<- TRUE
   globalVariable$paraSelection <<- dataParaSelectionSWAT
-  globalVariable$HTMLdir <<- system.file("R-SWAT", package = "RSWAT")
+  HTMLdir <<- system.file("R-SWAT", package = "RSWAT")
   globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
   globalVariable$runManualCaliSuccess <<- FALSE
 
@@ -758,7 +758,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 5. File with list of SWAT or SWAT+ parameters",
-      HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir,"HTML",
 	  "helpSWATparamFile.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -958,7 +958,7 @@ server <- function(input, output, session) {
     req(input$helpParamSelection)
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-	  HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+	  HTML(readLines(file.path(HTMLdir,"HTML",
 	  "helpParamSelection.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1285,7 +1285,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-	  HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+	  HTML(readLines(file.path(HTMLdir,"HTML",
 	  "helpOutputExtraction.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1337,7 +1337,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 2. Select date range for calibration",
-      HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir,"HTML",
                                "helpDateRangeCali.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1351,7 +1351,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 2. Select date range for calibration",
-		HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+		HTML(readLines(file.path(HTMLdir,"HTML",
 		"helpDateRangeCali.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1374,7 +1374,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 3. Select number of parallel runs (threads)",
-		HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+		HTML(readLines(file.path(HTMLdir,"HTML",
 		"helpNumberofThreads.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1388,7 +1388,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 4. Run SWAT",
-      HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir,"HTML",
                                "helpRunSWAT.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1402,7 +1402,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 5. See Simulation report",
-      HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir,"HTML",
                                "helpCheckCurrentSimulation.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -2622,7 +2622,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "1. Selecting parameter values",
-		HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+		HTML(readLines(file.path(HTMLdir,"HTML",
 		"selectParameterValue.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -2636,7 +2636,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "2. Model run",
-	  HTML(readLines(file.path(globalVariable$HTMLdir,"HTML",
+	  HTML(readLines(file.path(HTMLdir,"HTML",
 	  "modelRun.html"),warn=FALSE)),
       easyClose = TRUE
     ))

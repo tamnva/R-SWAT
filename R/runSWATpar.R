@@ -186,10 +186,13 @@ runSWATSequential <- function(coreNumber,
     exeFile <- strsplit(swatExe, split="\\\\")[[1]]
     if(!file.exists(exeFile[length(exeFile)])) file.copy(swatExe, toDir)
 
+    # Check platform
     if(.Platform$OS.type == "unix") {
       system(paste0("./", trimws(exeFile[length(exeFile)])))
-    } else {
+    } else if (.Platform$OS.type == "windows") {
       system(trimws(exeFile[length(exeFile)]))
+    } else {
+      stop("Unknown platform in runSWATpar.R")
     }
 
     # Check first run

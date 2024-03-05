@@ -15,7 +15,7 @@
 updateCalibrationFile <- function(paraSelection, parameterValue, currentDirectory){
 
   # condition type
-  conTyp <- c("hsg=", "texture=", "plant=", "landuse=", "region=", "region_lte=")
+  conTyp <- c("hgs=", "texture=", "plant=", "landuse=", "region=", "region_lte=")
 
 
   fileContent <- c()
@@ -128,12 +128,11 @@ updateCalibrationFile <- function(paraSelection, parameterValue, currentDirector
 
     condition <- c()
     conds <- 0
-    # condition on hsg, texture, landuse, plant,...
-    if(grepl("hsg=", paraSelection[i,6], fixed = TRUE)){
-      temp <- strsplit(paraSelection[i,6], ";", fixed = TRUE)[[1]]
-      for (j in 1:length(temp)){
 
-        # hsg condition
+    # Split condition
+    temp <- strsplit(paraSelection[i,6], ";", fixed = TRUE)[[1]]
+    if (length(temp) > 0){
+      for (j in 1:length(temp)){
         for (cond in 1:length(conTyp)){
           if(grepl(conTyp[cond], temp[j], fixed = TRUE)){
             condsplit <- strsplit(gsub(conTyp[cond], "", temp[j], fixed = TRUE), ",")[[1]]
@@ -176,4 +175,5 @@ updateCalibrationFile <- function(paraSelection, parameterValue, currentDirector
   }
 
   writeLines(fileContent, file.path(currentDirectory, "calibration.cal"))
+
 }
