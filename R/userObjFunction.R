@@ -8,6 +8,9 @@
 #' KGE, aBIAS, R2. User can implement their own objective function and replace
 #' this function. For more detail see RSWAT vignettes (user_objective_function).
 #'
+#'@param obs a list of vectors containing observed data
+#'@param sim a list of vectors containing simulated data
+#'
 #' @examples
 #' \donttest{
 #' # Create example data of observed and simulated

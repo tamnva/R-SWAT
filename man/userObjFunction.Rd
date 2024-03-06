@@ -6,6 +6,11 @@
 \usage{
 userObjFunction(obs, sim)
 }
+\arguments{
+\item{obs}{a list of vectors containing observed data}
+
+\item{sim}{a list of vectors containing simulated data}
+}
 \description{
 This is a dummy function. There are countless number of objective functions,
 which RSWAT cannot include all of them in here. Instead, RSWAT only
