@@ -1,4 +1,4 @@
-## RSWAT <a href="https://github.com/tamnva/R-SWAT/tree/master/inst/R-SWAT/figures/RSWAT_logo.svg"><img src="https://github.com/tamnva/R-SWAT/tree/master/inst/R-SWAT/figures/RSWAT_logo.svg" align="right" height="50" /></a>
+## RSWAT <a href="https://github.com/tamnva/R-SWAT/tree/master/inst/R-SWAT/figures/RSWAT_logo.svg"><img src="inst/R-SWAT/figures/RSWAT_logo.svg" align="right" height="50" /></a>
 
 [![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases) [![R-CMD-check](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml) [![status](https://joss.theoj.org/papers/89a04bc6f9a2a2b08cbac33fcd91c0c6/status.svg)](https://joss.theoj.org/papers/89a04bc6f9a2a2b08cbac33fcd91c0c6)
 
