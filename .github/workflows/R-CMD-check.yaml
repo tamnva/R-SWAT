@@ -8,10 +8,6 @@ on:
 
 name: R-CMD-check
 
-env:
-  global:
-    _R_CHECK_DONTTEST_EXAMPLES_=FALSE
-
 jobs:
   R-CMD-check:
     runs-on: ubuntu-latest
@@ -19,6 +15,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
     steps:
+      - _R_CHECK_DONTTEST_EXAMPLES_=FALSE
       - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-r@v2
