@@ -8,7 +8,7 @@
 Examples of TxtInOut, observed data files, and parameter files
 of SWAT and SWAT+ that are needed for running some exampled in the code.
 Information/data about the example watersheds for the SWAT project can be
-found from \url{https://doi.org/10.1016/j.envsoft.2022.105497}, and for the
+found from \doi{10.1016/j.envsoft.2022.105497}, and for the
 SWAT+ project was taken from
 \url{https://chrisschuerz.github.io/SWATrunR/reference/load_demo.html}. The
 example data set consist of following data

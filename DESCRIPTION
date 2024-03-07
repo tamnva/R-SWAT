@@ -1,9 +1,9 @@
 Package: RSWAT
 Type: Package
-Title: SWAT/SWAT+ calibration and uncertainty analysis
+Title: SWAT/SWAT+ Calibration and Uncertainty Analysis
 Version: 1.0.0
 Author: Tam V. Nguyen
-Maintainer: The package maintainer <tamnva@gmail.com>
+Maintainer: Tam V. Nguyen <tamnva@gmail.com>
 Description: Parameter calibration and uncertainty analysis with SWAT/SWAT+ and their modified versions.
 Encoding: UTF-8
 LazyData: true
