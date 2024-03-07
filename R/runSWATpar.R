@@ -92,15 +92,16 @@ runSWATpar <- function(workingDirectory,
                       fromToDate,
                       firstRun)
   } else {
+    core <- NA
     cl <- parallel::makeCluster(ncores)
     doParallel::registerDoParallel(cl)
-    foreach::foreach(i = 1:ncores, .combine = 'c') %dopar% {
-      runSWATSequential(i,
+    foreach::foreach(core = 1:ncores, .combine = 'c') %dopar% {
+      runSWATSequential(core,
                         workingDirectory,
                         swatExe,
                         caliParam,
                         paraSelection,
-                        subParameterSet[[i]],
+                        subParameterSet[[core]],
                         outputExtraction,
                         fileCioInfo,
                         fromToDate,

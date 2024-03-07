@@ -14,6 +14,8 @@ Calling this functions will show the GUI of R-SWAT
 }
 \examples{
 
+\donttest{
 showRSWAT()
+}
 
 }
