@@ -10,8 +10,7 @@ name: R-CMD-check
 
 env:
   global:
-    - RGL_USE_NULL=TRUE
-    - _R_CHECK_DONTTEST_EXAMPLES_=FALSE
+    _R_CHECK_DONTTEST_EXAMPLES_=FALSE
 
 jobs:
   R-CMD-check:
