@@ -12,6 +12,8 @@
 #' showRSWAT()
 #' }
 #'
+#'@importFrom shiny runApp
+#'
 #' @export
 #'
 showRSWAT <- function(){
