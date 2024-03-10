@@ -184,14 +184,14 @@ runSWATSequential <- function(coreNumber,
     updateMultiFile(toDir, caliParam, subParameterSet[i,2:nParam], paraSelection)
 
     # Call swat.exe file
-    exeFile <- strsplit(swatExe, split="\\\\")[[1]]
-    if(!file.exists(exeFile[length(exeFile)])) file.copy(swatExe, toDir)
+    exeFile <- basename(swatExe)
+    if(!file.exists(exeFile) file.copy(swatExe, toDir)
 
     # Check platform
     if(.Platform$OS.type == "unix") {
-      system(paste0("./", trimws(exeFile[length(exeFile)])))
+      system(paste0("./", exeFile))
     } else {
-      system(trimws(exeFile[length(exeFile)]))
+      system(exeFile)
     }
 
     # Check first run
