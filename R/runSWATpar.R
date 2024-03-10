@@ -185,7 +185,7 @@ runSWATSequential <- function(coreNumber,
 
     # Call swat.exe file
     exeFile <- basename(swatExe)
-    if(!file.exists(exeFile) file.copy(swatExe, toDir)
+    if(!file.exists(exeFile)) file.copy(swatExe, toDir)
 
     # Check platform
     if(.Platform$OS.type == "unix") {
