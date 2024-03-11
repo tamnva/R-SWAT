@@ -12,25 +12,6 @@ server <- function(input, output, session) {
   })
 
   #-----------------------------------------------------------------------------
-  # Global variables (use <<- for saving globalVariable inside observe)
-  # These variables are set by default, when opening the tool, will be updated
-  # according the user define in later steps
-  #-----------------------------------------------------------------------------
-  globalVariable <<- list()
-  displayOutput <<- list()
-  displayOutput$plotHru <<- FALSE
-  displayOutput$plotSub <<- FALSE
-  globalVariable$checkSimComplete <<- FALSE
-  globalVariable$loadProject <<- FALSE
-  globalVariable$TxtInOutSWAT <<- FALSE
-  globalVariable$TxtInOutSWATPlus <<- FALSE
-  globalVariable$SWATProject <<- TRUE
-  globalVariable$paraSelection <<- dataParaSelectionSWAT
-  HTMLdir <<- system.file("R-SWAT", package = "RSWAT")
-  globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
-  globalVariable$runManualCaliSuccess <<- FALSE
-
-  #-----------------------------------------------------------------------------
   # Global function for running SWAT
   #-----------------------------------------------------------------------------
   SWAT <- function(parameterValue){
@@ -53,10 +34,10 @@ server <- function(input, output, session) {
     colnames(parameterValue) <- NULL
 
     # Save parameter value to the globalVariable
-    globalVariable$parameterValue <<- rbind(globalVariable$parameterValue, parameterValue)
+    globalVariable$parameterValue <-rbind(globalVariable$parameterValue, parameterValue)
 
     # Number of parallel runs cannot be higher than number of input parameter sets
-    globalVariable$ncores <<- min(globalVariable$ncores, nrow(parameterValue))
+    globalVariable$ncores <-min(globalVariable$ncores, nrow(parameterValue))
 
     # Convert input parameter to matrix
     parameterValue <- as.matrix(parameterValue)
@@ -86,19 +67,19 @@ server <- function(input, output, session) {
 
     # If this is a first run
     if (is.null(globalVariable$simData)){
-      globalVariable$simData <<- temp$simData
-      globalVariable$objValueCali <<- temp$objValueCali
-      globalVariable$objValueValid <<- temp$objValueValid
+      globalVariable$simData <-temp$simData
+      globalVariable$objValueCali <-temp$objValueCali
+      globalVariable$objValueValid <- temp$objValueValid
 
     # If this is not the first run, then combine result with the existing data
     } else {
-      globalVariable$simData <<- bindList(globalVariable$simData, temp$simData)
-      globalVariable$objValueCali <<- c(globalVariable$objValueCali, temp$objValueCali)
-      globalVariable$objValueValid <<- c(globalVariable$objValueValid, temp$objValueValid)
+      globalVariable$simData <- bindList(globalVariable$simData, temp$simData)
+      globalVariable$objValueCali <- c(globalVariable$objValueCali, temp$objValueCali)
+      globalVariable$objValueValid <- c(globalVariable$objValueValid, temp$objValueValid)
     }
 
    # Next run, no need to copy unchanged SWAT input files
-   globalVariable$copyUnchangeFiles <<- FALSE
+   globalVariable$copyUnchangeFiles <- FALSE
 
    # Parameter optimization: convert to the minimize problem, regardless of input
    if (globalVariable$minOrmax == "Minimize"){
@@ -157,10 +138,10 @@ server <- function(input, output, session) {
                 nchar(RSWATProjectFile)) == "RSWATproject.rds"){
 
         # Read data in this file
-        globalVariable <<- readRDS(RSWATProjectFile)
+        globalVariable <- readRDS(RSWATProjectFile)
 
         # Now the load project is true (because the RSWATproject.rds was given)
-        globalVariable$loadProject <<- TRUE
+        globalVariable$loadProject <- TRUE
 
         #-------------------------------------------------------------------------
         # Update Tab 1: General Setting
@@ -313,7 +294,7 @@ server <- function(input, output, session) {
                           selected = globalVariable$objFunction)
 
         # Update get observed data files
-        output$printObservedDataFile <<- renderText(globalVariable$observedDataFile)
+        output$printObservedDataFile <- renderText(globalVariable$observedDataFile)
 
         # remove slider input when parameter selection was updated
         for (i in 2:30){
@@ -338,7 +319,7 @@ server <- function(input, output, session) {
 
 
         # Update number of calibrated parameter
-        globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
+        globalVariable$nCaliParam <- nrow(globalVariable$paraSelection)
 
         # Add slider input for other parameters
         if (nrow(globalVariable$paraSelection) > 1){
@@ -365,7 +346,7 @@ server <- function(input, output, session) {
             }
           })
         }
-		
+
 		# update output extraction reminder text
 		spsComps::shinyCatch(
           if (TRUE %in% globalVariable$userReadSwatOutput){
@@ -379,7 +360,7 @@ server <- function(input, output, session) {
               "No input file is needed")
         },
         blocking_level = "error")
-	  
+
 
         # Show meesage
         showNotification("All project settings were loaded",
@@ -415,11 +396,11 @@ server <- function(input, output, session) {
 
     # Check SWAT or SWAT+ project
     if (input$SWATorSWATplus == "SWAT"){
-      globalVariable$SWATProject <<- TRUE
-      globalVariable$SWATPlusProject <<- FALSE
+      globalVariable$SWATProject <- TRUE
+      globalVariable$SWATPlusProject <- FALSE
     } else {
-      globalVariable$SWATProject <<- FALSE
-      globalVariable$SWATPlusProject <<- TRUE
+      globalVariable$SWATProject <- FALSE
+      globalVariable$SWATPlusProject <- TRUE
     }
 
     # Initially there is no warning message
@@ -503,7 +484,7 @@ server <- function(input, output, session) {
                                  columnResize = FALSE,
                                  wordWrap = TRUE))
 
-        globalVariable$paraSelection <<- dataParaSelectionSWATPlus
+        globalVariable$paraSelection <- dataParaSelectionSWATPlus
       }
 
     }
@@ -532,10 +513,10 @@ server <- function(input, output, session) {
     req(input$workingFolder)
 
     # Save working directory in the global variable
-    globalVariable$workingFolder <<- trimws(input$workingFolder)
+    globalVariable$workingFolder <- trimws(input$workingFolder)
 
     # Save link to the simulation report log file to the global variable
-    globalVariable$CurrentSimulationReportFile <<- paste(
+    globalVariable$CurrentSimulationReportFile <- paste(
       globalVariable$workingFolder,
       '/Output/CurrentSimulationReport.log',
       sep =''
@@ -587,8 +568,8 @@ server <- function(input, output, session) {
     if (checkDirFileExist(trimws(input$TxtInOutFolder), "", ".cio")){
 
       # Is this TxtInOut of SWAT or SWAT plus
-      globalVariable$TxtInOutSWAT <<- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWAT
-      globalVariable$TxtInOutSWATPlus <<- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWATPlus
+      globalVariable$TxtInOutSWAT <- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWAT
+      globalVariable$TxtInOutSWATPlus <- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWATPlus
 
       # Check if the TxtInOut matches the SWAT project
       if (globalVariable$SWATPlusProject){
@@ -606,12 +587,12 @@ server <- function(input, output, session) {
       }
 
       # Save link to TxtInout Folder to the global variable
-      globalVariable$TxtInOutFolder <<- trimws(input$TxtInOutFolder)
+      globalVariable$TxtInOutFolder <- trimws(input$TxtInOutFolder)
 
       # If this is a SWAT project
       if (globalVariable$SWATProject & globalVariable$TxtInOutSWAT){
         # Get HRU information (land use, slope, soil, sub)
-        globalVariable$HRUinfo <<- getHruInfo(globalVariable$TxtInOutFolder)
+        globalVariable$HRUinfo <- getHruInfo(globalVariable$TxtInOutFolder)
 
         # Get unique soil, land use, slope, max number of subbasins
         uniqueSoil <- unique(globalVariable$HRUinfo$soil)
@@ -628,7 +609,7 @@ server <- function(input, output, session) {
 
 
         # Display unique land use, soil, slope
-        displayOutput$uniqueHruProperties <<- data.frame(
+        displayOutput$uniqueHruProperties <- data.frame(
           minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
           Landuse = c(uniqueLandUse,rep(NA, nRow - nLU)),
           soilName = c(uniqueSoil,rep(NA, nRow - nSoil)),
@@ -637,8 +618,8 @@ server <- function(input, output, session) {
 
       # If this is a SWAT+ project
       } else if (globalVariable$SWATPlusProject & globalVariable$TxtInOutSWATPlus){
-        displayOutput$uniqueHruProperties <<- NULL
-        globalVariable$HRUinfo <<- read.table(
+        displayOutput$uniqueHruProperties <- NULL
+        globalVariable$HRUinfo <- read.table(
           file = paste(globalVariable$TxtInOutFolder,
                        "/hru-data.hru", sep =""),
           header = TRUE, skip = 1, sep = ""
@@ -647,21 +628,21 @@ server <- function(input, output, session) {
 
 
       } else {
-        displayOutput$uniqueHruProperties <<- NULL
-        globalVariable$HRUinfo <<- NULL
+        displayOutput$uniqueHruProperties <- NULL
+        globalVariable$HRUinfo <- NULL
       }
 
       # Display table of HRU information (land use, soil, slope)
-      output$tableHRUinfo <<- renderDataTable(globalVariable$HRUinfo)
+      output$tableHRUinfo <- renderDataTable(globalVariable$HRUinfo)
 
 
     } else {
 
       # If this is not TxtInOut folder, assign global variables to NULL
-      globalVariable$HRUinfo <<- NULL
-      globalVariable$TxtInOutFolder <<- NULL
-      output$tableHRUinfo <<- NULL
-      displayOutput$uniqueHruProperties <<- NULL
+      globalVariable$HRUinfo <- NULL
+      globalVariable$TxtInOutFolder <- NULL
+      output$tableHRUinfo <- NULL
+      displayOutput$uniqueHruProperties <- NULL
     }
 
   })
@@ -689,7 +670,7 @@ server <- function(input, output, session) {
 
     # Get full path to SWAT exe file
     shinyjs::disable("getSWATexe")
-    spsComps::shinyCatch(globalVariable$SWATexeFile <<- file.choose(),
+    spsComps::shinyCatch(globalVariable$SWATexeFile <- file.choose(),
                blocking_level = "none")
     shinyjs::enable("getSWATexe")
 
@@ -728,7 +709,7 @@ server <- function(input, output, session) {
 
     # Get full path to SWAT exe file
     shinyjs::disable("getSWATParamFile")
-    spsComps::shinyCatch(globalVariable$SWATParamFile <<- file.choose(),
+    spsComps::shinyCatch(globalVariable$SWATParamFile <- file.choose(),
                blocking_level = "none")
     shinyjs::enable("getSWATParamFile")
 
@@ -736,7 +717,7 @@ server <- function(input, output, session) {
     if (grepl("swatParam.txt", globalVariable$SWATParamFile, fixed = TRUE) |
         grepl("cal_parms.cal", globalVariable$SWATParamFile, fixed = TRUE)){
 
-      globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
+      globalVariable$SWATParam <- loadSwatParam(globalVariable$SWATParamFile)
       output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
       output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
 
@@ -879,8 +860,8 @@ server <- function(input, output, session) {
     }
 
     # Save parameter selection to the global variable
-    globalVariable$paraSelection  <<- paraSelection
-    globalVariable$paraSelection[,1] <<- trimws(paraSelection[,1])
+    globalVariable$paraSelection  <- paraSelection
+    globalVariable$paraSelection[,1] <- trimws(paraSelection[,1])
 
     spsComps::shinyCatch(
       if(check_null_na_empty(globalVariable$paraSelection$Min[1]) &
@@ -917,7 +898,7 @@ server <- function(input, output, session) {
     )
 
     # Update number of calibrated parameter
-    globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
+    globalVariable$nCaliParam <- nrow(globalVariable$paraSelection)
 
     # Add slider input for other parameters
     spsComps::shinyCatch(
@@ -985,7 +966,7 @@ server <- function(input, output, session) {
     req(input$samplingApproach)
 
     # Save sampling approach to the global variable
-    globalVariable$samplingApproach <<- input$samplingApproach
+    globalVariable$samplingApproach <- input$samplingApproach
 
     # SUFI2 approach
     if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
@@ -1119,15 +1100,15 @@ server <- function(input, output, session) {
                                       'Cali_(from_userDefined_package)')){
 
       # Save input as text
-      globalVariable$sensCaliCommand <<- input$inputInfo
+      globalVariable$sensCaliCommand <- input$inputInfo
 
       # Remove comments and split R command
-      globalVariable$sensCaliCommand <<- splitRemoveComment(
+      globalVariable$sensCaliCommand <- splitRemoveComment(
         globalVariable$sensCaliCommand)
     } else {
 
       # If input is not R command, then just save as text
-      globalVariable$sensCaliCommand <<- input$inputInfo
+      globalVariable$sensCaliCommand <- input$inputInfo
     }
 
     })
@@ -1201,15 +1182,15 @@ server <- function(input, output, session) {
     }
 
     # Save this table to the global variable
-    globalVariable$outputExtraction <<- outputExtraction
+    globalVariable$outputExtraction <- outputExtraction
 
     # Number of output variables
     spsComps::shinyCatch(OutputVar <- getNumberOutputVar(outputExtraction),
                blocking_level = "error")
-    globalVariable$nOutputVar <<- OutputVar$nOutputVar
+    globalVariable$nOutputVar <- OutputVar$nOutputVar
 
     # Check if this option is activated
-    globalVariable$userReadSwatOutput <<- OutputVar$userReadSwatOutput
+    globalVariable$userReadSwatOutput <- OutputVar$userReadSwatOutput
 
     # Display message
     spsComps::shinyCatch(
@@ -1262,7 +1243,7 @@ server <- function(input, output, session) {
 
     # Get full path to userObjFunction.R file
     shinyjs::disable("getUserReadSwatOutput")
-    spsComps::shinyCatch(globalVariable$getUserReadSwatOutput <<- file.choose(),
+    spsComps::shinyCatch(globalVariable$getUserReadSwatOutput <- file.choose(),
                          blocking_level = "none")
     shinyjs::enable("getUserReadSwatOutput")
 
@@ -1307,7 +1288,7 @@ server <- function(input, output, session) {
       myDate <- getSimTime(trimws(input$TxtInOutFolder))
 
       # Assign simulation dates to the global variale
-      globalVariable$fileCioInfo <<- myDate
+      globalVariable$fileCioInfo <- myDate
 
       if (!globalVariable$loadProject){
         # Update selected date range for calibration/sensitivity
@@ -1326,7 +1307,7 @@ server <- function(input, output, session) {
   observe({
     req(input$dateRangeCali)
     # Save selected date range for calibration/sensitivity to the global variables
-    globalVariable$dateRangeCali <<- input$dateRangeCali
+    globalVariable$dateRangeCali <- input$dateRangeCali
   })
 
   # ****************************************************************************
@@ -1363,7 +1344,7 @@ server <- function(input, output, session) {
   observe({
     req(input$ncores)
     # Assign the number of selected cores to the global variables
-    globalVariable$ncores <<- input$ncores
+    globalVariable$ncores <- input$ncores
   })
 
   # ****************************************************************************
@@ -1413,7 +1394,7 @@ server <- function(input, output, session) {
   observeEvent(input$runSWAT, {
 
     # Refresh the parameter values in case of loading the projects
-    globalVariable$parameterValue <<- c()
+    globalVariable$parameterValue <- c()
 
     # Display progress bar
     withProgress(message = 'Running SWAT...', {
@@ -1447,7 +1428,7 @@ server <- function(input, output, session) {
 
         # Generate initial parameter set
         spsComps::shinyCatch(
-          globalVariable$parameterValue <<- lhsRange(globalVariable$ncores,
+          globalVariable$parameterValue <- lhsRange(globalVariable$ncores,
                                                      getParamRange(globalVariable$paraSelection)),
                    blocking_level = "error"
           )
@@ -1456,7 +1437,7 @@ server <- function(input, output, session) {
 
       # Load all files that are going to be updated
       spsComps::shinyCatch(
-        globalVariable$caliParam <<- updatedFileContent(globalVariable$HRUinfo,
+        globalVariable$caliParam <- updatedFileContent(globalVariable$HRUinfo,
                                                                 globalVariable$paraSelection,
                                                                 globalVariable$SWATParam,
                                                                 globalVariable$TxtInOutFolder),
@@ -1483,10 +1464,10 @@ server <- function(input, output, session) {
         # Generate parameter values
         if(input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
 
-          globalVariable$parameterValue <<- lhsRange(as.numeric(input$inputInfo), getParamRange(globalVariable$paraSelection))
+          globalVariable$parameterValue <- lhsRange(as.numeric(input$inputInfo), getParamRange(globalVariable$paraSelection))
 
         } else if(input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
-          globalVariable$parameterValue <<- runifSampling(as.numeric(input$inputInfo),
+          globalVariable$parameterValue <- runifSampling(as.numeric(input$inputInfo),
                                                           as.numeric(globalVariable$paraSelection$Min),
                                                           as.numeric(globalVariable$paraSelection$Max))
 
@@ -1497,13 +1478,13 @@ server <- function(input, output, session) {
           colnames(parameterValue) <- NULL
           rownames(parameterValue) <- NULL
 
-          globalVariable$parameterValue <<- parameterValue
+          globalVariable$parameterValue <- parameterValue
         } else {
-          globalVariable$parameterValue <<- NULL
+          globalVariable$parameterValue <- NULL
         }
 
         # Check max number of cores
-        globalVariable$ncores <<- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
+        globalVariable$ncores <- min(globalVariable$ncores, nrow(globalVariable$parameterValue))
 
         # Run SWAT in parallel
         spsComps::shinyCatch(
@@ -1627,7 +1608,7 @@ server <- function(input, output, session) {
               # Take the better parameter set/data if exist
               for (j in 1:nrow(newPar)){
                 if(temp$objValueCali[j] > best$objValueCali[j]){
-                  globalVariable$parameterValue[j, ] <<- newPar[j, ]
+                  globalVariable$parameterValue[j, ] <- newPar[j, ]
                   best$objValueCali[j] <- temp$objValueCali[j]
                   best$objValueValid[j] <- temp$objValueValid[j]
                 }
@@ -1646,7 +1627,7 @@ server <- function(input, output, session) {
               if (length(idBest) > 1) {idBest = idBest[1]}
 
               if(temp$objValueCali[idBest] > best$objValueCali){
-                globalVariable$parameterValue <<- newPar[idBest, ]
+                globalVariable$parameterValue <- newPar[idBest, ]
                 best$objValueCali <- temp$objValueCali[idBest]
                 best$objValueValid <- temp$objValueValid[idBest]
               }
@@ -1726,13 +1707,13 @@ server <- function(input, output, session) {
           print(c(i, round(best$objValueCali, digits = 3)))
 
           # Assign back to global variables
-          globalVariable$parameterValue <<- saveIterationResult$parameterValue
-          globalVariable$objValueCali <<- saveIterationResult$objValueCali
-          globalVariable$objValueValid <<- saveIterationResult$objValueValid
-          globalVariable$perCriteriaCali <<- saveIterationResult$perCriteriaCali
-          globalVariable$perCriteriaValid <<- saveIterationResult$perCriteriaValid
-          globalVariable$simData <<- saveIterationResult$simData
-          globalVariable$parameterValue[,1] <<- c(1:nrow(globalVariable$parameterValue))
+          globalVariable$parameterValue <- saveIterationResult$parameterValue
+          globalVariable$objValueCali <- saveIterationResult$objValueCali
+          globalVariable$objValueValid <- saveIterationResult$objValueValid
+          globalVariable$perCriteriaCali <- saveIterationResult$perCriteriaCali
+          globalVariable$perCriteriaValid <- saveIterationResult$perCriteriaValid
+          globalVariable$simData <- saveIterationResult$simData
+          globalVariable$parameterValue[,1] <- c(1:nrow(globalVariable$parameterValue))
 
           #Save output to text file
           writeOutputFiles(globalVariable$workingFolder, globalVariable$ncores,
@@ -1778,15 +1759,15 @@ server <- function(input, output, session) {
 
         } else {
           # There is no simulated data and obj function values when the model has not been run
-          globalVariable$simData <<- NULL
-          globalVariable$objValueCali <<- NULL
-          globalVariable$objValueValid <<- NULL
+          globalVariable$simData <- NULL
+          globalVariable$objValueCali <- NULL
+          globalVariable$objValueValid <- NULL
 
           # First run is true
-          globalVariable$copyUnchangeFiles <<- TRUE
-          globalVariable$firstRun <<- TRUE
+          globalVariable$copyUnchangeFiles <- TRUE
+          globalVariable$firstRun <- TRUE
 
-          globalVariable$sensCaliObject <<- eval(parse(text = globalVariable$sensCaliCommand[1]))
+          globalVariable$sensCaliObject <- eval(parse(text = globalVariable$sensCaliCommand[1]))
 
           # Print output to screen
            print(globalVariable$sensCaliObject)
@@ -1823,7 +1804,7 @@ server <- function(input, output, session) {
      }
 
       # End run SWAT for all iterations
-      globalVariable$checkSimComplete <<- TRUE
+      globalVariable$checkSimComplete <- TRUE
 
       # Save all results as RSWAT project
       spsComps::shinyCatch(
@@ -1915,7 +1896,7 @@ server <- function(input, output, session) {
     req(input$objFunction)
 
     # Get the type of objective function
-    globalVariable$objFunction  <<- input$objFunction
+    globalVariable$objFunction  <- input$objFunction
 
     # Check when the objective function needs to be maximize or minimize
     if (input$objFunction %in% c('NSE', 'KGE', 'R2')){
@@ -1941,7 +1922,7 @@ server <- function(input, output, session) {
     req(input$minOrmax)
 
     # Assign the maximum and miminum objective fuction values to the global variables
-    globalVariable$minOrmax  <<- input$minOrmax
+    globalVariable$minOrmax  <- input$minOrmax
   })
 
   # ****************************************************************************
@@ -1953,7 +1934,7 @@ server <- function(input, output, session) {
 
     # Get full path to userObjFunction.R file
     shinyjs::disable("getUserObjFunction")
-    spsComps::shinyCatch(globalVariable$getUserObjFunction <<- file.choose(),
+    spsComps::shinyCatch(globalVariable$getUserObjFunction <- file.choose(),
                          blocking_level = "none")
     shinyjs::enable("getUserObjFunction")
 
@@ -2006,7 +1987,7 @@ server <- function(input, output, session) {
     spsComps::shinyCatch(
       if(TRUE){
         # Assign observed data file paths to the global variables
-        globalVariable$observedDataFile <<- sortObservedDataFile(observedDataFile)
+        globalVariable$observedDataFile <- sortObservedDataFile(observedDataFile)
 
         # Display observed data file paths
         output$printObservedDataFile <- renderText(as.character(globalVariable$observedDataFile))
@@ -2014,7 +1995,7 @@ server <- function(input, output, session) {
 
 
         # Observed data
-        globalVariable$observedData <<- list()
+        globalVariable$observedData <- list()
 
         checkGetObservedDataFileMessage <- " "
         # Check number of output variable files
@@ -2055,7 +2036,7 @@ server <- function(input, output, session) {
                                    Flag = temp[,4])
 
                 # Assign back observed data to global variable
-                globalVariable$observedData[[i]] <<- temp
+                globalVariable$observedData[[i]] <- temp
               }
             }
           }
@@ -2140,11 +2121,11 @@ server <- function(input, output, session) {
           if(temp$error) output$printCalObjFunction <- renderText("ERROR in input data - please see R console")
 
           # Assign the intermediate objective function values to the global variable
-          globalVariable$objValueCali <<- temp$objValueCali
-          globalVariable$perCriteriaCali <<- temp$perCriteriaCali
-          globalVariable$objValueValid <<- temp$objValueValid
-          globalVariable$perCriteriaValid <<- temp$perCriteriaValid
-          globalVariable$simData <<- temp$simData
+          globalVariable$objValueCali <- temp$objValueCali
+          globalVariable$perCriteriaCali <- temp$perCriteriaCali
+          globalVariable$objValueValid <- temp$objValueValid
+          globalVariable$perCriteriaValid <- temp$perCriteriaValid
+          globalVariable$simData <- temp$simData
 
           # Update numeric input (threshold objective function)
           minObjValue <- min(globalVariable$objValueCali)
@@ -2315,7 +2296,7 @@ server <- function(input, output, session) {
           tableSensitivity <- as.data.frame(tableSensitivity)
 
           # Creat data frame with the results from parameter sensi. analysis
-          globalVariable$tableSensitivity <<- data.frame(Parameter = rownames(tableSensitivity),
+          globalVariable$tableSensitivity <- data.frame(Parameter = rownames(tableSensitivity),
                                                          t_stat = tableSensitivity[,1],
                                                          absolute_t_stat = abs(tableSensitivity[,1]),
                                                          p_value = tableSensitivity[,2])
@@ -2357,7 +2338,7 @@ server <- function(input, output, session) {
           }
 
           # Save result table to the global variable
-          globalVariable$tableSensitivity <<- sensiReport
+          globalVariable$tableSensitivity <- sensiReport
           output$tableSensitivity <- renderDataTable(globalVariable$tableSensitivity)
 
           # Set 1 second delay for the progress bar
@@ -2412,7 +2393,7 @@ server <- function(input, output, session) {
   observe({
 
     # By default the input behavioral threshold value is not valid
-    globalVariable$isBehThresholdValid <<- FALSE
+    globalVariable$isBehThresholdValid <- FALSE
 
     # Check if the user-defined behavioral threshold is in a valid range
     spsComps::shinyCatch(
@@ -2431,7 +2412,7 @@ server <- function(input, output, session) {
                                                               sep =""))
             } else {
               # Display check message
-              globalVariable$isBehThresholdValid <<- TRUE
+              globalVariable$isBehThresholdValid <- TRUE
               output$printMaxBehThreshold <- renderText("check threshold value OK")
             }
           }
@@ -2456,7 +2437,7 @@ server <- function(input, output, session) {
 
       # Find behavioral simulations - 95PPU
       spsComps::shinyCatch(
-        globalVariable$dataPlotVariableNumber <<- behaSimulation(
+        globalVariable$dataPlotVariableNumber <- behaSimulation(
           globalVariable$objValueCali,
           globalVariable$simData,
           globalVariable$parameterValue,
@@ -2476,7 +2457,7 @@ server <- function(input, output, session) {
 
       # Give column names for the 95PPU table
       colnames(tempVar) <- c("date", "lower", "median", "upper", "best", "observed")
-      globalVariable$PlotVariableNumber <<- plotSimulated(tempVar)
+      globalVariable$PlotVariableNumber <- plotSimulated(tempVar)
 
       # Plot the 95PPU
       output$PlotVariableNumber <- plotly::renderPlotly(
@@ -2651,7 +2632,7 @@ server <- function(input, output, session) {
       for (ii in 1:1){
 
         # Load all files that are going to be updated
-        globalVariable$caliParam <<- updatedFileContent(globalVariable$HRUinfo,
+        globalVariable$caliParam <- updatedFileContent(globalVariable$HRUinfo,
                                                                 globalVariable$paraSelection,
                                                                 globalVariable$SWATParam,
                                                                 globalVariable$TxtInOutFolder)
@@ -2689,9 +2670,9 @@ server <- function(input, output, session) {
         })
 
         # Read output data
-        globalVariable$SwatEduSimData <<- list()
+        globalVariable$SwatEduSimData <- list()
         for (i in 1:globalVariable$nOutputVar){
-          globalVariable$SwatEduSimData[[i]] <<- read.csv(file = paste0(globalVariable$workingFolder,
+          globalVariable$SwatEduSimData[[i]] <- read.csv(file = paste0(globalVariable$workingFolder,
                                          "/Output/Core_1/out_var_", i, ".txt"),
                            header = TRUE)[,1]
         }
@@ -2731,7 +2712,7 @@ server <- function(input, output, session) {
           output[[outID]] <- plotly::renderPlotly(temp_plot)
         })
 
-        globalVariable$runManualCaliSuccess <<- TRUE
+        globalVariable$runManualCaliSuccess <- TRUE
 
         # Get water balance and nutrient balance
         if (globalVariable$SWATProject){
