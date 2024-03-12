@@ -243,20 +243,3 @@ helpTextSensi <- paste("Please write TWO R commands (EACH command MUST be on a S
 
 
 
-globalVariable <- list()
-displayOutput <- list()
-displayOutput$plotHru <- FALSE
-displayOutput$plotSub <- FALSE
-globalVariable$checkSimComplete <- FALSE
-globalVariable$loadProject <- FALSE
-globalVariable$TxtInOutSWAT <- FALSE
-globalVariable$TxtInOutSWATPlus <- FALSE
-globalVariable$SWATProject <- TRUE
-globalVariable$paraSelection <- dataParaSelectionSWAT
-HTMLdir <- system.file("R-SWAT", package = "RSWAT")
-globalVariable$nCaliParam <- nrow(globalVariable$paraSelection)
-globalVariable$runManualCaliSuccess <- FALSE
-
-
-
-

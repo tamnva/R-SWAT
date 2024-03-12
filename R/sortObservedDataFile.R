@@ -37,5 +37,5 @@ sortObservedDataFile <- function(observedDataFile){
     out <- observedDataFile
   }
 
-  return(out)
+  return(observedDataFile)
 }

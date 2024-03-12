@@ -11,6 +11,22 @@ server <- function(input, output, session) {
     stopApp()
   })
 
+  # Reactive values
+  displayOutput <- reactiveValues(plotHru = FALSE)
+  displayOutput$plotSub <- FALSE
+
+  globalVariable <- reactiveValues(checkSimComplete = FALSE)
+  globalVariable$loadProject <- FALSE
+  globalVariable$TxtInOutSWAT <- FALSE
+  globalVariable$TxtInOutSWATPlus <- FALSE
+  globalVariable$SWATProject <- TRUE
+  globalVariable$paraSelection <- dataParaSelectionSWAT
+  globalVariable$nCaliParam <- nrow(dataParaSelectionSWAT)
+  globalVariable$runManualCaliSuccess <- FALSE
+  globalVariable$observedData <- list()
+
+  HTMLdir <- reactiveValues(path = system.file("R-SWAT", package = "RSWAT"))
+
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
   #-----------------------------------------------------------------------------
@@ -34,7 +50,7 @@ server <- function(input, output, session) {
     colnames(parameterValue) <- NULL
 
     # Save parameter value to the globalVariable
-    globalVariable$parameterValue <-rbind(globalVariable$parameterValue, parameterValue)
+    globalVariable$parameterValue <- rbind(globalVariable$parameterValue, parameterValue)
 
     # Number of parallel runs cannot be higher than number of input parameter sets
     globalVariable$ncores <-min(globalVariable$ncores, nrow(parameterValue))
@@ -556,14 +572,12 @@ server <- function(input, output, session) {
   # ****************************************************************************
   observe({
     req(input$TxtInOutFolder)
-
     # Check if TxtInOut folder exists
     if(!dir.exists(trimws(input$TxtInOutFolder))){
       output$checkTxtInOutFolder <- renderText("Input folder does not exist")
     } else {
       output$checkTxtInOutFolder <- renderText(" ")
     }
-
     # Check if .hru files exist in this folder
     if (checkDirFileExist(trimws(input$TxtInOutFolder), "", ".cio")){
 
@@ -573,6 +587,7 @@ server <- function(input, output, session) {
 
       # Check if the TxtInOut matches the SWAT project
       if (globalVariable$SWATPlusProject){
+
         if(globalVariable$TxtInOutSWAT){
           output$checkTxtInOutFolder <- renderText(
             "ERROR: This should be TxtInOut of SWAT+"
@@ -720,7 +735,6 @@ server <- function(input, output, session) {
       globalVariable$SWATParam <- loadSwatParam(globalVariable$SWATParamFile)
       output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
       output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
-
     } else {
       output$printSWATParamFile <- renderText(
         paste("Error: The selected file must be either 'swatParam.txt'",
@@ -739,7 +753,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 5. File with list of SWAT or SWAT+ parameters",
-      HTML(readLines(file.path(HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir$path,"HTML",
 	  "helpSWATparamFile.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -939,7 +953,7 @@ server <- function(input, output, session) {
     req(input$helpParamSelection)
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-	  HTML(readLines(file.path(HTMLdir,"HTML",
+	  HTML(readLines(file.path(HTMLdir$path,"HTML",
 	  "helpParamSelection.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1135,6 +1149,7 @@ server <- function(input, output, session) {
   # ****************************************************************************
   # Output extraction: Default setting
   # ****************************************************************************
+  observe({
   if(!globalVariable$loadProject){
     if (globalVariable$SWATProject){
       output$tableOutputExtraction <-
@@ -1163,7 +1178,7 @@ server <- function(input, output, session) {
                                wordWrap = TRUE))
     }
   }
-
+  })
   # ****************************************************************************
   # Get user output extraction
   # ****************************************************************************
@@ -1266,7 +1281,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: Parameter Selection",
-	  HTML(readLines(file.path(HTMLdir,"HTML",
+	  HTML(readLines(file.path(HTMLdir$path,"HTML",
 	  "helpOutputExtraction.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1318,7 +1333,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 2. Select date range for calibration",
-      HTML(readLines(file.path(HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir$path,"HTML",
                                "helpDateRangeCali.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1332,7 +1347,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 2. Select date range for calibration",
-		HTML(readLines(file.path(HTMLdir,"HTML",
+		HTML(readLines(file.path(HTMLdir$path,"HTML",
 		"helpDateRangeCali.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1355,7 +1370,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 3. Select number of parallel runs (threads)",
-		HTML(readLines(file.path(HTMLdir,"HTML",
+		HTML(readLines(file.path(HTMLdir$path,"HTML",
 		"helpNumberofThreads.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1369,7 +1384,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 4. Run SWAT",
-      HTML(readLines(file.path(HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir$path,"HTML",
                                "helpRunSWAT.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -1383,7 +1398,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "Help: 5. See Simulation report",
-      HTML(readLines(file.path(HTMLdir,"HTML",
+      HTML(readLines(file.path(HTMLdir$path,"HTML",
                                "helpCheckCurrentSimulation.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -2028,13 +2043,13 @@ server <- function(input, output, session) {
               # check observed data
               checkGetObservedDataFileMessage <- checkObservedData(temp)
 
-              if (checkGetObservedDataFileMessage == ""){
+              if (checkGetObservedDataFileMessage == "asdf"){
                 # Store observed data in the global variables
+
                 temp <- data.frame(Date = as.POSIXct(paste(temp[,1], temp[,2], sep = " "),
                                                      format = "%Y-%m-%d %H:%M", tz = ""),
                                    Value = temp[,3],
                                    Flag = temp[,4])
-
                 # Assign back observed data to global variable
                 globalVariable$observedData[[i]] <- temp
               }
@@ -2047,7 +2062,6 @@ server <- function(input, output, session) {
       },
       blocking_level = "error")
   })
-
   # ****************************************************************************
   # Display list of input observed data files
   # ****************************************************************************
@@ -2530,6 +2544,7 @@ server <- function(input, output, session) {
   # ****************************************************************************
   # Default list of parameters for manual calibration
   # ****************************************************************************
+  observe({
   spsComps::shinyCatch(
     if(check_null_na_empty(globalVariable$paraSelection$Min[1]) &
        check_null_na_empty(globalVariable$paraSelection$Max[1])){
@@ -2593,7 +2608,7 @@ server <- function(input, output, session) {
     },
     blocking_level = "error"
   )
-
+  })
 
   # ****************************************************************************
   # Help button R-SWAT Education select parameter value
@@ -2603,7 +2618,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "1. Selecting parameter values",
-		HTML(readLines(file.path(HTMLdir,"HTML",
+		HTML(readLines(file.path(HTMLdir$path,"HTML",
 		"selectParameterValue.html"),warn=FALSE)),
       easyClose = TRUE
     ))
@@ -2617,7 +2632,7 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(
       title = "2. Model run",
-	  HTML(readLines(file.path(HTMLdir,"HTML",
+	  HTML(readLines(file.path(HTMLdir$path,"HTML",
 	  "modelRun.html"),warn=FALSE)),
       easyClose = TRUE
     ))
