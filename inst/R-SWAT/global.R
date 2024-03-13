@@ -241,5 +241,50 @@ helpTextSensi <- paste("Please write TWO R commands (EACH command MUST be on a S
                        "  2.Get observed data file BEFORE proceeding to the next steps", "\n",
                        sep ="")
 
+  # Reactive values
+displayOutput <- list()
+displayOutput$plotHru <- FALSE
+displayOutput$plotSub <- FALSE
 
+HTMLdir <- system.file("R-SWAT", package = "RSWAT")
 
+globalVariable <- list()
+globalVariable$checkSimComplete <- FALSE
+globalVariable$loadProject <- FALSE
+globalVariable$TxtInOutSWAT <- FALSE
+globalVariable$TxtInOutSWATPlus <- FALSE
+globalVariable$SWATProject <- TRUE
+globalVariable$paraSelection <- dataParaSelectionSWAT
+globalVariable$nCaliParam <- nrow(dataParaSelectionSWAT)
+globalVariable$runManualCaliSuccess <- FALSE
+globalVariable$SWATPlusProject <- FALSE
+globalVariable$workingFolder <- NA
+globalVariable$CurrentSimulationReportFile <- NA
+globalVariable$samplingApproach <- NA
+globalVariable$sensCaliCommand <- NA
+globalVariable$outputExtraction <- NA
+globalVariable$nOutputVar <- NA
+globalVariable$userReadSwatOutput <- FALSE
+globalVariable$dateRangeCali <- NA
+globalVariable$ncores <- NA
+globalVariable$objFunction <- NA
+globalVariable$minOrmax <- NA
+globalVariable$isBehThresholdValid - TRUE
+globalVariable$TxtInOutFolder <- NA
+globalVariable$HRUinfo <- NA
+globalVariable$fileCioInfo <- NA
+globalVariable$SWATexeFile <- NA
+globalVariable$SWATParamFile <- NA
+globalVariable$SWATParam <- NA
+globalVariable$caliParam <- NA
+globalVariable$parameterValue <- NA
+globalVariable$observedDataFile <- NA
+globalVariable$observedData <- list()
+globalVariable$objValueCali <- NA
+globalVariable$perCriteriaCali <- list()
+globalVariable$objValueValid <- NA
+globalVariable$perCriteriaValid <- list()
+globalVariable$simData <- list()
+globalVariable$tableSensitivity <- NA
+globalVariable$dataPlotVariableNumber <- list()
+globalVariable$PlotVariableNumber <- NA

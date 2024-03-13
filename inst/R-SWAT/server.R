@@ -11,21 +11,6 @@ server <- function(input, output, session) {
     stopApp()
   })
 
-  # Reactive values
-  displayOutput <- reactiveValues(plotHru = FALSE)
-  displayOutput$plotSub <- FALSE
-
-  globalVariable <- reactiveValues(checkSimComplete = FALSE)
-  globalVariable$loadProject <- FALSE
-  globalVariable$TxtInOutSWAT <- FALSE
-  globalVariable$TxtInOutSWATPlus <- FALSE
-  globalVariable$SWATProject <- TRUE
-  globalVariable$paraSelection <- dataParaSelectionSWAT
-  globalVariable$nCaliParam <- nrow(dataParaSelectionSWAT)
-  globalVariable$runManualCaliSuccess <- FALSE
-  globalVariable$observedData <- list()
-
-  HTMLdir <- reactiveValues(path = system.file("R-SWAT", package = "RSWAT"))
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
