@@ -462,9 +462,9 @@ R^2_{Q_2}}{1 + 2} \]</span> Here is the content of the
 <span id="cb2-90"><a href="#cb2-90" tabindex="-1"></a>}</span>
 <span id="cb2-91"><a href="#cb2-91" tabindex="-1"></a></span>
 <span id="cb2-92"><a href="#cb2-92" tabindex="-1"></a></span>
-<span id="cb2-93"><a href="#cb2-93" tabindex="-1"></a><span class="co"># Overwrite the userObjFunction with our updatedUserObjFunction</span></span>
-<span id="cb2-94"><a href="#cb2-94" tabindex="-1"></a><span class="fu">environment</span>(updatedUserObjFunction) <span class="ot">&lt;-</span> <span class="fu">asNamespace</span>(<span class="st">&#39;RSWAT&#39;</span>)</span>
-<span id="cb2-95"><a href="#cb2-95" tabindex="-1"></a><span class="fu">assignInNamespace</span>(<span class="st">&quot;userObjFunction&quot;</span>, updatedUserObjFunction, <span class="at">ns =</span> <span class="st">&quot;RSWAT&quot;</span>)</span></code></pre></div>
+<span id="cb2-93"><a href="#cb2-93" tabindex="-1"></a><span class="co"># Overwrite the userObjFunction with our new userObjFunction</span></span>
+<span id="cb2-94"><a href="#cb2-94" tabindex="-1"></a><span class="fu">environment</span>(userObjFunction) <span class="ot">&lt;-</span> <span class="fu">asNamespace</span>(<span class="st">&#39;RSWAT&#39;</span>)</span>
+<span id="cb2-95"><a href="#cb2-95" tabindex="-1"></a><span class="fu">assignInNamespace</span>(<span class="st">&quot;userObjFunction&quot;</span>, userObjFunction, <span class="at">ns =</span> <span class="st">&quot;RSWAT&quot;</span>)</span></code></pre></div>
 </div>
 
 

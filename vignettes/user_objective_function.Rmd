@@ -129,9 +129,9 @@ userObjFunction <- function(obs, sim){
 }
 
 
-# Overwrite the userObjFunction with our updatedUserObjFunction
-environment(updatedUserObjFunction) <- asNamespace('RSWAT')
-assignInNamespace("userObjFunction", updatedUserObjFunction, ns = "RSWAT")
+# Overwrite the userObjFunction with our new userObjFunction
+environment(userObjFunction) <- asNamespace('RSWAT')
+assignInNamespace("userObjFunction", userObjFunction, ns = "RSWAT")
 
 ```
 

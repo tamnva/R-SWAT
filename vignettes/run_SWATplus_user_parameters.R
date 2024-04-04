@@ -1,10 +1,10 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  library(RSWAT)
 #  
 #  # 1.Create an example TxtInOut of SWAT+ (TODO: remove this command if you already # had the TxtInOut folder of SWAT+)
@@ -78,7 +78,7 @@ knitr::opts_chunk$set(
 #  rownames(parameterValue) <- NULL
 #  
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  # Get HRU infor (HRU names, landuse, soil, slope, subbasin)
 #  HRUinfo <- read.table(file.path(TxtInOutFolder, "hru-data.hru"),
 #                        header = TRUE, skip = 1, sep = "")
@@ -103,7 +103,7 @@ knitr::opts_chunk$set(
 #             dateRangeCali,firstRun)
 #  
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  
 #  # Read all output_var_xx.txt files in the workingFolder/Output/Core_xx
 #  # First you need to you how many output time steps for each variables

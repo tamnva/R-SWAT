@@ -374,7 +374,7 @@ of the “userReadSwatOutput.R” file is as follows:</p>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&#39; as it is now, please modify the source code of this function if you use</span></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&#39; according to your need and then install RSWAT app again from your local</span></span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&#39; folder to update this function.DO NOT CHANGE the name of this function</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&#39; (mus be updateUserReadSwatOutput). ONLY CHANGE the code at the place where indicates</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&#39; (mus be userReadSwatOutput). ONLY CHANGE the code at the place where indicates</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&#39; &quot;START TO CHANGE FROM HERE&quot; and STOP at &quot;</span><span class="re">END</span><span class="co"> OF CHANGE&quot;. This functions</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&#39; must NOT receive any input. By default, you are NOW INSIDE the TxtInOut folder</span></span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&#39; and you can read any output files there by just using the file name.</span></span>
@@ -390,7 +390,7 @@ of the “userReadSwatOutput.R” file is as follows:</p>
 <span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&#39; @export</span></span>
 <span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&#39;</span></span>
 <span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>updateUserReadSwatOutput <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>userReadSwatOutput <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
 <span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  </span>
 <span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>  output <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  <span class="co"># -------------------------------------------------------------------------#</span></span>
@@ -448,9 +448,9 @@ of the “userReadSwatOutput.R” file is as follows:</p>
 <span id="cb2-80"><a href="#cb2-80" tabindex="-1"></a>  </span>
 <span id="cb2-81"><a href="#cb2-81" tabindex="-1"></a>}</span>
 <span id="cb2-82"><a href="#cb2-82" tabindex="-1"></a></span>
-<span id="cb2-83"><a href="#cb2-83" tabindex="-1"></a><span class="co"># Overwrite the userReadSwatOutput with our updateUserReadSwatOutput</span></span>
-<span id="cb2-84"><a href="#cb2-84" tabindex="-1"></a><span class="fu">environment</span>(updateUserReadSwatOutput) <span class="ot">&lt;-</span> <span class="fu">asNamespace</span>(<span class="st">&#39;RSWAT&#39;</span>)</span>
-<span id="cb2-85"><a href="#cb2-85" tabindex="-1"></a><span class="fu">assignInNamespace</span>(<span class="st">&quot;userReadSwatOutput&quot;</span>, updateUserReadSwatOutput, <span class="at">ns =</span> <span class="st">&quot;RSWAT&quot;</span>)</span></code></pre></div>
+<span id="cb2-83"><a href="#cb2-83" tabindex="-1"></a><span class="co"># Overwrite the userReadSwatOutput with our new userReadSwatOutput</span></span>
+<span id="cb2-84"><a href="#cb2-84" tabindex="-1"></a><span class="fu">environment</span>(userReadSwatOutput) <span class="ot">&lt;-</span> <span class="fu">asNamespace</span>(<span class="st">&#39;RSWAT&#39;</span>)</span>
+<span id="cb2-85"><a href="#cb2-85" tabindex="-1"></a><span class="fu">assignInNamespace</span>(<span class="st">&quot;userReadSwatOutput&quot;</span>, userReadSwatOutput, <span class="at">ns =</span> <span class="st">&quot;RSWAT&quot;</span>)</span></code></pre></div>
 </div>
 
 

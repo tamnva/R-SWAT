@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
 # Load require packages
 library(RSWAT)
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  # Extract all of examples data to the temporal working directory
 #  extracExampleData(exampleData, "all", tempdir())
 #  
@@ -16,7 +16,7 @@ library(RSWAT)
 #  tempdir()
 #  
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  #
 #  # 1. Set SWATproject is TRUE if you run SWAT, set to FALSE if you run SWAT+
 #  SWATproject <- TRUE
@@ -117,7 +117,7 @@ library(RSWAT)
 #  # observedDataFile <- c("D:/example/obs_var_1.txt", "D:/example/obs_var_2.txt")
 #  
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  
 #  # Generate parameter samples using Latin Hypercube Sampling
 #  parameterValue <- lhsRange(sensCaliCommand, getParamRange(paraSelection))
@@ -150,7 +150,7 @@ library(RSWAT)
 #             dateRangeCali,firstRun)
 #  
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  # Number of output variables (from the output extraction data frame)
 #  OutputVar <- getNumberOutputVar(outputExtraction)
 #  nOutputVar <- OutputVar$nOutputVar
