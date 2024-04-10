@@ -1,14 +1,14 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  # TODO change file path to your userObjFunction.R file
 #  source("C:/example/userReadSwatOutput.R")
 
-## ---- message=FALSE, eval = FALSE---------------------------------------------
+## ----message=FALSE, eval = FALSE----------------------------------------------
 #  
 #  #' User-defined function for reading SWAT/SWAT+
 #  #'
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 #  #' as it is now, please modify the source code of this function if you use
 #  #' according to your need and then install RSWAT app again from your local
 #  #' folder to update this function.DO NOT CHANGE the name of this function
-#  #' (mus be updateUserReadSwatOutput). ONLY CHANGE the code at the place where indicates
+#  #' (mus be userReadSwatOutput). ONLY CHANGE the code at the place where indicates
 #  #' "START TO CHANGE FROM HERE" and STOP at "END OF CHANGE". This functions
 #  #' must NOT receive any input. By default, you are NOW INSIDE the TxtInOut folder
 #  #' and you can read any output files there by just using the file name.
@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 #  #' @export
 #  #'
 #  
-#  updateUserReadSwatOutput <- function(){
+#  userReadSwatOutput <- function(){
 #  
 #    output <- list()
 #    # -------------------------------------------------------------------------#
@@ -91,8 +91,8 @@ knitr::opts_chunk$set(
 #  
 #  }
 #  
-#  # Overwrite the userReadSwatOutput with our updateUserReadSwatOutput
-#  environment(updateUserReadSwatOutput) <- asNamespace('RSWAT')
-#  assignInNamespace("userReadSwatOutput", updateUserReadSwatOutput, ns = "RSWAT")
+#  # Overwrite the userReadSwatOutput with our userReadSwatOutput
+#  environment(userReadSwatOutput) <- asNamespace('RSWAT')
+#  assignInNamespace("userReadSwatOutput", userReadSwatOutput, ns = "RSWAT")
 #  
 

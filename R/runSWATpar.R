@@ -26,6 +26,8 @@
 #' in the first iteration, all files need to be copied to the new TxtInOut folder
 #' for SWAT/SWAT+ run, in the subsequent iterations, only files that content
 #' parameters (that need to be changed) are updated.
+#' @param readOutputScript optional input - the R script file containing the
+#' function to read SWAT output file according to the user define in this function
 #' @importFrom foreach %dopar%
 #' @importFrom foreach foreach
 #' @importFrom parallel makeCluster
@@ -34,22 +36,6 @@
 
 #' @return no return value, results will be saved in the workingDirectory
 #'
-#' @examples
-#'
-#'\donttest{
-#' runSWATpar(workingDirectory,
-#'            TxtInOutFolder,
-#'            outputExtraction,
-#'            ncores,
-#'            swatExe,
-#'            parameterValue,
-#'            paraSelection,
-#'            caliParam,
-#'            copyUnchangeFiles,
-#'            fileCioInfo,
-#'            fromToDate,
-#'            firstRun)
-#'}
 #'
 #' @export
 #'
@@ -65,7 +51,8 @@ runSWATpar <- function(workingDirectory,
                        copyUnchangeFiles,
                        fileCioInfo,
                        fromToDate,
-                       firstRun){
+                       firstRun,
+                       readOutputScript = NULL){
 
   # Create n directory in R
   if(copyUnchangeFiles){
@@ -90,7 +77,8 @@ runSWATpar <- function(workingDirectory,
                       outputExtraction,
                       fileCioInfo,
                       fromToDate,
-                      firstRun)
+                      firstRun,
+                      readOutputScript)
   } else {
     core <- NA
     cl <- parallel::makeCluster(ncores)
@@ -105,7 +93,8 @@ runSWATpar <- function(workingDirectory,
                         outputExtraction,
                         fileCioInfo,
                         fromToDate,
-                        firstRun)
+                        firstRun,
+                        readOutputScript)
 
     }
     parallel::stopCluster(cl)
@@ -139,7 +128,8 @@ runSWATpar <- function(workingDirectory,
 #'                   outputExtraction,
 #'                   fileCioInfo,
 #'                   fromToDate,
-#'                   firstRun)
+#'                   firstRun,
+#'                   readOutputScript)
 #'}
 #'
 #' @export
@@ -154,7 +144,12 @@ runSWATSequential <- function(coreNumber,
                               outputExtraction,
                               fileCioInfo,
                               fromToDate,
-                              firstRun){
+                              firstRun,
+                              readOutputScript = NULL){
+
+  if (!is.null(readOutputScript)){
+    source(readOutputScript)
+  }
 
   # Set working directory
   setwd(file.path(workingDirectory, paste0('TxtInOut_', coreNumber)))

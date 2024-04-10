@@ -14,7 +14,8 @@ runSWATSequential(
   outputExtraction,
   fileCioInfo,
   fromToDate,
-  firstRun
+  firstRun,
+  readOutputScript = NULL
 )
 }
 \arguments{
@@ -46,6 +47,9 @@ period the function should extract outputs}
 in the first iteration, all files need to be copied to the new TxtInOut folder
 for SWAT/SWAT+ run, in the subsequent iterations, only files that content
 parameters (that need to be changed) are updated.}
+
+\item{readOutputScript}{optional input - the R script file containing the
+function to read SWAT output file according to the user define in this function}
 }
 \value{
 no return value, results will be saved in the workingDirectory
@@ -65,7 +69,8 @@ runSWATSequential(coreNumber,
                   outputExtraction,
                   fileCioInfo,
                   fromToDate,
-                  firstRun)
+                  firstRun,
+                  readOutputScript)
 }
 
 }

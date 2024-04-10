@@ -29,6 +29,9 @@ server <- function(input, output, session) {
   HTMLdir <<- system.file("R-SWAT", package = "RSWAT")
   globalVariable$nCaliParam <<- nrow(globalVariable$paraSelection)
   globalVariable$runManualCaliSuccess <<- FALSE
+  globalVariable$readOutputScript <<- NULL
+  globalVariable$objFunctionScript <<- NULL
+  globalVariable$minOrmax <<- "Maximize"
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
@@ -73,7 +76,8 @@ server <- function(input, output, session) {
                globalVariable$copyUnchangeFiles,
                globalVariable$fileCioInfo,
                globalVariable$dateRangeCali,
-               globalVariable$firstRun)
+               globalVariable$firstRun,
+               globalVariable$readOutputScript)
 
     # Objective function with initial parameter set
     temp <- calObjFunction(parameterValue,
@@ -365,7 +369,7 @@ server <- function(input, output, session) {
             }
           })
         }
-		
+
 		# update output extraction reminder text
 		spsComps::shinyCatch(
           if (TRUE %in% globalVariable$userReadSwatOutput){
@@ -379,7 +383,7 @@ server <- function(input, output, session) {
               "No input file is needed")
         },
         blocking_level = "error")
-	  
+
 
         # Show meesage
         showNotification("All project settings were loaded",
@@ -1262,16 +1266,18 @@ server <- function(input, output, session) {
 
     # Get full path to userObjFunction.R file
     shinyjs::disable("getUserReadSwatOutput")
-    spsComps::shinyCatch(globalVariable$getUserReadSwatOutput <<- file.choose(),
+    spsComps::shinyCatch(globalVariable$readOutputScript <<- file.choose(),
                          blocking_level = "none")
     shinyjs::enable("getUserReadSwatOutput")
 
     spsComps::shinyCatch(
-      if (grepl(".R", globalVariable$getUserReadSwatOutput, fixed = TRUE)){
-        output$userReadSwatOutputFile <- renderText(globalVariable$getUserReadSwatOutput)
-        source(globalVariable$getUserReadSwatOutput)
+      if (basename(globalVariable$readOutputScript) == 'userReadSwatOutput.R'){
+        output$userReadSwatOutputFile <- renderText(globalVariable$readOutputScript)
+        source(globalVariable$readOutputScript)
       } else {
-        output$userReadSwatOutputFile <- renderText("Error: The selected file must be '.R' extention")
+        output$userReadSwatOutputFile <- renderText(
+          "Error: The selected file must be 'userReadSwatOutput.R'")
+        globalVariable$readOutputScript <<- NULL
       },
       blocking_level = "error")
   })
@@ -1518,7 +1524,8 @@ server <- function(input, output, session) {
                      copyUnchangeFiles,
                      globalVariable$fileCioInfo,
                      globalVariable$dateRangeCali,
-                     firstRun),
+                     firstRun,
+                     globalVariable$readOutputScript),
           blocking_level = "error"
         )
 
@@ -1553,7 +1560,8 @@ server <- function(input, output, session) {
                        copyUnchangeFiles,
                        globalVariable$fileCioInfo,
                        globalVariable$dateRangeCali,
-                       firstRun),
+                       firstRun,
+                       globalVariable$readOutputScript),
             blocking_level = "error"
           )
 
@@ -1596,7 +1604,9 @@ server <- function(input, output, session) {
             best$perCriteriaValid <- temp$perCriteriaValid
             best$simData <- temp$simData
           } else {
-            idBest <- which(temp$objValueCali == max(temp$objValueCali))
+
+            idBest <- ilocMinMax(temp$objValueCali, globalVariable$minOrmax)
+
             if (length(idBest) > 1) {idBest = idBest[1]}
 
             # Take the better parameter value and objective function values
@@ -1626,7 +1636,7 @@ server <- function(input, output, session) {
             if (parallelMode == 1) {
               # Take the better parameter set/data if exist
               for (j in 1:nrow(newPar)){
-                if(temp$objValueCali[j] > best$objValueCali[j]){
+                if(isNewSimBetter(temp$objValueCali[j], best$objValueCali[j], globalVariable$minOrmax)){
                   globalVariable$parameterValue[j, ] <<- newPar[j, ]
                   best$objValueCali[j] <- temp$objValueCali[j]
                   best$objValueValid[j] <- temp$objValueValid[j]
@@ -1642,14 +1652,16 @@ server <- function(input, output, session) {
 
             } else {
 
-              idBest <- which(temp$objValueCali == max(temp$objValueCali))
+              idBest <- ilocMinMax(temp$objValueCali, globalVariable$minOrmax)
+
               if (length(idBest) > 1) {idBest = idBest[1]}
 
-              if(temp$objValueCali[idBest] > best$objValueCali){
+              if(isNewSimBetter(temp$objValueCali[idBest], best$objValueCali, globalVariable$minOrmax)){
                 globalVariable$parameterValue <<- newPar[idBest, ]
                 best$objValueCali <- temp$objValueCali[idBest]
                 best$objValueValid <- temp$objValueValid[idBest]
               }
+
               # Generate new parameter set
               newPar <- data.frame(min = as.numeric(globalVariable$paraSelection$Min),
                                    max = as.numeric(globalVariable$paraSelection$Max))
@@ -1677,7 +1689,8 @@ server <- function(input, output, session) {
                          FALSE,
                          globalVariable$fileCioInfo,
                          globalVariable$dateRangeCali,
-                         firstRun),
+                         firstRun,
+                         globalVariable$readOutputScript),
               blocking_level = "error"
             )
 
@@ -1707,16 +1720,17 @@ server <- function(input, output, session) {
           if (parallelMode == 1) {
             # Take the better parameter set/data if exists
             for (j in 1:nrow(newPar)){
-              if(temp$objValueCali[j] > best$objValueCali[j]){
+              if(isNewSimBetter(temp$objValueCali[j],best$objValueCali[j], globalVariable$minOrmax)){
                 best$objValueCali[j] <- temp$objValueCali[j]
                 best$objValueValid[j] <- temp$objValueValid[j]
               }
+
             }
           } else {
-            idBest <- which(temp$objValueCali == max(temp$objValueCali))
+            idBest <- ilocMinMax(temp$objValueCali, globalVariable$minOrmax)
             if (length(idBest) > 1) {idBest = idBest[1]}
 
-            if(temp$objValueCali[idBest] > best$objValueCali){
+            if(isNewSimBetter(temp$objValueCali[idBest],best$objValueCali, globalVariable$minOrmax)){
               best$objValueCali <- temp$objValueCali[idBest]
               best$objValueValid <- temp$objValueValid[idBest]
             }
@@ -1939,7 +1953,6 @@ server <- function(input, output, session) {
   # ****************************************************************************
   observe({
     req(input$minOrmax)
-
     # Assign the maximum and miminum objective fuction values to the global variables
     globalVariable$minOrmax  <<- input$minOrmax
   })
@@ -1953,16 +1966,17 @@ server <- function(input, output, session) {
 
     # Get full path to userObjFunction.R file
     shinyjs::disable("getUserObjFunction")
-    spsComps::shinyCatch(globalVariable$getUserObjFunction <<- file.choose(),
+    spsComps::shinyCatch(globalVariable$objFunctionScript <<- file.choose(),
                          blocking_level = "none")
     shinyjs::enable("getUserObjFunction")
 
     spsComps::shinyCatch(
-      if (grepl(".R", globalVariable$getUserObjFunction, fixed = TRUE)){
-        output$userObjFunctionFile <- renderText(globalVariable$getUserObjFunction)
-        source(globalVariable$getUserObjFunction)
+      if (basename(globalVariable$objFunctionScript) == "userObjFunction.R"){
+        output$userObjFunctionFile <- renderText(globalVariable$objFunctionScript)
+        source(globalVariable$objFunctionScript)
       } else {
-        output$userObjFunctionFile <- renderText("Error: The selected file must have '.R' extention")
+        output$userObjFunctionFile <- renderText("Error: The selected file must be 'userObjFunction.R'")
+        globalVariable$objFunctionScript <<- NULL
       },
       blocking_level = "error")
   })
@@ -1979,7 +1993,6 @@ server <- function(input, output, session) {
     }
 
     if(.Platform$OS.type == 'windows'){
-
       shinyjs::disable("getObservedDataFileWindow")
       observedDataFile <- choose.files()
       shinyjs::enable("getObservedDataFileWindow")

@@ -34,7 +34,7 @@ sim[[2]] <- runif(100)
 # for the first variable (obs[[1]]) is 1 and for the second variable is 2
 
 # Create a custom objective function for this task
-updatedUserObjFunction <- function(obs, sim){
+userObjFunction <- function(obs, sim){
 
   # Define output variable
   output <- list()
@@ -56,9 +56,9 @@ updatedUserObjFunction <- function(obs, sim){
   return(output)
 }
 
-# Overwrite the userObjFunction with our updatedUserObjFunction
-environment(updatedUserObjFunction) <- asNamespace('RSWAT')
-assignInNamespace("userObjFunction", updatedUserObjFunction, ns = "RSWAT")
+# Overwrite the userObjFunction with our userObjFunction
+environment(userObjFunction) <- asNamespace('RSWAT')
+assignInNamespace("userObjFunction", userObjFunction, ns = "RSWAT")
 }
 
 }

@@ -154,6 +154,38 @@ splitRemoveComment <- function(textCommand){
 }
 
 
+#-------------------------------------------------------------------------------
+# Function to find location of min and max
+#-------------------------------------------------------------------------------
+ilocMinMax <- function(iVector, MinOrMax){
+  if (MinOrMax == "Maximize"){
+    output <- which(iVector == max(iVector))
+  } else {
+    output <- which(iVector == min(iVector))
+  }
+  return(output)
+}
+
+#-------------------------------------------------------------------------------
+# Check if there is an improvement in the objective function
+#-------------------------------------------------------------------------------
+
+isNewSimBetter <- function(newObj, oldObj, MinOrMax){
+
+  output <- FALSE
+
+  if (MinOrMax == "Maximize"){
+    if (newObj > oldObj){
+      output <- TRUE
+    }
+  } else {
+    if (newObj < oldObj){
+      output <- TRUE
+    }
+  }
+
+  return(output)
+}
 
 
 

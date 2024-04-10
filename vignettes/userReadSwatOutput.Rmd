@@ -42,7 +42,7 @@ Below is a minimum example of a user defined output extraction. Lets say we run 
 #' as it is now, please modify the source code of this function if you use
 #' according to your need and then install RSWAT app again from your local
 #' folder to update this function.DO NOT CHANGE the name of this function
-#' (mus be updateUserReadSwatOutput). ONLY CHANGE the code at the place where indicates
+#' (mus be userReadSwatOutput). ONLY CHANGE the code at the place where indicates
 #' "START TO CHANGE FROM HERE" and STOP at "END OF CHANGE". This functions
 #' must NOT receive any input. By default, you are NOW INSIDE the TxtInOut folder
 #' and you can read any output files there by just using the file name.
@@ -58,7 +58,7 @@ Below is a minimum example of a user defined output extraction. Lets say we run 
 #' @export
 #'
 
-updateUserReadSwatOutput <- function(){
+userReadSwatOutput <- function(){
   
   output <- list()
   # -------------------------------------------------------------------------#
@@ -116,9 +116,9 @@ updateUserReadSwatOutput <- function(){
   
 }
 
-# Overwrite the userReadSwatOutput with our updateUserReadSwatOutput
-environment(updateUserReadSwatOutput) <- asNamespace('RSWAT')
-assignInNamespace("userReadSwatOutput", updateUserReadSwatOutput, ns = "RSWAT")
+# Overwrite the userReadSwatOutput with our userReadSwatOutput
+environment(userReadSwatOutput) <- asNamespace('RSWAT')
+assignInNamespace("userReadSwatOutput", userReadSwatOutput, ns = "RSWAT")
 
 ```
 
