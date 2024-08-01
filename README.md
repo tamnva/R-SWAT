@@ -10,7 +10,9 @@
 
 ## Quick Start!
 
-RSWAT is an R package hosted on GitHub (to be submitted to CRAN soon). First, you need to install [R](https://cloud.r-project.org/), and [RStudio](https://posit.co/download/rstudio-desktop/) (installing RStudio is recommended, not a MUST) then **run** the following commands **in RStudio**. If you run in R, package vignettes cannot be built, however, this DOES NOT affect the functionalities of RSWAT.
+RSWAT is an R package hosted on GitHub (to be submitted to CRAN soon). First, you need to install [R](https://cloud.r-project.org/), and [RStudio](https://posit.co/download/rstudio-desktop/) (installing RStudio is recommended, not a MUST) then run the following commands **in RStudio**. If you run in R, package vignettes cannot be built, however, this DOES NOT affect the functionalities of RSWAT.
+
+To run RSWAT, the SWAT/SWAT+ model is required.  The SWAT/SWAT+ model (executable file) could be obtained from the official [SWAT website](https://swat.tamu.edu/software/).
 
 ```R
 # First install remotes package if you have not installed
@@ -24,6 +26,7 @@ remotes::install_github("tamnva/R-SWAT", force = TRUE, dependencies = TRUE, buil
 library(RSWAT)
 
 # Extract example data (3.6 MB of storage). TODO: replace tempdir() with your path, e.g., "C:/example"
+# The example data DO NOT include the SWAT executable files (please download them at https://swat.tamu.edu/software/)
 extracExampleData(exampleData, "all", tempdir())
 
 # Call RSWAT graphical user interface: DO NOT use RSWAT::showRSWAT()
