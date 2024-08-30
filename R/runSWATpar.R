@@ -178,9 +178,16 @@ runSWATSequential <- function(coreNumber,
     # Update TxtInOut folder
     updateMultiFile(toDir, caliParam, subParameterSet[i,2:nParam], paraSelection)
 
-    # Call swat.exe file
+    # Copy swat.exe file (only if it was not there yet)
     exeFile <- basename(swatExe)
     if(!file.exists(exeFile)) file.copy(swatExe, toDir)
+
+    # Check if copy is successful
+    if(!file.exists(exeFile)){
+      stop("cannot find swat/swat+ exe file in TxtinOut \n
+      please check if file path is correct \n
+      and check you have a permission to copy file to the working folder")
+    }
 
     # Check platform
     if(.Platform$OS.type == "unix") {
