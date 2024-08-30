@@ -7,7 +7,7 @@ ui <- shinydashboard::dashboardPage(
   # ----------------------------------------------------------------------Header
   shinydashboard::dashboardHeader(
     # Name of the app
-    title = "RSWAT (v4.0)",
+    title = "RSWAT v4.01",
 
     # Add two buttons in the header for saving and loading project
     tags$li(class = "dropdown",

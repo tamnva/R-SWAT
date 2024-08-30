@@ -179,6 +179,9 @@ behaSimulation <- function(objValue, simData, parameterValue, behThreshold,
                               ppuSimData$lower_95PPU[iloc],
                               ppuSimData$upper_95PPU[iloc])
 
+  # Behavioral parameter set
+  output$behaParameterSet <- as.data.frame(behaParameter[,-c(1)])
+
   return(output)
 }
 

@@ -32,6 +32,7 @@ server <- function(input, output, session) {
   globalVariable$readOutputScript <<- NULL
   globalVariable$objFunctionScript <<- NULL
   globalVariable$minOrmax <<- "Maximize"
+  globalVariable$RSWATversion <<- "v4.01"
 
   #-----------------------------------------------------------------------------
   # Global function for running SWAT
@@ -204,7 +205,7 @@ server <- function(input, output, session) {
         output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
 
         # Update display content of the SWAT parameter file
-        output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
+        output$tableSWATParam <- renderDT(globalVariable$SWATParam)
 
         #-------------------------------------------------------------------------
         # Update Tab 2: Parameter sampling
@@ -290,7 +291,7 @@ server <- function(input, output, session) {
         }
 
         # Update display corresponding observed file names
-        output$tableOutputExtractionDisplayOnly <- renderDataTable(
+        output$tableOutputExtractionDisplayOnly <- renderDT(
           printVariableNameObservedFiles(globalVariable$outputExtraction))
 
         # Update select date range
@@ -656,7 +657,7 @@ server <- function(input, output, session) {
       }
 
       # Display table of HRU information (land use, soil, slope)
-      output$tableHRUinfo <<- renderDataTable(globalVariable$HRUinfo)
+      output$tableHRUinfo <<- renderDT(globalVariable$HRUinfo)
 
 
     } else {
@@ -742,7 +743,7 @@ server <- function(input, output, session) {
 
       globalVariable$SWATParam <<- loadSwatParam(globalVariable$SWATParamFile)
       output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
-      output$tableSWATParam <- renderDataTable(globalVariable$SWATParam)
+      output$tableSWATParam <- renderDT(globalVariable$SWATParam)
 
     } else {
       output$printSWATParamFile <- renderText(
@@ -786,7 +787,7 @@ server <- function(input, output, session) {
       # Check if there is no input SWAT parameter file
       if (is.null(globalVariable$SWATParam$parameter)){
         output$tableHelpParameterSelection <-
-          renderDataTable(displayOutput$uniqueHruProperties)
+          renderDT(displayOutput$uniqueHruProperties)
       } else {
 
         SWATParamName <- globalVariable$SWATParam$parameter
@@ -810,7 +811,7 @@ server <- function(input, output, session) {
 
           tempUniqueHruProperties <- cbind(SWATParamName,tempUniqueHruProperties)
 
-          output$tableHelpParameterSelection <- renderDataTable(tempUniqueHruProperties)
+          output$tableHelpParameterSelection <- renderDT(tempUniqueHruProperties)
         }
 
       }
@@ -823,7 +824,7 @@ server <- function(input, output, session) {
                       sep = "")
         # Display SWAT+ help table
         output$tableHelpParameterSelection <-
-          renderDataTable(data.frame(Parameter = temp))
+          renderDT(data.frame(Parameter = temp))
       }
     } else {
       # Display SWAT+ help table
@@ -1230,7 +1231,7 @@ server <- function(input, output, session) {
       blocking_level = "error")
 
     # Display table of observed file names needed for calibration/optimization
-    output$tableOutputExtractionDisplayOnly <- renderDataTable(
+    output$tableOutputExtractionDisplayOnly <- renderDT(
       printVariableNameObservedFiles(outputExtraction)
     )
 
@@ -1901,7 +1902,7 @@ server <- function(input, output, session) {
       colnames(globalVariable$parameterValue) = c("Simulation Nr.",
                                                   globalVariable$paraSelection$Parameter)
       # Display output table
-      output$tableDisplayParameterSet <- renderDataTable(
+      output$tableDisplayParameterSet <- renderDT(
         round(globalVariable$parameterValue, 3),
         server = FALSE,
         extensions = c("Buttons"),
@@ -2088,7 +2089,7 @@ server <- function(input, output, session) {
 
     # Display observed data in table
     spsComps::shinyCatch(
-      output$tableObsVarDisplay <- renderDataTable(mergeDataFrameDiffRow(globalVariable$observedData),
+      output$tableObsVarDisplay <- renderDT(mergeDataFrameDiffRow(globalVariable$observedData),
                                                    server = FALSE,
                                                    extensions = c("Buttons"),
                                                    rownames = FALSE,
@@ -2246,7 +2247,7 @@ server <- function(input, output, session) {
         tableParaObj[is.num] <- lapply(tableParaObj[is.num], round, 3)
 
         # Fill output tables with parameter and objective function values
-        output$tableCalObjFunction <- renderDataTable(tableParaObj,
+        output$tableCalObjFunction <- renderDT(tableParaObj,
                                                       server = FALSE,
                                                       extensions = c("Buttons"),
                                                       rownames = FALSE,
@@ -2279,7 +2280,7 @@ server <- function(input, output, session) {
 
     # Fill output tables with parameter and objective function values
     spsComps::shinyCatch(
-      output$tableObjEachVar <- renderDataTable(tableParaObjEachVar,
+      output$tableObjEachVar <- renderDT(tableParaObjEachVar,
                                                 server = FALSE,
                                                 extensions = c("Buttons"),
                                                 rownames = FALSE,
@@ -2334,7 +2335,7 @@ server <- function(input, output, session) {
                                                          p_value = tableSensitivity[,2])
 
           # Fill output table with values
-          output$tableSensitivity <- renderDataTable(globalVariable$tableSensitivity,
+          output$tableSensitivity <- renderDT(globalVariable$tableSensitivity,
                                                      server = FALSE,
                                                      extensions = c("Buttons"),
                                                      rownames = FALSE,
@@ -2371,7 +2372,7 @@ server <- function(input, output, session) {
 
           # Save result table to the global variable
           globalVariable$tableSensitivity <<- sensiReport
-          output$tableSensitivity <- renderDataTable(globalVariable$tableSensitivity)
+          output$tableSensitivity <- renderDT(globalVariable$tableSensitivity)
 
           # Set 1 second delay for the progress bar
           Sys.sleep(1)
@@ -2518,18 +2519,18 @@ server <- function(input, output, session) {
         wordWrap = FALSE))
 
       #Table behavioral parameter range
-      columnsTableBehaParam <- data.frame(title = c('parameter', 'lower_95PPU',
-                                                    'median','upper_95PPU',
-                                                    'bestParameter'),
-                                          source = rep(NA, 5),
-                                          width = rep(300, 5),
-                                          type = rep('numeric', 5))
+      columnsTableBehaParamRange <- data.frame(title = c('parameter', 'lower_95PPU',
+                                                         'median','upper_95PPU',
+                                                         'bestParameter'),
+                                               source = rep(NA, 5),
+                                               width = rep(300, 5),
+                                               type = rep('numeric', 5))
 
       # Set format for the behavioral parameter range table
-      output$tableBehaParam <- excelR::renderExcel(excelR::excelTable(
+      output$tableBehaParamRange <- excelR::renderExcel(excelR::excelTable(
         data = cbind(globalVariable$paraSelection$Parameter,
                      globalVariable$dataPlotVariableNumber$ppuParaRange),
-        columns = columnsTableBehaParam,
+        columns = columnsTableBehaParamRange,
         editable = FALSE,
         allowInsertRow = FALSE,
         allowInsertColumn = FALSE,
@@ -2539,6 +2540,28 @@ server <- function(input, output, session) {
         columnResize = FALSE,
         wordWrap = FALSE
         ))
+
+      #Table behavioral parameter sets
+      numOfParameters <- length(globalVariable$paraSelection$Parameter)
+      columnsTableBehaParamSet <- data.frame(title = rep("-", numOfParameters),
+                                               source = rep(NA, numOfParameters),
+                                               width = rep(300, numOfParameters),
+                                               type = rep('text', numOfParameters))
+
+      # Set format for the behavioral parameter range table
+      output$tableBehaParamSet <- excelR::renderExcel(excelR::excelTable(
+        data = rbind(globalVariable$paraSelection$Parameter,
+                     round(globalVariable$dataPlotVariableNumber$behaParameterSet,7)),
+        columns = columnsTableBehaParamSet,
+        editable = FALSE,
+        allowInsertRow = FALSE,
+        allowInsertColumn = FALSE,
+        allowDeleteColumn = FALSE,
+        allowDeleteRow = FALSE,
+        rowDrag = FALSE,
+        columnResize = FALSE,
+        wordWrap = FALSE
+      ))
 
       # Show p- and r-factor
       output$printPandRFactor <- renderText(
@@ -2750,9 +2773,9 @@ server <- function(input, output, session) {
         if (globalVariable$SWATProject){
           output_std <- paste0(globalVariable$workingFolder, "/TxtInOut_1/output.std")
           output_std <- read_output_std(output_std)
-          output$swatEduWaterBalance <- renderDataTable(output_std$waterbalance,
+          output$swatEduWaterBalance <- renderDT(output_std$waterbalance,
                                                         options = list(scrollX = TRUE, searching = FALSE))
-          output$swatEduNutrientBalance <- renderDataTable(output_std$nutrientblance,
+          output$swatEduNutrientBalance <- renderDT(output_std$nutrientblance,
                                                            options = list(scrollX = TRUE, searching = FALSE))
         } else {
           # TODO
