@@ -615,8 +615,11 @@ server <- function(input, output, session) {
 
       # If this is a SWAT project
       if (globalVariable$SWATProject & globalVariable$TxtInOutSWAT){
+
         # Get HRU information (land use, slope, soil, sub)
-        globalVariable$HRUinfo <<- getHruInfo(globalVariable$TxtInOutFolder)
+        spsComps::shinyCatch(
+          globalVariable$HRUinfo <<- getHruInfo(globalVariable$TxtInOutFolder),
+          blocking_level = "error")
 
         # Get unique soil, land use, slope, max number of subbasins
         uniqueSoil <- unique(globalVariable$HRUinfo$soil)
@@ -1059,11 +1062,17 @@ server <- function(input, output, session) {
                           "formatted as follows:","\n",
                           "   First row: Name of the parameters","\n",
                           "   From the second row: Parameter value", "\n",
-                          "   Leave one row empty at the end of the file", "\n",
                           " ", "\n",
                           "   As many column as the number of parameters","\n",
+                          "   Columns are seperated by one or more spaces or tabs","\n",
                           "   The order of parameters in these columns follows ",
                           "the order of the parameters in the above Table", "\n",
+                          " ", "\n",
+                          "Example (content of myParameterFile.txt)", "\n",
+                          " ", "\n",
+                          "   GW_DELAY.gw  CN2.mgt   SOL_K.sol    ALPHA_BF.gw  ESCO.hru    SURLAG.hru  CH_K2.rte     SURLAG.bsn", "\n",
+                          "   228.03       0.05     -0.21         0.07         0.80        0.14        0.41          3.39", "\n",
+                          "   96.27       -0.12      0.17         0.35         0.66        0.34        0.03          3.00", "\n",
                          sep = "")
 
     } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
@@ -1414,6 +1423,21 @@ server <- function(input, output, session) {
       easyClose = TRUE
     ))
   })
+
+  # ****************************************************************************
+  # Help button helpCheckSaveSimTocsv
+  # ****************************************************************************
+  observe({
+    req(input$helpCheckSaveSimTocsv)
+
+    showModal(modalDialog(
+      title = "Help: Save simulated results as .csv files",
+      HTML(readLines(file.path(HTMLdir,"HTML",
+                               "helpCheckSaveSimTocsv.html"),warn=FALSE)),
+      easyClose = TRUE
+    ))
+  })
+
   # ****************************************************************************
   # Run SWAT
   # ****************************************************************************
@@ -1825,6 +1849,15 @@ server <- function(input, output, session) {
                              min = 1,
                              max = globalVariable$nOutputVar,
                              step = 1)
+
+           # Update select variable number
+           updateSliderInput(session = session,
+                             "showSimResultsVariable",
+                             "Select variable",
+                             value = 1,
+                             min = 1,
+                             max = globalVariable$nOutputVar,
+                             step = 1)
         }
 
       } else {
@@ -1886,6 +1919,42 @@ server <- function(input, output, session) {
         return(lapply(printFileContent, p))
       })
     }
+  })
+
+
+  # ****************************************************************************
+  # Display simulated results
+  # ****************************************************************************
+  observe({
+    req(input$checkSaveSimTocsv)
+    # Display observed data in table
+    spsComps::shinyCatch(
+      if (TRUE){
+        # Get simulated data
+        for (var in 1:globalVariable$nOutputVar){
+
+          data <- c()
+          for (core in 1:globalVariable$ncores){
+            data <- rbind(data, read.csv(file = file.path(globalVariable$workingFolder,
+                                              "Output",
+                                              paste0("Core_", core),
+                                              paste0("out_var_", var, ".txt")),
+                             header = FALSE))
+          }
+          # Convert to data frame
+          data <- matrix(data$V1, ncol = nrow(globalVariable$parameterValue), byrow = FALSE)
+          colnames(data) <- paste0("sim_", data[1,])
+
+          fileName <- file.path(globalVariable$workingFolder,
+                                paste0("sim_variable_", var, ".csv"))
+          write.csv(data[-c(1),], file = fileName,
+                    quote = FALSE, row.names = FALSE)
+
+          message(paste0("Simulated output variable ", var, " was saved as: ", fileName))
+        }
+      },
+      blocking_level = "error"
+    )
   })
 
 

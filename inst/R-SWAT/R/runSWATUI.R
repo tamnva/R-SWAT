@@ -126,7 +126,7 @@ runSwatUI <- function(id) {
       #-------------------------------------------------------------------------
       # 5. See simulation report
       #-------------------------------------------------------------------------
-      div( style = "margin-top: 15em",
+      div( style = "margin-top: 20em",
            column(width = 10,
                   HTML("<b>","5. See simulation report","</b>"),
            ),
@@ -140,18 +140,11 @@ runSwatUI <- function(id) {
                           class = NULL),
       ),
 
-      column(width = 5,
+      column(width = 10,
              checkboxInput('checkCurrentSimulation',
                            'Open file CurrentSimulationReport.log',
                            value = FALSE, width = NULL),
       ),
-
-      column(width = 5,
-             checkboxInput('checkDisplayParameterSet',
-                           'Display all parameter sets',
-                           value = FALSE, width = NULL),
-      ),
-
 
       conditionalPanel(
         condition = "input.checkCurrentSimulation == 1",
@@ -161,11 +154,31 @@ runSwatUI <- function(id) {
         ),
       ),
 
+      column(width = 10,
+             checkboxInput('checkDisplayParameterSet',
+                           'Display all parameter sets',
+                           value = FALSE, width = NULL),
+      ),
+
       conditionalPanel(
         condition = "input.checkDisplayParameterSet == 1",
         column(width = 10,
                dataTableOutput("tableDisplayParameterSet"),
         ),
+      ),
+
+      # Check box display all simulation results
+      column(width = 10,
+             checkboxInput("checkSaveSimTocsv",
+                           "Save simulated results as .csv files"),
+      ),
+
+      column(width = 1,
+             actionButton("helpCheckSaveSimTocsv",
+                          "Help",
+                          buttonType = "default",
+                          style="background-color: none; border-color: none",
+                          class = NULL),
       ),
       #-------------------------------------------------------------------------
 
