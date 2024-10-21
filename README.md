@@ -25,8 +25,10 @@ remotes::install_github("tamnva/R-SWAT", force = TRUE, dependencies = TRUE, buil
 # Load RSWAT
 library(RSWAT)
 
-# Extract example data (3.6 MB of storage). TODO: replace tempdir() with your path, e.g., "C:/example"
-# The example data DO NOT include the SWAT executable files (please download them at https://swat.tamu.edu/software/)
+# Extract example data (3.6 MB of storage). TODO: replace tempdir()
+#     with your path, e.g., "C:/example"
+# The example data DO NOT include the SWAT executable files
+#    (please download them at https://swat.tamu.edu/software/)
 extracExampleData(exampleData, "all", tempdir())
 
 # Call RSWAT graphical user interface: DO NOT use RSWAT::showRSWAT()
