@@ -107,25 +107,25 @@ ui <- shinydashboard::dashboardPage(
               introductionUI("introductionUI")),
 
       shinydashboard::tabItem(tabName = "generalSetting",
-              generalSettingUI("generalSettingUI")),
+              generalSettingUI("general_setting_id")),
 
       shinydashboard::tabItem(tabName = "paramSampling",
-              paramSamplingUI("paramSamplingUI")),
+              paramSamplingUI("param_sampling_id")),
 
       shinydashboard::tabItem(tabName = "runSWAT",
-              runSwatUI("runSwatUI")),
+              runSwatUI("run_swat_id")),
 
       shinydashboard::tabItem(tabName = "objFunctionTab",
-              objFunctionUI("objFunctionUI")),
+              objFunctionUI("obj_function_id")),
 
       shinydashboard::tabItem(tabName = "sensAnalysisTab",
-              sensAnalysisUI("sensAnalysisUI")),
+              sensAnalysisUI("sens_analysis_id")),
 
       shinydashboard::tabItem(tabName = "paraOptUncerTab",
-              paraOptUncerUI("paraOptUncerUI")),
+              paraOptUncerUI("para_opt_uncer_id")),
 
       shinydashboard::tabItem(tabName = "swatEdu",
-              swatEduUI("swatEdu"))
+              swatEduUI("swat_edu_id"))
 
     )
   ),
