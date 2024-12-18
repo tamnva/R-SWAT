@@ -1,7 +1,7 @@
 
 generalSettingServer <- function(id) {
   moduleServer(id, function(input, output, session) {
-    
+
     #-----------------------------------------------------------------------------
     # Tab 1. General Setting
     #-----------------------------------------------------------------------------
@@ -9,7 +9,7 @@ generalSettingServer <- function(id) {
     # Check SWAT or SWAT+ project
     # ****************************************************************************
     observeEvent(input$SWATorSWATplus, {
-      
+
       # Check SWAT or SWAT+ project
       if (input$SWATorSWATplus == "SWAT"){
         globalVariable$SWATProject <- TRUE
@@ -18,10 +18,11 @@ generalSettingServer <- function(id) {
         globalVariable$SWATProject <- FALSE
         globalVariable$SWATPlusProject <- TRUE
       }
-      
+      print("okcheck")
       # Initially there is no warning message
-      output$checkTxtInOutFolder <- renderText(" ")
-      
+      output$checkTxtInOutFolder <- renderText("546546455")
+      print("okcheck2")
+
       # Check if the TxtInOut matches the SWAT project
       if (globalVariable$SWATPlusProject){
         if(globalVariable$TxtInOutSWAT){
@@ -36,13 +37,13 @@ generalSettingServer <- function(id) {
           )
         }
       }
-      
+
       # ****************************************************************************
       # Select SWAT parameters for calibration and/or sensitivity: Default setting
       # ****************************************************************************
       print("ok1")
       if (!globalVariable$loadProject){
-        
+
         # Update template for parameter and output extraction according to the SWAT project
         if (globalVariable$SWATProject){
           print("ok2")
@@ -58,7 +59,7 @@ generalSettingServer <- function(id) {
                                                    rowDrag = TRUE,
                                                    columnResize = FALSE,
                                                    wordWrap = TRUE))
-          
+
           # Example of output extraction for SWAT project
           output$tableOutputExtraction <-
             excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWAT,
@@ -71,10 +72,10 @@ generalSettingServer <- function(id) {
                                                    rowDrag = FALSE,
                                                    columnResize = FALSE,
                                                    wordWrap = TRUE))
-          
+
           # If this is SWAT+ project
         } else {
-          
+
           # Example of parameter selection for SWAT+ project
           output$tableParaSelection <-
             excelR::renderExcel(excelR::excelTable(data = dataParaSelectionSWATPlus,
@@ -87,7 +88,7 @@ generalSettingServer <- function(id) {
                                                    rowDrag = TRUE,
                                                    columnResize = FALSE,
                                                    wordWrap = TRUE))
-          
+
           # Example of output extraction for SWAT+ project
           output$tableOutputExtraction <-
             excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWATPlus,
@@ -100,39 +101,40 @@ generalSettingServer <- function(id) {
                                                    rowDrag = FALSE,
                                                    columnResize = FALSE,
                                                    wordWrap = TRUE))
-          
+
           globalVariable$paraSelection <- dataParaSelectionSWATPlus
         }
         print("ok3")
       }
       print("ok4")
     })
-    
+
     # ****************************************************************************
     # Help button select SWAT or SWAT+ project
     # ****************************************************************************
     observeEvent(input$helpSWATorSWATplus, {
-      
+
       showModal(modalDialog(
         title = "Help: 1. SWAT or SWAT+ project",
         "Please select SWAT or SWAT+ model, the graphical user interface will be
       changed after the selection",
         easyClose = TRUE
       ))
-      
+
     })
-    
+
     # ****************************************************************************
     # Get working folder
     # ****************************************************************************
+
     observeEvent(input$workingFolder, {
       print("ok5")
       tam$a <- tam$a + 2
       print(tam$a)
-      
+
       # Save working directory in the global variable
       globalVariable$workingFolder <- trimws(input$workingFolder)
-      
+
       # Save link to the simulation report log file to the global variable
       globalVariable$CurrentSimulationReportFile <- paste(
         globalVariable$workingFolder,
@@ -145,13 +147,13 @@ generalSettingServer <- function(id) {
         # Print out message if working dir does not exist
         output$checkWorkingFolder <- renderText("Input folder does not exist")
       } else {
-        
+
         # If exists, does not display anything
         output$checkWorkingFolder <- renderText(" ")
       }
       print("ok6.0")
     })
-    
+
     # ****************************************************************************
     # Help button select working folder
     # ****************************************************************************
@@ -165,28 +167,31 @@ generalSettingServer <- function(id) {
       simulation outputs, TxtInOut folders for parallel runs, etc...",
         easyClose = TRUE
       ))
-      
+
     })
-    
+
     # ****************************************************************************
     # TxtInOut folder: Display HRU info from TxtInOut folder
     # ****************************************************************************
     observeEvent(input$TxtInOutFolder, {
       print("ok8")
       # Check if TxtInOut folder exists
+      print("ok8a")
+
       if(!dir.exists(trimws(input$TxtInOutFolder))){
         output$checkTxtInOutFolder <- renderText("Input folder does not exist")
       } else {
         output$checkTxtInOutFolder <- renderText(" ")
       }
-      
+
+      print("ok8b")
       # Check if .hru files exist in this folder
       if (checkDirFileExist(trimws(input$TxtInOutFolder), "", ".cio")){
-        
+
         # Is this TxtInOut of SWAT or SWAT plus
         globalVariable$TxtInOutSWAT <- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWAT
         globalVariable$TxtInOutSWATPlus <- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWATPlus
-        
+
         # Check if the TxtInOut matches the SWAT project
         if (globalVariable$SWATPlusProject){
           if(globalVariable$TxtInOutSWAT){
@@ -201,32 +206,32 @@ generalSettingServer <- function(id) {
             )
           }
         }
-        
+        print("ok8c")
         # Save link to TxtInout Folder to the global variable
         globalVariable$TxtInOutFolder <- trimws(input$TxtInOutFolder)
-        
+
         # If this is a SWAT project
         if (globalVariable$SWATProject & globalVariable$TxtInOutSWAT){
-          
+
           # Get HRU information (land use, slope, soil, sub)
           spsComps::shinyCatch(
             globalVariable$HRUinfo <- getHruInfo(globalVariable$TxtInOutFolder),
             blocking_level = "error")
-          
+
           # Get unique soil, land use, slope, max number of subbasins
           uniqueSoil <- unique(globalVariable$HRUinfo$soil)
           uniqueLandUse <- unique(globalVariable$HRUinfo$lu)
           uniqueSlope <- unique(globalVariable$HRUinfo$slope)
           minMaxSubbasin <- range(globalVariable$HRUinfo$sub)
-          
+
           # Number of soil, land use, slope
           nSoil <- length(uniqueSoil)
           nLU <- length(uniqueLandUse)
           nSlope <- length(uniqueSlope)
-          
+
           nRow <- max(nSoil, nLU, nSlope, 2)
-          
-          
+
+
           # Display unique land use, soil, slope
           displayOutput$uniqueHruProperties <- data.frame(
             minMaxSubbasin = c(minMaxSubbasin,rep(NA, nRow - 2)),
@@ -234,7 +239,7 @@ generalSettingServer <- function(id) {
             soilName = c(uniqueSoil,rep(NA, nRow - nSoil)),
             slopeClass = c(uniqueSlope,rep(NA, nRow - nSlope))
           )
-          
+
           # If this is a SWAT+ project
         } else if (globalVariable$SWATPlusProject & globalVariable$TxtInOutSWATPlus){
           displayOutput$uniqueHruProperties <- NULL
@@ -244,19 +249,19 @@ generalSettingServer <- function(id) {
             header = TRUE, skip = 1, sep = ""
           )
           # Find maximum number of HRU
-          
-          
+
+
         } else {
           displayOutput$uniqueHruProperties <- NULL
           globalVariable$HRUinfo <- NULL
         }
-        
+
         # Display table of HRU information (land use, soil, slope)
         output$tableHRUinfo <- renderDT(globalVariable$HRUinfo)
-        
-        
+
+
       } else {
-        
+
         # If this is not TxtInOut folder, assign global variables to NULL
         globalVariable$HRUinfo <- NULL
         globalVariable$TxtInOutFolder <- NULL
@@ -265,7 +270,7 @@ generalSettingServer <- function(id) {
       }
       print("ok9aaaaa")
     })
-    
+
     # ****************************************************************************
     # Help button select TxtInOut folder
     # ****************************************************************************
@@ -278,7 +283,7 @@ generalSettingServer <- function(id) {
         easyClose = TRUE
       ))
     })
-    
+
     # ****************************************************************************
     # Get executable SWAT file
     # ****************************************************************************
@@ -289,7 +294,7 @@ generalSettingServer <- function(id) {
       spsComps::shinyCatch(globalVariable$SWATexeFile <- file.choose(),
                            blocking_level = "none")
       shinyjs::enable("getSWATexe")
-      
+
       spsComps::shinyCatch(
         if (grepl(".exe", globalVariable$SWATexeFile, fixed = TRUE)){
           output$printSWATexe <- renderText(globalVariable$SWATexeFile)
@@ -297,16 +302,16 @@ generalSettingServer <- function(id) {
           output$printSWATexe <- renderText("Error: The selected file must have '.exe' extention")
         },
         blocking_level = "error")
-      
-      
+
+
     })
-    
+
     print("ok13-1")
     # ****************************************************************************
     # Help button select executable SWAT
     # ****************************************************************************
     observeEvent(input$helpgetSWATexe, {
-      
+
       showModal(modalDialog(
         title = "Help: 4. Select executable SWAT",
         "Select the executable SWAT or SWAT+ file, for example, swat_32debug.exe,
@@ -320,21 +325,21 @@ generalSettingServer <- function(id) {
     # ****************************************************************************
     observeEvent(input$getSWATParamFile, {
       print("ok12")
-      
+
       # Get full path to SWAT exe file
       shinyjs::disable("getSWATParamFile")
       spsComps::shinyCatch(globalVariable$SWATParamFile <- file.choose(),
                            blocking_level = "none")
       shinyjs::enable("getSWATParamFile")
-      
+
       spsComps::shinyCatch(
         if (grepl("swatParam.txt", globalVariable$SWATParamFile, fixed = TRUE) |
             grepl("cal_parms.cal", globalVariable$SWATParamFile, fixed = TRUE)){
-          
+
           globalVariable$SWATParam <- loadSwatParam(globalVariable$SWATParamFile)
           output$printSWATParamFile <- renderText(globalVariable$SWATParamFile)
           output$tableSWATParam <- renderDT(globalVariable$SWATParam)
-          
+
         } else {
           output$printSWATParamFile <- renderText(
             paste("Error: The selected file must be either 'swatParam.txt'",
@@ -342,7 +347,7 @@ generalSettingServer <- function(id) {
           )
         },
         blocking_level = "error")
-      
+
     })
     print("ok13-1")
     # ****************************************************************************
@@ -357,6 +362,6 @@ generalSettingServer <- function(id) {
         easyClose = TRUE
       ))
     })
-    
+
   })
 }

@@ -174,6 +174,7 @@ globalVariable$loadProject <- FALSE
 globalVariable$TxtInOutSWAT <- FALSE
 globalVariable$TxtInOutSWATPlus <- FALSE
 globalVariable$SWATProject <- TRUE
+globalVariable$SWATPlusProject <- FALSE
 globalVariable$paraSelection <- dataParaSelectionSWAT
 HTMLdir <- system.file("R-SWAT", package = "RSWAT")
 globalVariable$nCaliParam <- nrow(globalVariable$paraSelection)
