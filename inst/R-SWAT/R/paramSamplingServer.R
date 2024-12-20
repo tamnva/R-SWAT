@@ -41,21 +41,19 @@ paramSamplingServer <- function(id) {
     #--------------------------------------------------------------------------#
     # Show list of all parameters                                              #
     #--------------------------------------------------------------------------#
-    observeEvent(input$helpParameterSelection, {
-print("ok1")
-      print(globalVariable$workingFolder)
-      print(globalVariable$SWATParam)
+    observe({
+
+      req(input$helpParameterSelection)
+
       # This first if command prevents the app crashed when no input is given
       if (is.data.frame(globalVariable$SWATParam)){
-        print("ok2")
 
         # Check if there is no input SWAT parameter file
         if (is.null(globalVariable$SWATParam$parameter)){
-          print("ok3")
           output$tableHelpParameterSelection <-
             renderDT(displayOutput$uniqueHruProperties)
-        } else {
 
+        } else {
           SWATParamName <- globalVariable$SWATParam$parameter
           nSWATParamName <- length(SWATParamName)
 
@@ -115,7 +113,9 @@ print("ok1")
     #--------------------------------------------------------------------------#
     # Check parameter table                                                    #
     #--------------------------------------------------------------------------#
-    observeEvent(input$checkParameterTableButton, {
+    observe({
+
+      req(input$checkParameterTableButton)
 
       spsComps::shinyCatch(
         checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection,
@@ -131,7 +131,9 @@ print("ok1")
     #--------------------------------------------------------------------------#
     # Save parameter table to global variables                                 #
     #--------------------------------------------------------------------------#
-    observeEvent(input$tableParaSelection, {
+    observe({
+
+      req(input$tableParaSelection)
 
       # Parameter selection
       paraSelection <-  excelR::excel_to_R(input$tableParaSelection)
@@ -236,7 +238,9 @@ print("ok1")
     # ****************************************************************************
     # Parameter sampling: Get user input for parameter sampling
     # ****************************************************************************
-    observeEvent(input$samplingApproach, {
+    observe({
+
+      req(input$samplingApproach)
 
       # Save sampling approach to the global variable
       globalVariable$samplingApproach <- input$samplingApproach
@@ -366,7 +370,10 @@ print("ok1")
     # ****************************************************************************
     # Parameter sampling: get input information
     # ****************************************************************************
-    observeEvent(input$inputInfo, {
+    observe({
+
+      req(input$inputInfo)
+
       # Check if user need to input R command
       if (input$samplingApproach %in% c('Sensi_(from_sensitivity_package)',
                                         'Cali_(from_optimization_package)',
@@ -401,7 +408,5 @@ print("ok1")
         easyClose = TRUE
       ))
     })
-
-
   })
 }

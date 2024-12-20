@@ -2,6 +2,7 @@
 paramSamplingUI <- function(id) {
 
   tagList(
+
     fluidRow(
 
       #------------------------------------------------------------------------#
@@ -12,12 +13,12 @@ paramSamplingUI <- function(id) {
                   sensitivity analysis","</b>"),
       ),
       column(width = 10,
-             checkboxInput(shiny::NS(id,'helpParameterSelection'),
+             checkboxInput(shiny::NS(id, 'helpParameterSelection'),
                            'Display help for parameter selection',
                            value = FALSE, width = NULL),
       ),
       column(width = 1,
-             actionButton(shiny::NS(id,"helpParam"),
+             actionButton(shiny::NS(id, "helpParam"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
@@ -27,7 +28,7 @@ paramSamplingUI <- function(id) {
       conditionalPanel(
         condition = "input.helpParameterSelection == 1",
         column(width = 10,
-               dataTableOutput(shiny::NS(id,'tableHelpParameterSelection')),
+               dataTableOutput(shiny::NS(id, 'tableHelpParameterSelection')),
         ),
         ns = shiny::NS(id)
       ),
@@ -37,19 +38,19 @@ paramSamplingUI <- function(id) {
                          height = "0px"),
       ),
       column(width = 1,
-             actionButton(shiny::NS(id,"helpParamSelection"),
+             actionButton(shiny::NS(id, "helpParamSelection"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
                           class = NULL),
       ),
       column(width = 10,
-             actionButton(shiny::NS(id,"checkParameterTableButton"),
+             actionButton(shiny::NS(id, "checkParameterTableButton"),
                           "Click here to check the input table (IMPORTANT)",
                           #icon("paper-plane"),
                           style="background-color: #fa8787;
                           border-color: #2e6da4"),
-             verbatimTextOutput('checkParameterTableTxtOuput'),
+             verbatimTextOutput(shiny::NS(id, 'checkParameterTableTxtOuput')),
       ),
       div( style = "margin-bottom: 10em",
            column(width = 10,
