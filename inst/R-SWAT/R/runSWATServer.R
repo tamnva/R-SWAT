@@ -100,8 +100,9 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Get userObjFunction.R file file
     # ****************************************************************************
-    observeEvent(input$getUserReadSwatOutput, {
+    observe({
 
+      req(input$getUserReadSwatOutput)
       print("ok25")
       # Display message
       spsComps::shinyCatch(
@@ -136,7 +137,9 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Help output extraction
     # ****************************************************************************
-    observeEvent(input$helpOutputExtraction, {
+    observe({
+
+      req(input$helpOutputExtraction)
       print("ok26")
       showModal(modalDialog(
         title = "Help: Parameter Selection",
@@ -150,7 +153,9 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Update select input range based on file.cio in the TxtInOutFolder
     # ****************************************************************************
-    observeEvent(input$TxtInOutFolder, {
+    observe({
+
+      req(input$TxtInOutFolder)
 
       print("ok27")
       # Check if there is a file called file.cio in this TxtInOut
@@ -177,7 +182,10 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Get user input range for calibration
     # ****************************************************************************
-    observeEvent(input$dateRangeCali, {
+    observe({
+
+      req(input$dateRangeCali)
+
       # Save selected date range for calibration/sensitivity to the global variables
       globalVariable$dateRangeCali <- input$dateRangeCali
     })
@@ -211,7 +219,10 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Get user input number of cores/threads
     # ****************************************************************************
-    observeEvent(input$ncores, {
+    observe({
+
+      req(input$ncores)
+
       # Assign the number of selected cores to the global variables
       globalVariable$ncores <- input$ncores
     })
@@ -271,7 +282,10 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Run SWAT
     # ****************************************************************************
-    observeEvent(input$runSWAT, {
+    observe({
+
+      req(input$runSWAT)
+
       print("ok29")
       # Refresh the parameter values in case of loading the projects
       globalVariable$parameterValue <- c()
@@ -730,7 +744,9 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # See simulation report - Open file CurrentSimulationReport.log
     # ****************************************************************************
-    observeEvent(input$checkCurrentSimulation, {
+    observe({
+
+      req(input$checkCurrentSimulation)
       print("ok30")
       if (!is.null(globalVariable$CurrentSimulationReportFile)){
         # Check if the CurrentSimulationReport.log file exists
@@ -757,7 +773,9 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Display simulated results
     # ****************************************************************************
-    observeEvent(input$checkSaveSimTocsv, {
+    observe({
+
+      req(input$checkSaveSimTocsv)
 
       # Display observed data in table
       spsComps::shinyCatch(
@@ -793,7 +811,9 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Display parameter sets used for simulations
     # ****************************************************************************
-    observeEvent(input$checkDisplayParameterSet, {
+    observe({
+
+      req(input$checkDisplayParameterSet)
       print("ok32")
       # Check if the parameterValue exists
       if (!is.null(globalVariable$parameterValue)){

@@ -6,8 +6,6 @@ runSwatUI <- function(id) {
   # shiny::NS(id) returns a namespace function, which was save as `ns` and will
   # invoke later.
 
-  ns <- shiny::NS(id)
-
   tagList(
 
     fluidRow(
@@ -19,7 +17,7 @@ runSwatUI <- function(id) {
       ),
 
       column(width = 1,
-             actionButton("helpOutputExtraction",
+             actionButton(shiny::NS(id, "helpOutputExtraction"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
@@ -27,14 +25,15 @@ runSwatUI <- function(id) {
       ),
 
       column(width = 10,
-             excelR::excelOutput("tableOutputExtraction",
-                         width = "100%",
-                         height = "1px"),
-             span(textOutput("messageUserReadSwatOutput"), style="color:red"),
+             excelR::excelOutput(shiny::NS(id, "tableOutputExtraction"),
+                                 width = "100%",
+                                 height = "1px"),
+             span(textOutput(shiny::NS(id, "messageUserReadSwatOutput")),
+                  style="color:red"),
       ),
 
       column(width = 5,
-             checkboxInput('checkOutputExtractionDisplayOnly',
+             checkboxInput(shiny::NS(id, 'checkOutputExtractionDisplayOnly'),
                            'Display corresponding observed file names',
                            value = FALSE, width = NULL),
       ),
@@ -43,7 +42,7 @@ runSwatUI <- function(id) {
       conditionalPanel(
         condition = "input.checkOutputExtractionDisplayOnly == 1",
         column(width = 10,
-               actionButton("getUserReadSwatOutput",
+               actionButton(shiny::NS(id, "getUserReadSwatOutput"),
                             "Load userReadSwatOutput.R",
                             buttonType = "default",
                             style="background-color: #87CEFA; border-color: #0d0c0c",
@@ -51,26 +50,29 @@ runSwatUI <- function(id) {
         ),
         # Display file name
         column(width = 10,
-               verbatimTextOutput("userReadSwatOutputFile", placeholder = TRUE),
+               verbatimTextOutput(shiny::NS(id, "userReadSwatOutputFile"),
+                                  placeholder = TRUE),
         ),
 
         column(width = 10,
-               dataTableOutput('tableOutputExtractionDisplayOnly'),
+               dataTableOutput(shiny::NS(id, 'tableOutputExtractionDisplayOnly')),
         ),
+        ns = shiny::NS(id)
       ),
 
       #-------------------------------------------------------------------------
       # 2. Select date range for calibration
       #-------------------------------------------------------------------------
       column(width = 10,
-             dateRangeInput("dateRangeCali", "2. Select date range",
+             dateRangeInput(shiny::NS(id, "dateRangeCali"),
+                            "2. Select date range",
                             start = "2001-01-01",
                             end   = "2010-12-31"),
 
       ),
 
       column(width = 1,
-             actionButton("helpDateRangeCali",
+             actionButton(shiny::NS(id, "helpDateRangeCali"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
@@ -81,17 +83,17 @@ runSwatUI <- function(id) {
       # 3. Select number of parallel runs (cores)
       #-------------------------------------------------------------------------
       column(width = 10,
-             sliderInput("ncores",
+             sliderInput(shiny::NS(id, "ncores"),
                          "3. Select number of parallel runs (threads)",
                          value = 4,
                          min = 1,
                          max = parallel::detectCores(),
                          step = 1,
                          round = TRUE),
-             ),
+      ),
 
       column(width = 1,
-             actionButton("helpNumberofThreads",
+             actionButton(shiny::NS(id, "helpNumberofThreads"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
@@ -108,7 +110,7 @@ runSwatUI <- function(id) {
       ),
 
       column(width = 1,
-             actionButton("helpRunSWAT",
+             actionButton(shiny::NS(id, "helpRunSWAT"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
@@ -117,10 +119,10 @@ runSwatUI <- function(id) {
 
 
       column(width = 10,
-             actionButton("runSWAT",
+             actionButton(shiny::NS(id, "runSWAT"),
                           "Click here to run SWAT",
                           style="background-color: #87CEFA; border-color: #2e6da4"),
-             verbatimTextOutput('printRuning'),
+             verbatimTextOutput(shiny::NS(id, 'printRuning')),
       ),
 
       #-------------------------------------------------------------------------
@@ -133,7 +135,7 @@ runSwatUI <- function(id) {
       ),
 
       column(width = 1,
-             actionButton("helpCheckCurrentSimulation",
+             actionButton(shiny::NS(id, "helpCheckCurrentSimulation"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
@@ -141,7 +143,7 @@ runSwatUI <- function(id) {
       ),
 
       column(width = 10,
-             checkboxInput('checkCurrentSimulation',
+             checkboxInput(shiny::NS(id, 'checkCurrentSimulation'),
                            'Open file CurrentSimulationReport.log',
                            value = FALSE, width = NULL),
       ),
@@ -149,13 +151,14 @@ runSwatUI <- function(id) {
       conditionalPanel(
         condition = "input.checkCurrentSimulation == 1",
         column(width = 10,
-               uiOutput('tableCurrentSimulation'),
+               uiOutput(shiny::NS(id, 'tableCurrentSimulation')),
 
         ),
+        ns = shiny::NS(id)
       ),
 
       column(width = 10,
-             checkboxInput('checkDisplayParameterSet',
+             checkboxInput(shiny::NS(id, 'checkDisplayParameterSet'),
                            'Display all parameter sets',
                            value = FALSE, width = NULL),
       ),
@@ -163,18 +166,19 @@ runSwatUI <- function(id) {
       conditionalPanel(
         condition = "input.checkDisplayParameterSet == 1",
         column(width = 10,
-               dataTableOutput("tableDisplayParameterSet"),
+               dataTableOutput(shiny::NS(id, "tableDisplayParameterSet")),
         ),
+        ns = shiny::NS(id)
       ),
 
       # Check box display all simulation results
       column(width = 10,
-             checkboxInput("checkSaveSimTocsv",
+             checkboxInput(shiny::NS(id, "checkSaveSimTocsv"),
                            "Save simulated results as .csv files"),
       ),
 
       column(width = 1,
-             actionButton("helpCheckSaveSimTocsv",
+             actionButton(shiny::NS(id, "helpCheckSaveSimTocsv"),
                           "Help",
                           buttonType = "default",
                           style="background-color: none; border-color: none",
@@ -184,4 +188,3 @@ runSwatUI <- function(id) {
 
     )
   )}
-
