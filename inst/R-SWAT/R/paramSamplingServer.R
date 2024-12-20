@@ -1,52 +1,90 @@
-
-
+#------------------------------------------------------------------------------#
+#                      2. Parameter sampling server module                     #
+#------------------------------------------------------------------------------#
 paramSamplingServer <- function(id) {
+
   moduleServer(id, function(input, output, session) {
 
-    
-    # ****************************************************************************
-    # Display help for parameter selection
-    # ****************************************************************************
-    
+    #--------------------------------------------------------------------------#
+    # Default parameter table                                                  #
+    #--------------------------------------------------------------------------#
+    observe({
+      if(globalVariable$SWATProject){
+        output$tableParaSelection <- excelR::renderExcel(
+          excelR::excelTable(data = dataParaSelectionSWAT,
+                             columns = columnsParaSelectionSWAT,
+                             editable = TRUE,
+                             allowInsertRow = TRUE,
+                             allowInsertColumn = TRUE,
+                             allowDeleteColumn = TRUE,
+                             allowDeleteRow = TRUE,
+                             rowDrag = TRUE,
+                             columnResize = FALSE,
+                             wordWrap = TRUE))
+      } else {
+        output$tableParaSelection <- excelR::renderExcel(
+          excelR::excelTable(data = dataParaSelectionSWATPlus,
+                             columns = columnsParaSelectionSWATPlus,
+                             editable = TRUE,
+                             allowInsertRow = TRUE,
+                             allowInsertColumn = TRUE,
+                             allowDeleteColumn = TRUE,
+                             allowDeleteRow = TRUE,
+                             rowDrag = TRUE,
+                             columnResize = FALSE,
+                             wordWrap = TRUE))
+      }
+    })
+
+
+
+    #--------------------------------------------------------------------------#
+    # Show list of all parameters                                              #
+    #--------------------------------------------------------------------------#
     observeEvent(input$helpParameterSelection, {
-      print("ok14")
+print("ok1")
+      print(globalVariable$workingFolder)
+      print(globalVariable$SWATParam)
       # This first if command prevents the app crashed when no input is given
       if (is.data.frame(globalVariable$SWATParam)){
+        print("ok2")
+
         # Check if there is no input SWAT parameter file
         if (is.null(globalVariable$SWATParam$parameter)){
+          print("ok3")
           output$tableHelpParameterSelection <-
             renderDT(displayOutput$uniqueHruProperties)
         } else {
-          
+
           SWATParamName <- globalVariable$SWATParam$parameter
           nSWATParamName <- length(SWATParamName)
-          
+
           if(is.null(displayOutput$uniqueHruProperties)){
             output$tableHelpParameterSelection <- NULL
           } else {
             nRowUniqueHRU <- nrow(displayOutput$uniqueHruProperties)
             compareLength <- max(nRowUniqueHRU, nSWATParamName)
             if (nRowUniqueHRU < compareLength){
-              newRow <- data.frame(matrix(rep(NA, (compareLength - nRowUniqueHRU)*4),
-                                          ncol = 4))
+              newRow <- data.frame(
+                matrix(rep(NA, (compareLength - nRowUniqueHRU)*4),ncol = 4))
               names(newRow) <- names(displayOutput$uniqueHruProperties)
               tempUniqueHruProperties <- rbind(displayOutput$uniqueHruProperties,
                                                newRow)
-              
+
             } else {
               SWATParamName <- c(SWATParamName, rep(NA, compareLength - nSWATParamName))
             }
-            
+
             tempUniqueHruProperties <- cbind(SWATParamName,tempUniqueHruProperties)
-            
+
             output$tableHelpParameterSelection <- renderDT(tempUniqueHruProperties)
           }
-          
+
         }
-        
+
         # If this is a SWAT+ project
         if (ncol(globalVariable$SWATParam) != 7){
-          
+
           # Get SWAT+ parameter name
           temp <- paste(globalVariable$SWATParam[, 1], ".", globalVariable$SWATParam[, 2],
                         sep = "")
@@ -58,14 +96,14 @@ paramSamplingServer <- function(id) {
         # Display SWAT+ help table
         output$tableHelpParameterSelection <- NULL
       }
-      print("ok15")
+
     })
-    print("ok14-1")
-    # ****************************************************************************
-    # Help parameter selection
-    # ****************************************************************************
+
+    #--------------------------------------------------------------------------#
+    # Help parameter selection                                                 #
+    #--------------------------------------------------------------------------#
     observeEvent(input$helpParam, {
-      print("ok14-1")
+
       showModal(modalDialog(
         title = "Help: 1. Display help for parameter selection",
         "If you don't know the parameter, subbasin, land use, and slope names,
@@ -73,12 +111,12 @@ paramSamplingServer <- function(id) {
         easyClose = TRUE
       ))
     })
-    
-    # ****************************************************************************
-    # Check input 'Select SWAT parameters for calibration'
-    # ****************************************************************************
+
+    #--------------------------------------------------------------------------#
+    # Check parameter table                                                    #
+    #--------------------------------------------------------------------------#
     observeEvent(input$checkParameterTableButton, {
-      print("ok16")
+
       spsComps::shinyCatch(
         checkParameterTable <- checkSwatParameterName(globalVariable$paraSelection,
                                                       globalVariable$SWATParam,
@@ -86,21 +124,21 @@ paramSamplingServer <- function(id) {
                                                       globalVariable$SWATProject),
         blocking_level = "error"
       )
-      
+
       output$checkParameterTableTxtOuput <- renderText(checkParameterTable$checkMessage)
     })
-    
-    # ****************************************************************************
-    # Save "SWAT parameters for calibration" to global variable
-    # ****************************************************************************
+
+    #--------------------------------------------------------------------------#
+    # Save parameter table to global variables                                 #
+    #--------------------------------------------------------------------------#
     observeEvent(input$tableParaSelection, {
-      print("ok17")
+
       # Parameter selection
       paraSelection <-  excelR::excel_to_R(input$tableParaSelection)
-      
+
       # Check if no input data
       if(is.null(paraSelection)) {
-        
+
         # Check if this is SWAT or SWAT+ project
         if(globalVariable$SWATProject){
           paraSelection <- dataParaSelectionSWAT
@@ -108,19 +146,19 @@ paramSamplingServer <- function(id) {
           paraSelection <- dataParaSelectionSWATPlus
         }
       }
-      
+
       # Save parameter selection to the global variable
       globalVariable$paraSelection  <- paraSelection
       globalVariable$paraSelection[,1] <- trimws(paraSelection[,1])
-      
+
       spsComps::shinyCatch(
         if(check_null_na_empty(globalVariable$paraSelection$Min[1]) &
            check_null_na_empty(globalVariable$paraSelection$Max[1])){
-          
+
           # Min and max value
           minVal <- as.numeric(globalVariable$paraSelection$Min[1])
           maxVal <- as.numeric(globalVariable$paraSelection$Max[1])
-          
+
           # Update slider input
           updateSliderInput(session,
                             inputId = "parameter1",
@@ -133,7 +171,7 @@ paramSamplingServer <- function(id) {
         },
         blocking_level = "warning"
       )
-      
+
       # remove slider input when parameter selection was updated
       spsComps::shinyCatch(
         if(globalVariable$nCaliParam > 1){
@@ -146,21 +184,21 @@ paramSamplingServer <- function(id) {
         },
         blocking_level = "warning"
       )
-      
+
       # Update number of calibrated parameter
       globalVariable$nCaliParam <- nrow(globalVariable$paraSelection)
-      
+
       # Add slider input for other parameters
       spsComps::shinyCatch(
         if (nrow(globalVariable$paraSelection) > 1){
           lapply(1:(nrow(globalVariable$paraSelection)-1), FUN = function(i) {
             if (check_null_na_empty(globalVariable$paraSelection$Min[i+1]) &
                 check_null_na_empty(globalVariable$paraSelection$Max[i+1])){
-              
+
               # Min and max value
               minVal <- as.numeric(globalVariable$paraSelection$Min[i+1])
               maxVal <- as.numeric(globalVariable$paraSelection$Max[i+1])
-              
+
               # Update slider input
               insertUI(
                 selector = "#parameter1",
@@ -180,55 +218,41 @@ paramSamplingServer <- function(id) {
         blocking_level = "error"
       )
     })
-    
+
     # ****************************************************************************
     # Help button parameter change selection
     # ****************************************************************************
     observeEvent(input$helpParamSelection, {
-      
+
       showModal(modalDialog(
         title = "Help: Parameter Selection",
         HTML(readLines(file.path(HTMLdir,"HTML",
                                  "helpParamSelection.html"),warn=FALSE)),
         easyClose = TRUE
       ))
-      
+
     })
-    # ****************************************************************************
-    # Parameter sampling: Default setting
-    # ****************************************************************************
-    output$tableParaSampling <- excelR::renderExcel(excelR::excelTable(data = dataParaSampling,
-                                                                       columns = ColumnsParaSampling,
-                                                                       editable = TRUE,
-                                                                       allowInsertRow = FALSE,
-                                                                       allowInsertColumn = FALSE,
-                                                                       allowDeleteColumn = FALSE,
-                                                                       allowDeleteRow = FALSE,
-                                                                       rowDrag = FALSE,
-                                                                       columnResize = FALSE,
-                                                                       wordWrap = TRUE))
-    
+
     # ****************************************************************************
     # Parameter sampling: Get user input for parameter sampling
     # ****************************************************************************
     observeEvent(input$samplingApproach, {
-      
-      print("ok18")
+
       # Save sampling approach to the global variable
       globalVariable$samplingApproach <- input$samplingApproach
-      
+
       # SUFI2 approach
       if (input$samplingApproach == 'Sensi_Cali_(uniform_Latin_Hypercube_Sampling)'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
                             "100")
         outputText <- paste("Please input the number of iterations, e.g., 100")
-        
+
         # From optimization package
       } else if (input$samplingApproach == 'Cali_(from_optimization_package)'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
@@ -237,10 +261,10 @@ paramSamplingServer <- function(id) {
                                   "upper = maxCol, trace = TRUE, control = list(t0 = 10,",
                                   "nlimit = 5,t_min = 0.1, dyn_rf = FALSE,rf = 1,r = 0.7)))"))
         outputText <- helpTextCali
-        
+
         # From nloptr_package
       } else if (input$samplingApproach == 'Cali_(from_nloptr_package)'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
@@ -248,9 +272,9 @@ paramSamplingServer <- function(id) {
                                   "SWAT, lower = minCol, upper = maxCol,",
                                   "control = list(maxeval = 100))"))
         outputText <- helpTextCali
-        
+
       } else if (input$samplingApproach == 'Cali_(Dynamically_Dimensioned_Search)'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
@@ -265,17 +289,17 @@ paramSamplingServer <- function(id) {
                             "from all cores is selected", "\n",
                             "and is assigned as an inital parameter set for the",
                             "next run with all cores")
-        
+
       } else if (input$samplingApproach == 'Cali_(Generalized_Likelihood_Uncertainty_Estimation)'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
                             "100")
         outputText <- paste("Please input the number of iterations, e.g., 100", sep ="")
-        
+
       } else if (input$samplingApproach == 'Read_User_Parameter_File'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
@@ -296,24 +320,24 @@ paramSamplingServer <- function(id) {
                             "   228.03       0.05     -0.21         0.07         0.80        0.14        0.41          3.39", "\n",
                             "   96.27       -0.12      0.17         0.35         0.66        0.34        0.03          3.00", "\n",
                             sep = "")
-        
+
       } else if (input$samplingApproach == 'Sensi_(from_userDefined_package)'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
                             paste("Write_your_first_R_command_here \n",
                                   "Write_your_second_R_command_here", sep = ""))
         outputText <- helpTextSensi
-        
+
       } else if (input$samplingApproach == 'Cali_(from_userDefined_package)'){
-        
+
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
                                   "sensitivity/calibration approach"),
                             "Write_your_SINGLE_line_R_command_here")
         outputText <- helpTextCali
-        
+
       } else {
         updateTextAreaInput(session, "inputInfo",
                             paste("3. Additional infomation about the selected",
@@ -325,14 +349,12 @@ paramSamplingServer <- function(id) {
         outputText <- helpTextSensi
       }
       output$displayInputInfo <- renderText(outputText)
-      print("ok19")
     })
-    
+
     # ****************************************************************************
     # Help: Selecting sensitivity, calibration approach
     # ****************************************************************************
     observeEvent(input$helpSelectingApproach, {
-      print("ok20")
       showModal(modalDialog(
         title = "Help: 1. Selecting calibration and/or sensitivity approach",
         "Sensi', 'Cali', and 'Sensi_Cali' mean for sensitivity, calibration,
@@ -340,38 +362,37 @@ paramSamplingServer <- function(id) {
         easyClose = TRUE
       ))
     })
-    
+
     # ****************************************************************************
     # Parameter sampling: get input information
     # ****************************************************************************
     observeEvent(input$inputInfo, {
-      print("ok21")
       # Check if user need to input R command
       if (input$samplingApproach %in% c('Sensi_(from_sensitivity_package)',
                                         'Cali_(from_optimization_package)',
                                         'Cali_(from_nloptr_package)',
                                         'Sensi_(from_userDefined_package)',
                                         'Cali_(from_userDefined_package)')){
-        
+
         # Save input as text
         globalVariable$sensCaliCommand <- input$inputInfo
-        
+
         # Remove comments and split R command
         globalVariable$sensCaliCommand <- splitRemoveComment(
           globalVariable$sensCaliCommand)
       } else {
-        
+
         # If input is not R command, then just save as text
         globalVariable$sensCaliCommand <- input$inputInfo
       }
-      
+
     })
-    
+
     # ****************************************************************************
     # Help: Additional infomation about the selected sensitivity/calibration
     # ****************************************************************************
     observeEvent(input$helpAdditionalInfo, {
-      
+
       showModal(modalDialog(
         title = "Help: 3. Additional infomation for sensitivity/calibration",
         "Default input for each method is given, please modify the text if necessary
@@ -380,7 +401,7 @@ paramSamplingServer <- function(id) {
         easyClose = TRUE
       ))
     })
-    
-    
+
+
   })
 }

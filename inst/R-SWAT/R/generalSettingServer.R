@@ -6,7 +6,9 @@ generalSettingServer <- function(id) {
     #--------------------------------------------------------------------------#
     #                      Check SWAT or SWAT+ project                         #
     #--------------------------------------------------------------------------#
-    observeEvent(input$SWATorSWATplus, {
+    observe({
+
+      req(input$SWATorSWATplus)
 
       # Check SWAT or SWAT+ project
       if (input$SWATorSWATplus == "SWAT"){
@@ -114,8 +116,8 @@ generalSettingServer <- function(id) {
     # Get working folder
     # ****************************************************************************
 
-    observeEvent(input$workingFolder, {
-
+    observe({
+      req(input$workingFolder)
       # Save working directory in the global variable
       globalVariable$workingFolder <- trimws(input$workingFolder)
 
@@ -134,6 +136,7 @@ generalSettingServer <- function(id) {
         # If exists, does not display anything
         output$checkWorkingFolder <- renderText(" ")
       }
+      print(globalVariable$workingFolder)
     })
 
     # ****************************************************************************
@@ -148,14 +151,15 @@ generalSettingServer <- function(id) {
       simulation outputs, TxtInOut folders for parallel runs, etc...",
         easyClose = TRUE
       ))
-
+      globalVariable$workingFolder
     })
 
     # ****************************************************************************
     # TxtInOut folder: Display HRU info from TxtInOut folder
     # ****************************************************************************
-    observeEvent(input$TxtInOutFolder, {
+    observe({
 
+      req(input$TxtInOutFolder)
       if(!dir.exists(trimws(input$TxtInOutFolder))){
         output$checkTxtInOutFolder <- renderText("Input folder does not exist")
       } else {
@@ -251,7 +255,10 @@ generalSettingServer <- function(id) {
     # ****************************************************************************
     # Get executable SWAT file
     # ****************************************************************************
-    observeEvent(input$getSWATexe, {
+    observe({
+
+      req(input$getSWATexe)
+
       # Get full path to SWAT exe file
       shinyjs::disable("getSWATexe")
       spsComps::shinyCatch(globalVariable$SWATexeFile <- file.choose(),
@@ -284,8 +291,8 @@ generalSettingServer <- function(id) {
     # ****************************************************************************
     # Files with list of all SWAT parameters (get file) + display content of file
     # ****************************************************************************
-    observeEvent(input$getSWATParamFile, {
-
+    observe({
+ req(input$getSWATParamFile)
       # Get full path to SWAT exe file
       shinyjs::disable("getSWATParamFile")
       spsComps::shinyCatch(globalVariable$SWATParamFile <- file.choose(),
@@ -307,7 +314,8 @@ generalSettingServer <- function(id) {
           )
         },
         blocking_level = "error")
-
+print(globalVariable$SWATParam)
+print(globalVariable$workingFolder)
     })
     # ****************************************************************************
     # Help button select file SWAT (or SWAT+) parameter file

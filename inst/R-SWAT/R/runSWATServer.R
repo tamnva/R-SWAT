@@ -6,35 +6,38 @@ runSWATServer <- function(id) {
     # ****************************************************************************
     # Output extraction: Default setting
     # ****************************************************************************
-    if(!globalVariable$loadProject){
-      print("ok22")
-      if (globalVariable$SWATProject){
-        output$tableOutputExtraction <-
-          excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWAT,
-                                                 columns = columnsOutputExtractionSWAT,
-                                                 editable = TRUE,
-                                                 allowInsertRow = TRUE,
-                                                 allowInsertColumn = FALSE,
-                                                 allowDeleteColumn = FALSE,
-                                                 allowDeleteRow = TRUE,
-                                                 rowDrag = FALSE,
-                                                 columnResize = FALSE,
-                                                 wordWrap = TRUE))
-      } else {
+    observe({
+      if(!globalVariable$loadProject){
+        print("ok22")
+        if (globalVariable$SWATProject){
+          output$tableOutputExtraction <-
+            excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWAT,
+                                                   columns = columnsOutputExtractionSWAT,
+                                                   editable = TRUE,
+                                                   allowInsertRow = TRUE,
+                                                   allowInsertColumn = FALSE,
+                                                   allowDeleteColumn = FALSE,
+                                                   allowDeleteRow = TRUE,
+                                                   rowDrag = FALSE,
+                                                   columnResize = FALSE,
+                                                   wordWrap = TRUE))
+        } else {
 
-        output$tableOutputExtraction <-
-          excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWATPlus,
-                                                 columns = columnsOutputExtractionSWATPlus,
-                                                 editable = TRUE,
-                                                 allowInsertRow = TRUE,
-                                                 allowInsertColumn = FALSE,
-                                                 allowDeleteColumn = FALSE,
-                                                 allowDeleteRow = TRUE,
-                                                 rowDrag = FALSE,
-                                                 columnResize = FALSE,
-                                                 wordWrap = TRUE))
+          output$tableOutputExtraction <-
+            excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWATPlus,
+                                                   columns = columnsOutputExtractionSWATPlus,
+                                                   editable = TRUE,
+                                                   allowInsertRow = TRUE,
+                                                   allowInsertColumn = FALSE,
+                                                   allowDeleteColumn = FALSE,
+                                                   allowDeleteRow = TRUE,
+                                                   rowDrag = FALSE,
+                                                   columnResize = FALSE,
+                                                   wordWrap = TRUE))
+        }
       }
-    }
+    })
+
 
     # ****************************************************************************
     # Get user output extraction

@@ -6,69 +6,72 @@ swatEduServer <- function(id) {
     # ****************************************************************************
     # Default list of parameters for manual calibration
     # ****************************************************************************
-    spsComps::shinyCatch(
-      if(check_null_na_empty(globalVariable$paraSelection$Min[1]) &
-         check_null_na_empty(globalVariable$paraSelection$Max[1])){
+    observe({
+      spsComps::shinyCatch(
+        if(check_null_na_empty(globalVariable$paraSelection$Min[1]) &
+           check_null_na_empty(globalVariable$paraSelection$Max[1])){
 
-        # Min and max value
-        minVal <- as.numeric(globalVariable$paraSelection$Min[1])
-        maxVal <- as.numeric(globalVariable$paraSelection$Max[1])
+          # Min and max value
+          minVal <- as.numeric(globalVariable$paraSelection$Min[1])
+          maxVal <- as.numeric(globalVariable$paraSelection$Max[1])
 
-        # Update slider input
-        updateSliderInput(session,
-                          inputId = "parameter1",
-                          label = globalVariable$paraSelection$Parameter[1],
-                          min = minVal,
-                          max = maxVal,
-                          value = minVal,
-                          step = (maxVal - minVal)/50
-        )
-      },
-      blocking_level = "warning"
-    )
+          # Update slider input
+          updateSliderInput(session,
+                            inputId = "parameter1",
+                            label = globalVariable$paraSelection$Parameter[1],
+                            min = minVal,
+                            max = maxVal,
+                            value = minVal,
+                            step = (maxVal - minVal)/50
+          )
+        },
+        blocking_level = "warning"
+      )
 
-    # remove slider input when parameter selection was updated
-    spsComps::shinyCatch(
-      if(globalVariable$nCaliParam > 1){
-        for (i in 2:globalVariable$nCaliParam){
-          removeUI(selector = paste0("div:has(> #parameter", i, ")"),
-                   multiple = TRUE,
-                   immediate = TRUE,
-                   session)
-        }
-      },
-      blocking_level = "warning"
-    )
-
-    # Add slider input for other parameters
-    spsComps::shinyCatch(
-      if (nrow(globalVariable$paraSelection) > 1){
-        lapply(1:(nrow(globalVariable$paraSelection)-1), FUN = function(i) {
-          if (check_null_na_empty(globalVariable$paraSelection$Min[i+1]) &
-              check_null_na_empty(globalVariable$paraSelection$Max[i+1])){
-
-            # Min and max value
-            minVal <- as.numeric(globalVariable$paraSelection$Min[i+1])
-            maxVal <- as.numeric(globalVariable$paraSelection$Max[i+1])
-
-            # Insert Slider input for other parameters
-            insertUI(
-              selector = "#parameter1",
-              where = "afterEnd",
-              ui = sliderInput(
-                inputId = paste0("parameter", i+1),
-                label = globalVariable$paraSelection$Parameter[i+1],
-                min = minVal,
-                max = maxVal,
-                value = minVal,
-                step = (maxVal - minVal)/50
-              )
-            )
+      # remove slider input when parameter selection was updated
+      spsComps::shinyCatch(
+        if(globalVariable$nCaliParam > 1){
+          for (i in 2:globalVariable$nCaliParam){
+            removeUI(selector = paste0("div:has(> #parameter", i, ")"),
+                     multiple = TRUE,
+                     immediate = TRUE,
+                     session)
           }
-        })
-      },
-      blocking_level = "error"
-    )
+        },
+        blocking_level = "warning"
+      )
+
+      # Add slider input for other parameters
+      spsComps::shinyCatch(
+        if (nrow(globalVariable$paraSelection) > 1){
+          lapply(1:(nrow(globalVariable$paraSelection)-1), FUN = function(i) {
+            if (check_null_na_empty(globalVariable$paraSelection$Min[i+1]) &
+                check_null_na_empty(globalVariable$paraSelection$Max[i+1])){
+
+              # Min and max value
+              minVal <- as.numeric(globalVariable$paraSelection$Min[i+1])
+              maxVal <- as.numeric(globalVariable$paraSelection$Max[i+1])
+
+              # Insert Slider input for other parameters
+              insertUI(
+                selector = "#parameter1",
+                where = "afterEnd",
+                ui = sliderInput(
+                  inputId = paste0("parameter", i+1),
+                  label = globalVariable$paraSelection$Parameter[i+1],
+                  min = minVal,
+                  max = maxVal,
+                  value = minVal,
+                  step = (maxVal - minVal)/50
+                )
+              )
+            }
+          })
+        },
+        blocking_level = "error"
+      )
+    })
+
 
 
     # ****************************************************************************
