@@ -129,6 +129,7 @@ generalSettingServer <- function(id) {
       )
       # Check if working folder exists
       if(!dir.exists(globalVariable$workingFolder)){
+
         # Print out message if working dir does not exist
         output$checkWorkingFolder <- renderText("Input folder does not exist")
       } else {
@@ -136,7 +137,7 @@ generalSettingServer <- function(id) {
         # If exists, does not display anything
         output$checkWorkingFolder <- renderText(" ")
       }
-      print(globalVariable$workingFolder)
+
     })
 
     # ****************************************************************************
@@ -292,9 +293,11 @@ generalSettingServer <- function(id) {
     # Files with list of all SWAT parameters (get file) + display content of file
     # ****************************************************************************
     observe({
- req(input$getSWATParamFile)
+      req(input$getSWATParamFile)
+
       # Get full path to SWAT exe file
       shinyjs::disable("getSWATParamFile")
+
       spsComps::shinyCatch(globalVariable$SWATParamFile <- file.choose(),
                            blocking_level = "none")
       shinyjs::enable("getSWATParamFile")
@@ -314,8 +317,7 @@ generalSettingServer <- function(id) {
           )
         },
         blocking_level = "error")
-print(globalVariable$SWATParam)
-print(globalVariable$workingFolder)
+
     })
     # ****************************************************************************
     # Help button select file SWAT (or SWAT+) parameter file

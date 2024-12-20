@@ -2,7 +2,7 @@
 #                  Default parameter change values for SWAT                    #
 # -----------------------------------------------------------------------------#
 globalVariable <- reactiveValues()
-displayOutput <- list()
+displayOutput <- reactiveValues()
 displayOutput$plotHru <- FALSE
 displayOutput$plotSub <- FALSE
 globalVariable$checkSimComplete <- FALSE
