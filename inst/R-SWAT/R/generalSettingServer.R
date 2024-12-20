@@ -1,13 +1,11 @@
 
 generalSettingServer <- function(id) {
+
   moduleServer(id, function(input, output, session) {
 
-    #-----------------------------------------------------------------------------
-    # Tab 1. General Setting
-    #-----------------------------------------------------------------------------
-    # ****************************************************************************
-    # Check SWAT or SWAT+ project
-    # ****************************************************************************
+    #--------------------------------------------------------------------------#
+    #                      Check SWAT or SWAT+ project                         #
+    #--------------------------------------------------------------------------#
     observeEvent(input$SWATorSWATplus, {
 
       # Check SWAT or SWAT+ project
@@ -18,95 +16,84 @@ generalSettingServer <- function(id) {
         globalVariable$SWATProject <- FALSE
         globalVariable$SWATPlusProject <- TRUE
       }
-      print("okcheck")
-      # Initially there is no warning message
-      output$checkTxtInOutFolder <- renderText("546546455")
-      print("okcheck2")
 
-      # Check if the TxtInOut matches the SWAT project
-      if (globalVariable$SWATPlusProject){
-        if(globalVariable$TxtInOutSWAT){
-          output$checkTxtInOutFolder <- renderText(
-            "ERROR: This should be TxtInOut of SWAT+"
-          )
-        }
-      } else {
-        if(globalVariable$TxtInOutSWATPlus){
-          output$checkTxtInOutFolder <- renderText(
-            "ERROR: This should be TxtInOut of SWAT"
-          )
-        }
-      }
+      out_check <- check_txtinout_message(input$TxtInOutFolder,
+                                          globalVariable$SWATPlusProject)
+      globalVariable$TxtInOutSWAT <- out_check$txtinout_swat
+      globalVariable$TxtInOutSWATPlus <- out_check$txtinout_swat_plus
+      output$checkTxtInOutFolder <- renderText(out_check$out_message)
 
       # ****************************************************************************
       # Select SWAT parameters for calibration and/or sensitivity: Default setting
       # ****************************************************************************
-      print("ok1")
+
       if (!globalVariable$loadProject){
 
         # Update template for parameter and output extraction according to the SWAT project
         if (globalVariable$SWATProject){
-          print("ok2")
+
           # Example of parameter selection for SWAT project
           output$tableParaSelection <-
-            excelR::renderExcel(excelR::excelTable(data = dataParaSelectionSWAT,
-                                                   columns = columnsParaSelectionSWAT,
-                                                   editable = TRUE,
-                                                   allowInsertRow = TRUE,
-                                                   allowInsertColumn = TRUE,
-                                                   allowDeleteColumn = TRUE,
-                                                   allowDeleteRow = TRUE,
-                                                   rowDrag = TRUE,
-                                                   columnResize = FALSE,
-                                                   wordWrap = TRUE))
+            excelR::renderExcel(excelR::excelTable(
+              data = dataParaSelectionSWAT,
+              columns = columnsParaSelectionSWAT,
+              editable = TRUE,
+              allowInsertRow = TRUE,
+              allowInsertColumn = TRUE,
+              allowDeleteColumn = TRUE,
+              allowDeleteRow = TRUE,
+              rowDrag = TRUE,
+              columnResize = FALSE,
+              wordWrap = TRUE))
 
           # Example of output extraction for SWAT project
           output$tableOutputExtraction <-
-            excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWAT,
-                                                   columns = columnsOutputExtractionSWAT,
-                                                   editable = TRUE,
-                                                   allowInsertRow = TRUE,
-                                                   allowInsertColumn = FALSE,
-                                                   allowDeleteColumn = FALSE,
-                                                   allowDeleteRow = TRUE,
-                                                   rowDrag = FALSE,
-                                                   columnResize = FALSE,
-                                                   wordWrap = TRUE))
+            excelR::renderExcel(excelR::excelTable(
+              data = dataOutputExtractionSWAT,
+              columns = columnsOutputExtractionSWAT,
+              editable = TRUE,
+              allowInsertRow = TRUE,
+              allowInsertColumn = FALSE,
+              allowDeleteColumn = FALSE,
+              allowDeleteRow = TRUE,
+              rowDrag = FALSE,
+              columnResize = FALSE,
+              wordWrap = TRUE))
 
           # If this is SWAT+ project
         } else {
 
           # Example of parameter selection for SWAT+ project
           output$tableParaSelection <-
-            excelR::renderExcel(excelR::excelTable(data = dataParaSelectionSWATPlus,
-                                                   columns = columnsParaSelectionSWATPlus,
-                                                   editable = TRUE,
-                                                   allowInsertRow = TRUE,
-                                                   allowInsertColumn = TRUE,
-                                                   allowDeleteColumn = TRUE,
-                                                   allowDeleteRow = TRUE,
-                                                   rowDrag = TRUE,
-                                                   columnResize = FALSE,
-                                                   wordWrap = TRUE))
+            excelR::renderExcel(
+              excelR::excelTable(data = dataParaSelectionSWATPlus,
+                                 columns = columnsParaSelectionSWATPlus,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = TRUE,
+                                 allowDeleteColumn = TRUE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = TRUE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE))
 
           # Example of output extraction for SWAT+ project
           output$tableOutputExtraction <-
-            excelR::renderExcel(excelR::excelTable(data = dataOutputExtractionSWATPlus,
-                                                   columns = columnsOutputExtractionSWATPlus,
-                                                   editable = TRUE,
-                                                   allowInsertRow = TRUE,
-                                                   allowInsertColumn = FALSE,
-                                                   allowDeleteColumn = FALSE,
-                                                   allowDeleteRow = TRUE,
-                                                   rowDrag = FALSE,
-                                                   columnResize = FALSE,
-                                                   wordWrap = TRUE))
-
+            excelR::renderExcel(
+              excelR::excelTable(data = dataOutputExtractionSWATPlus,
+                                 columns = columnsOutputExtractionSWATPlus,
+                                 editable = TRUE,
+                                 allowInsertRow = TRUE,
+                                 allowInsertColumn = FALSE,
+                                 allowDeleteColumn = FALSE,
+                                 allowDeleteRow = TRUE,
+                                 rowDrag = FALSE,
+                                 columnResize = FALSE,
+                                 wordWrap = TRUE)
+            )
           globalVariable$paraSelection <- dataParaSelectionSWATPlus
         }
-        print("ok3")
       }
-      print("ok4")
     })
 
     # ****************************************************************************
@@ -128,9 +115,6 @@ generalSettingServer <- function(id) {
     # ****************************************************************************
 
     observeEvent(input$workingFolder, {
-      print("ok5")
-      tam$a <- tam$a + 2
-      print(tam$a)
 
       # Save working directory in the global variable
       globalVariable$workingFolder <- trimws(input$workingFolder)
@@ -143,7 +127,6 @@ generalSettingServer <- function(id) {
       )
       # Check if working folder exists
       if(!dir.exists(globalVariable$workingFolder)){
-        print("ok6")
         # Print out message if working dir does not exist
         output$checkWorkingFolder <- renderText("Input folder does not exist")
       } else {
@@ -151,14 +134,12 @@ generalSettingServer <- function(id) {
         # If exists, does not display anything
         output$checkWorkingFolder <- renderText(" ")
       }
-      print("ok6.0")
     })
 
     # ****************************************************************************
     # Help button select working folder
     # ****************************************************************************
     observeEvent(input$helpworkingFolder, {
-      print("ok7")
       showModal(modalDialog(
         title = "Help: 2. Working folder",
         "All files created by R-SWAT will be saved in this folder, for example,
@@ -174,9 +155,6 @@ generalSettingServer <- function(id) {
     # TxtInOut folder: Display HRU info from TxtInOut folder
     # ****************************************************************************
     observeEvent(input$TxtInOutFolder, {
-      print("ok8")
-      # Check if TxtInOut folder exists
-      print("ok8a")
 
       if(!dir.exists(trimws(input$TxtInOutFolder))){
         output$checkTxtInOutFolder <- renderText("Input folder does not exist")
@@ -184,29 +162,16 @@ generalSettingServer <- function(id) {
         output$checkTxtInOutFolder <- renderText(" ")
       }
 
-      print("ok8b")
+
       # Check if .hru files exist in this folder
       if (checkDirFileExist(trimws(input$TxtInOutFolder), "", ".cio")){
 
-        # Is this TxtInOut of SWAT or SWAT plus
-        globalVariable$TxtInOutSWAT <- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWAT
-        globalVariable$TxtInOutSWATPlus <- checkSWATorSWATplus(trimws(input$TxtInOutFolder))$SWATPlus
+        out_check <- check_txtinout_message(input$TxtInOutFolder,
+                                            globalVariable$SWATPlusProject)
+        globalVariable$TxtInOutSWAT <- out_check$txtinout_swat
+        globalVariable$TxtInOutSWATPlus <- out_check$txtinout_swat_plus
+        output$checkTxtInOutFolder <- renderText(out_check$out_message)
 
-        # Check if the TxtInOut matches the SWAT project
-        if (globalVariable$SWATPlusProject){
-          if(globalVariable$TxtInOutSWAT){
-            output$checkTxtInOutFolder <- renderText(
-              "ERROR: This should be TxtInOut of SWAT+"
-            )
-          }
-        } else {
-          if(globalVariable$TxtInOutSWATPlus){
-            output$checkTxtInOutFolder <- renderText(
-              "ERROR: This should be TxtInOut of SWAT"
-            )
-          }
-        }
-        print("ok8c")
         # Save link to TxtInout Folder to the global variable
         globalVariable$TxtInOutFolder <- trimws(input$TxtInOutFolder)
 
@@ -241,7 +206,8 @@ generalSettingServer <- function(id) {
           )
 
           # If this is a SWAT+ project
-        } else if (globalVariable$SWATPlusProject & globalVariable$TxtInOutSWATPlus){
+        } else if (globalVariable$SWATPlusProject &
+                   globalVariable$TxtInOutSWATPlus){
           displayOutput$uniqueHruProperties <- NULL
           globalVariable$HRUinfo <- read.table(
             file = paste(globalVariable$TxtInOutFolder,
@@ -268,14 +234,12 @@ generalSettingServer <- function(id) {
         output$tableHRUinfo <- NULL
         displayOutput$uniqueHruProperties <- NULL
       }
-      print("ok9aaaaa")
     })
 
     # ****************************************************************************
     # Help button select TxtInOut folder
     # ****************************************************************************
     observeEvent(input$helpTxtInOutFolder, {
-      print("ok10")
       showModal(modalDialog(
         title = "Help: 3. TxtInOut folder",
         "Path to the TxtInOut directory which contains all original SWAT (or SWAT+)
@@ -288,7 +252,6 @@ generalSettingServer <- function(id) {
     # Get executable SWAT file
     # ****************************************************************************
     observeEvent(input$getSWATexe, {
-      print("ok11")
       # Get full path to SWAT exe file
       shinyjs::disable("getSWATexe")
       spsComps::shinyCatch(globalVariable$SWATexeFile <- file.choose(),
@@ -299,14 +262,13 @@ generalSettingServer <- function(id) {
         if (grepl(".exe", globalVariable$SWATexeFile, fixed = TRUE)){
           output$printSWATexe <- renderText(globalVariable$SWATexeFile)
         } else {
-          output$printSWATexe <- renderText("Error: The selected file must have '.exe' extention")
+          output$printSWATexe <- renderText(
+            "Error: The selected file must have '.exe' extention")
         },
         blocking_level = "error")
 
 
     })
-
-    print("ok13-1")
     # ****************************************************************************
     # Help button select executable SWAT
     # ****************************************************************************
@@ -319,12 +281,10 @@ generalSettingServer <- function(id) {
         easyClose = TRUE
       ))
     })
-    print("ok13-1")
     # ****************************************************************************
     # Files with list of all SWAT parameters (get file) + display content of file
     # ****************************************************************************
     observeEvent(input$getSWATParamFile, {
-      print("ok12")
 
       # Get full path to SWAT exe file
       shinyjs::disable("getSWATParamFile")
@@ -349,12 +309,10 @@ generalSettingServer <- function(id) {
         blocking_level = "error")
 
     })
-    print("ok13-1")
     # ****************************************************************************
     # Help button select file SWAT (or SWAT+) parameter file
     # ****************************************************************************
     observeEvent(input$helpSWATparamFile, {
-      print("ok13")
       showModal(modalDialog(
         title = "Help: 5. File with list of SWAT or SWAT+ parameters",
         HTML(readLines(file.path(HTMLdir,"HTML",

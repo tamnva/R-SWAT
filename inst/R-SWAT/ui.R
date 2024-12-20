@@ -7,11 +7,10 @@ ui <- shinydashboard::dashboardPage(
   # ----------------------------------------------------------------------Header
   shinydashboard::dashboardHeader(
     # Name of the app
-    title = "RSWAT v4.01",
+    title = "RSWAT v5.0",
 
     # Add two buttons in the header for saving and loading project
     tags$li(class = "dropdown",
-
             # Save project button
             actionButton(inputId = "saveProject",
                          label = "Save project",
@@ -93,14 +92,12 @@ ui <- shinydashboard::dashboardPage(
   shinydashboard::dashboardBody(
 
     # Change menu background color when selected
-    tags$head(tags$style(HTML('/* active selected tab in the shinydashboard::sidebarMenu */
-                            .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
-                            background-color: #E0E0E0;
-                            color: #666666;
-                            }
-                            '))),
+    tags$head(tags$style(HTML(
+      '/* active selected tab in the shinydashboard::sidebarMenu */
+      .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
+      background-color: #E0E0E0;color: #666666}'))),
 
-    # Link tab names with their codes
+    # Link tab names with their UI
     shinydashboard::tabItems(
 
       shinydashboard::tabItem(tabName = "intro",

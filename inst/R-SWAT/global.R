@@ -1,6 +1,3 @@
-tam <- reactiveValues()
-tam$a <- 10
-
 # -----------------------------------------------------------------------------#
 #                  Default parameter change values for SWAT                    #
 # -----------------------------------------------------------------------------#
@@ -171,7 +168,7 @@ displayOutput$plotHru <- FALSE
 displayOutput$plotSub <- FALSE
 globalVariable$checkSimComplete <- FALSE
 globalVariable$loadProject <- FALSE
-globalVariable$TxtInOutSWAT <- FALSE
+globalVariable$TxtInOutSWAT <- TRUE
 globalVariable$TxtInOutSWATPlus <- FALSE
 globalVariable$SWATProject <- TRUE
 globalVariable$SWATPlusProject <- FALSE

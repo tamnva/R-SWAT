@@ -186,5 +186,41 @@ isNewSimBetter <- function(newObj, oldObj, MinOrMax){
   return(output)
 }
 
+#-------------------------------------------------------------------------------
+# Message check txtinout folder
+#-------------------------------------------------------------------------------
+
+check_txtinout_message <- function(txtinout_folder, swat_plus_project){
+
+
+  out_check <- list()
+
+  # Initial values
+  out_check$out_message <- " "
+  out_check$txtinout_swat <- TRUE
+  out_check$txtinout_swat_plus <- TRUE
+
+  if (checkDirFileExist(trimws(txtinout_folder), "", ".cio")){
+
+    # Is this TxtInOut of SWAT or SWAT plus
+    out_check$txtinout_swat <- checkSWATorSWATplus(trimws(txtinout_folder))$SWAT
+    out_check$txtinout_swat_plus <- checkSWATorSWATplus(
+      trimws(txtinout_folder))$SWATPlus
+
+    # Check if the TxtInOut matches the SWAT project
+    if (swat_plus_project){
+      if(out_check$txtinout_swat){
+        out_check$out_message <- "ERROR: This should be TxtInOut of SWAT+"
+      }
+    } else {
+      if(out_check$txtinout_swat_plus){
+        out_check$out_message <- "ERROR: This should be TxtInOut of SWAT"
+      }
+    }
+  }
+
+  return(out_check)
+}
+
 
 
