@@ -87,5 +87,3 @@ You need to run the aforementioned R script (in section Quick Start) to call the
 ## Citing RSWAT
 
 **Nguyen, T. V.**, Dietrich, J., Dang, D. T., Tran, D. A., Doan, B. V., Sarrazin, F. J., Abbaspour, K., Srinivasan, R. (2022). An interactive graphical interface tool for parameter calibration, sensitivity analysis, uncertainty analysis, and visualization for the Soil and Water Assessment Tool. Environmental Modelling & Software, 156, 105497. https://doi.org/10.1016/j.envsoft.2022.105497.
-
-**Nguyen, T. V.** (2024). RSWAT: An R package for the Soil and Water Assessment Tool models. Submitted to The Journal of Open Source Software.
