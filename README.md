@@ -12,7 +12,7 @@
 
 RSWAT is an R package hosted on GitHub (to be submitted to CRAN soon). First, you need to install [R](https://cloud.r-project.org/), and [RStudio](https://posit.co/download/rstudio-desktop/) (installing RStudio is recommended, not a MUST) then run the following commands **in RStudio**. If you run in R, package vignettes cannot be built, however, this DOES NOT affect the functionalities of RSWAT.
 
-To run RSWAT, the SWAT/SWAT+ model is required.  The SWAT/SWAT+ model (executable file) could be obtained from the official [SWAT website](https://swat.tamu.edu/software/).
+To run RSWAT, the SWAT/SWAT+ model is required.  The SWAT/SWAT+ model (executable file) could be obtained from the official [SWAT website](https://swat.tamu.edu/software/) or [here](https://drive.google.com/drive/folders/1ptNRYWSUA420Bxhfi-_mHiynVFhXJMGW).
 
 ```R
 # First install remotes package if you have not installed
