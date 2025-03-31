@@ -1,8 +1,8 @@
 ## RSWAT <a href="https://github.com/tamnva/R-SWAT/tree/master/inst/R-SWAT/figures/RSWAT_logo.svg"><img src="inst/R-SWAT/figures/RSWAT_logo.svg" align="right" height="50" /></a>
 
-[![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases) [![R-CMD-check](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml) [![status](https://joss.theoj.org/papers/89a04bc6f9a2a2b08cbac33fcd91c0c6/status.svg)](https://joss.theoj.org/papers/89a04bc6f9a2a2b08cbac33fcd91c0c6)
+[![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases) [![R-CMD-check](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml) 
 
-- This is an R package with a graphical user interface (GUI) for parallel parameter calibration, sensitivity, and uncertainty analyses with the Soil and Water Assessment Tool models (e.g., [SWAT](https://swat.tamu.edu/), [SWAT+](https://swat.tamu.edu/software/plus/), [SWAT-Carbon](https://sites.google.com/view/swat-carbon), and its other modified versions). 
+- This is an R package (called RSWAT or R-SWAT) with a graphical user interface (GUI) for parallel parameter calibration, sensitivity, and uncertainty analyses with the Soil and Water Assessment Tool models (e.g., [SWAT](https://swat.tamu.edu/), [SWAT+](https://swat.tamu.edu/software/plus/), [SWAT-Carbon](https://sites.google.com/view/swat-carbon), and its other modified versions). 
 - RSWAT can also be used without the GUI, please see the RSWAT vignettes.
 - If you would like to contribute to the code, have any suggestions, or want to report errors, please contact me via the [Google group](https://groups.google.com/g/R-SWAT) or GitHub. Tutorial videos can be found on the [RSWAT YouTube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - RSWAT will be constantly developed to serve the SWAT community, together we can make this package much better.
@@ -56,7 +56,7 @@ Data extracted from the above command are stored in the temporal directory (or y
 
 # Quick demo (streamflow calibration with SWAT)
 
-You need to run the aforementioned R script (in section Quick Start) to call the GUI of RSWAT. In the latest version, the GUI could be slightly difference with the one showing below
+You need to run the aforementioned R script (in section Quick Start) to call the GUI of RSWAT. In the latest version, the GUI could be slightly differenT with the one showing below
 
 <p align="center">
   <img src="inst/R-SWAT/figures/1.PNG" width=100% title="hover text">
