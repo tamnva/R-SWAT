@@ -6,7 +6,7 @@
 - RSWAT can also be used without the GUI, please see the RSWAT vignettes.
 - If you would like to contribute to the code, have any suggestions, or want to report errors, please contact me via the [Google group](https://groups.google.com/g/R-SWAT) or GitHub. Tutorial videos can be found on the [RSWAT YouTube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - RSWAT will be constantly developed to serve the SWAT community, together we can make this package much better.
-- **IMPORTANT: The older version of this package, called the R-SWAT app, [can be found here](https://github.com/tamnva/R-SWAT/tree/4d49ac6a2e153a34081d7d7b24958af0127f4ed3).**
+- **IMPORTANT: The older version of this package[can be found here](https://github.com/tamnva/R-SWAT/tree/4d49ac6a2e153a34081d7d7b24958af0127f4ed3).**
 
 ## Quick Start!
 
@@ -59,29 +59,8 @@ Data extracted from the above command are stored in the temporal directory (or y
 You need to run the aforementioned R script (in section Quick Start) to call the GUI of RSWAT. In the latest version, the GUI could be slightly differenT with the one showing below
 
 <p align="center">
-  <img src="inst/R-SWAT/figures/1.PNG" width=100% title="hover text">
+  <img src="inst/R-SWAT/figures/rswat.gif" width=100% title="hover text">
 </p>
-
-<p align="center">
-  <img src="inst/R-SWAT/figures/2.PNG" width=100% title="hover text">
-</p>
-
-<p align="center">
-  <img src="inst/R-SWAT/figures/3.PNG" width=100% title="hover text">
-</p>
-
-<p align="center">
-  <img src="inst/R-SWAT/figures/41.PNG" width=100% title="hover text">
-</p>
-
-<p align="center">
-  <img src="inst/R-SWAT/figures/42.PNG" width=100% title="hover text">
-</p>
-
-<p align="center">
-  <img src="inst/R-SWAT/figures/43.PNG" width=100% title="hover text">
-</p>
-
 
 
 ## Citing RSWAT
