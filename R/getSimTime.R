@@ -34,28 +34,30 @@ getSimTime <- function(TxtInOut){
 
   # Check whether this is TxtInOut of SWAT or SWAT+
   if (substr(fileCio[8], 21,44) == "| NBYR : Number of years"){
-    startSim <- as.Date(paste(substr(fileCio[9],13,17), "0101", sep=""), "%Y%m%d")
-    startSim <- startSim + as.numeric(substr(fileCio[10],13,17)) - 1
+    startSim <- as.Date(paste(
+      gsub(" ", "", substr(fileCio[9],1,17)), "0101", sep=""), "%Y%m%d")
+    startSim <- startSim + as.numeric(
+      gsub(" ", "", substr(fileCio[10],1,17))) - 1
 
     endSim <- as.Date(paste(
       toString(
-        as.numeric(substr(fileCio[9],13,17)) +
-          as.numeric(substr(fileCio[8],13,17)) - 1
+        as.numeric(gsub(" ", "", substr(fileCio[9],1,17))) +
+          as.numeric(gsub(" ", "", substr(fileCio[8],1,17))) - 1
       ),
       "0101",
       sep=""
     ),
     "%Y%m%d")
 
-    endSim <- endSim + as.numeric(substr(fileCio[11],13,17)) - 1
-    nyearSkip  <- as.numeric(substr(fileCio[60],13,16))
+    endSim <- endSim + as.numeric(gsub(" ", "", substr(fileCio[11],1,17))) - 1
+    nyearSkip  <- as.numeric(gsub(" ", "", substr(fileCio[60],1,17)))
 
     if(nyearSkip == 0){
       startEval <- startSim
     } else {
       startEval <- as.Date(paste(
         toString(
-          as.numeric(substr(fileCio[9],13,17)) + nyearSkip
+          as.numeric(gsub(" ", "", substr(fileCio[9],1,17))) + nyearSkip
         ),
         "0101",
         sep=""
@@ -67,7 +69,7 @@ getSimTime <- function(TxtInOut){
     info$startSim <- startSim
     info$startEval <- startEval
     info$endSim <- endSim
-    info$timeStepCode <- as.numeric(substr(fileCio[59],13,16))
+    info$timeStepCode <- as.numeric(gsub(" ", "", substr(fileCio[59],1,17)))
 
     # SWAT+ project, simulation time in different file
   } else {
