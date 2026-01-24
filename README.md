@@ -2,11 +2,12 @@
 
 [![DOI](https://zenodo.org/badge/395115735.svg)](https://zenodo.org/badge/latestdoi/395115735) [![Release](https://img.shields.io/github/release/tamnva/R-SWAT.svg?style=flat-square)](https://github.com/tamnva/R-SWAT/releases) [![R-CMD-check](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tamnva/R-SWAT/actions/workflows/R-CMD-check.yaml) 
 
+- Since RSWAT is from now on only developed in my free time, your sponsorship [click here](https://github.com/sponsors/tamnva) or sponsor button above (with a heart shape) helps support its development and grants you priority access to support.
 - This is an R package (called RSWAT or R-SWAT) with a graphical user interface (GUI) for parallel parameter calibration, sensitivity, and uncertainty analyses with the Soil and Water Assessment Tool models (e.g., [SWAT](https://swat.tamu.edu/), [SWAT+](https://swat.tamu.edu/software/plus/), [SWAT-Carbon](https://sites.google.com/view/swat-carbon), and its other modified versions). 
 - RSWAT can also be used without the GUI, please see the RSWAT vignettes.
 - If you would like to contribute to the code, have any suggestions, or want to report errors, please contact me via the [Google group](https://groups.google.com/g/R-SWAT) or GitHub. Tutorial videos can be found on the [RSWAT YouTube channel](https://www.youtube.com/channel/UCRK1rKFiNgYbG7qKWxAPtEQ)
 - RSWAT will be constantly developed to serve the SWAT community, together we can make this package much better.
-- **IMPORTANT: The older version of this package[can be found here](https://github.com/tamnva/R-SWAT/tree/4d49ac6a2e153a34081d7d7b24958af0127f4ed3).**
+- **IMPORTANT: The older version of this package [can be found here](https://github.com/tamnva/R-SWAT/tree/4d49ac6a2e153a34081d7d7b24958af0127f4ed3).**
 
 ## Quick Start!
 
